@@ -1,14 +1,33 @@
-<? include connexion.inc.php ?>
+<?php
+require_once __DIR__ . '/connexion.inc.php';
+require_once __DIR__ . '/header.inc.php';
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
+session_start();
+if (!isset($_SESSION["errCode"]) || $_SESSION['errCode']!=0)
+{
+  header("location:connexion.php");
+}
+
+
+$result = $conn->query("SELECT * FROM user");
+
+// Process the result set
+if ($result->num_rows > 0) {
+  // Output data of each row
+  while($row = $result->fetch_assoc()) {
+    echo "id: " . $row["id_user"] . "<br>";
+  }
+} else {
+  echo "0 results";
+}
+
+$conn->close();
+?>
+
 <body>
-    <p>aaaa</p>
-    
+
 </body>
-</html>
+
+<?php
+require_once __DIR__ . '/footer.inc.php';
+?>
