@@ -3,8 +3,7 @@ require_once __DIR__ . '/connexion.inc.php';
 require_once __DIR__ . '/header.inc.php';
 
 
-$result = $conn->query("SELECT * FROM user");
-$username
+$result = $conn->query("SELECT username FROM user");
 
 if(isset($_GET['username'])) {
   $result = $_GET['username'];
@@ -15,7 +14,7 @@ if(isset($_GET['username'])) {
 $conn->close();
 ?>
 
-<form action="connexion.php" method="GET">
-    <input type="text" name="username" placeholder="username">
+<form action="index.php" method="GET">
+    <input type="text" name="username" placeholder="username"><br>
     <input type="submit" name="button" id="">
 </form>
