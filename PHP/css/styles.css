@@ -1,3 +1,20 @@
-div.mainWindow {
-    
+body {
+    display: flex;
+}
+
+nav {
+    border: 1px solid black;
+    margin-right: 20px;
+    width: 30%;
+    display: flex;
+}
+
+#closeNav {
+    justify-content: flex-end;
+}
+
+#mainWindow {
+   border: 1px solid black; 
+   padding: 5%;
+   width: 70%;
 }
