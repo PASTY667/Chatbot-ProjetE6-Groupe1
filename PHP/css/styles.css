@@ -12,8 +12,9 @@ body {
 }
 
 #app {
-    background-color: yellow;
+    background-color: orange;
     padding: 10%;
+    text: 
     text-decoration: none;
     color: black;
 }
@@ -21,5 +22,7 @@ body {
 #row {
     display: flex;
     justify-content: space-evenly;
+    margin-top: 5%;
+    margin-bottom: 5%;
     width: 100%;
 }
