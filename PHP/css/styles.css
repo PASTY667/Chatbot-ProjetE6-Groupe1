@@ -1,20 +1,22 @@
 body {
+    background-color: var(--primary-bg-color);
     display: flex;
-}
-
-nav {
-    border: 1px solid black;
-    margin-right: 20px;
-    width: 30%;
-    display: flex;
-}
-
-#closeNav {
-    justify-content: flex-end;
+    justify-content: center;
+    margin: 0;
 }
 
 #mainWindow {
-   border: 1px solid black; 
-   padding: 5%;
-   width: 70%;
+    text-align: center;
+    padding: 5%;
+    width: 100%;
+}
+
+#app {
+    background-color: yellow;
+    text-decoration:solid;
+    width: ;
+}
+
+#row {
+    width: 100%;
 }
