@@ -13,10 +13,13 @@ body {
 
 #app {
     background-color: yellow;
-    text-decoration:solid;
-    width: ;
+    padding: 10%;
+    text-decoration: none;
+    color: black;
 }
 
 #row {
+    display: flex;
+    justify-content: space-evenly;
     width: 100%;
 }
