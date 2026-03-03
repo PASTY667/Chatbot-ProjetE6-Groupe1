@@ -46,6 +46,11 @@ def chunking(text):
     :rtype: list[str]
     :raises ValueError: If the input text is empty or cannot be chunked.
     """
+    if not text:
+        raise ValueError("Input text is empty or cannot be chunked")
+    if text.strip() == "":
+        raise ValueError("Input text is empty or cannot be chunked")
+
     text = text.strip()
     text = normalize_string(text)
     text = text.split()

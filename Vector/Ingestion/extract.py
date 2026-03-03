@@ -32,7 +32,6 @@ def extract_file(file_path):
         p = reader.pages[page]
         text += p.extract_text() or ""
     log.info(f"Extracted file: {file_path}")
-    log.info("extracted text : " + str(text))
     if text == "":
         log.error("No text extracted for page")
         raise ValueError(f"No text extracted for page")
