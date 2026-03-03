@@ -21,6 +21,9 @@ def extract_file(file_path):
     if file_path.suffix.lower() != ".pdf":
         log.error("the provided file path does not end with '.pdf'")
         raise ValueError(file_path)
+    if not file_path.exists():
+        log.error("The provided file path does not exist")
+        raise FileNotFoundError(file_path)
 
     reader = PdfReader(str(file_path))
     text = ""
@@ -33,6 +36,9 @@ def extract_file(file_path):
     if text == "":
         log.error("No text extracted for page")
         raise ValueError(f"No text extracted for page")
-    text.strip()
+    text = text.strip()
+    if not text:
+        log.error("No text extracted for page")
+        raise ValueError(f"No text extracted for page")
     return text
 
