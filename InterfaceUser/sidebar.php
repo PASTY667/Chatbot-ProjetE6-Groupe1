@@ -13,6 +13,7 @@
             <li><a href="history.php">Chat</a></li>  
             <li><a href="history.php">Chat</a></li>  
             <li><a href="history.php">Chat</a></li> 
-        </div>    
+        </div>
+    
     </ul>
 </div>
