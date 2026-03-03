@@ -1,34 +1,68 @@
-body{
-    color:var(--primary-text-color);
-    background-color: var(--primary-background-color);
-    font-family: var(--primary-font-family);
-    
+body {
+  color: var(--light-text-color);
+  background-color: var(--dark-background-color);
+  font-family: var(--primary-font-family);
+
+  display: flex;
+  flex-direction: row;
+  margin: 0;
+}
+
+.sidebar {
+  background-color: var(--lightOrange-background-color);
+  font-family: var(--secondary-font-family);
+  font-size: 1.4rem;
+  min-height: 100vh;
+  width: 17em;
+  margin: 0;
+
+  .headerSidebar {
+    background-color: var(--pink-background-color);
+    padding: 2px 18px;
     display: flex;
-    flex-direction: row;
-    margin: 0;
-    font-size: 1rem;
+    flex-direction:row;
+
+    .buttonSidebar{
+        align-self: center;
+        padding: 0px 10px;
+    }
+  }
+
+  .listSidebar {
+    list-style: none;
+    padding-left: 0px;
+
+    .hrSidebar {
+      color: var(--darkOrange-background-color);
+    }
+    a:link {
+      border: none;
+      border-radius: 2px;
+      text-decoration: none;
+      background-color: none;
+      color: var(--light-text-color);
+      display: block;
+      margin: 0px 5px;
+      padding: 2px 35px 4px 15px;
+    }
+    a:visited {
+      text-decoration: none;
+      color: var(--light-text-color);
+    }
+
+    a:hover {
+      color: #be7827;
+      transition-duration: 0.4s;
+      background-color: var(--darkOrange-background-color);
+      padding-left: 20px;
+    }
+
+    a:active {
+      color: var(--dark-text-color);
+    }
+  }
 }
 
-.lateral{
-    background-color: var(--secondary-background-color);
-    font-family: var(--secondary-font-family);
-
-    /*position:fixed;*/
-    height: 100%;
-    width:17em;
-    margin: 0;
-
-    .titleLateral{
-        background-color: var(--terciary-background-color);
-        padding: 2px 18px;
-    }
-    .listLateral{
-        list-style:none;
-        padding: 0px 25px;
-    }
-
-}
-
-.mainChat{
-    align-items: center;
+.mainChat {
+  align-items: center;
 }
