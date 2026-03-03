@@ -1,0 +1,24 @@
+@import url('https://fonts.googleapis.com/css2?family=Hahmlet:wght@100;200;300;400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@300;400;700&display=swap');
+
+
+:root {
+    /*COULEURS DU TEXTE*/
+    --primary-text-color: #ffffff;
+    --secondary-text-color: #57535B;
+
+    /*COULEURS DU TEXTE - HOVER*/
+
+
+    /*COULEURS DU FOND*/
+    --primary-background-color: #57535B;
+    --secondary-background-color: #F6BF80;
+    --terciary-background-color: #F5ACAD;
+  
+    /*POLICE DU TEXTE*/
+    --primary-font-family: 'Roboto Condensed', sans-serif;
+    --secondary-font-family: 'Hahmlet', serif;
+
+    /*TAILLE DU TEXTE*/
+    
+}

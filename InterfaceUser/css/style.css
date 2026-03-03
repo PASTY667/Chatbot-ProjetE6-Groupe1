@@ -1,0 +1,34 @@
+body{
+    color:var(--primary-text-color);
+    background-color: var(--primary-background-color);
+    font-family: var(--primary-font-family);
+    
+    display: flex;
+    flex-direction: row;
+    margin: 0;
+    font-size: 1rem;
+}
+
+.lateral{
+    background-color: var(--secondary-background-color);
+    font-family: var(--secondary-font-family);
+
+    /*position:fixed;*/
+    height: 100%;
+    width:17em;
+    margin: 0;
+
+    .titleLateral{
+        background-color: var(--terciary-background-color);
+        padding: 2px 18px;
+    }
+    .listLateral{
+        list-style:none;
+        padding: 0px 25px;
+    }
+
+}
+
+.mainChat{
+    align-items: center;
+}
