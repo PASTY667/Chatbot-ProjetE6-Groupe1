@@ -1,5 +1,36 @@
 import utils.logger as logger
 import logging as log
+import unicodedata
+import re
+
+def normalize_string(input_string):
+    """
+    Normalize a string to lower case and remove punctuation.
+
+    :param input_string:
+    :type input_string: str
+    :return: normalized string
+    :rtype: str
+    """
+    # Convert to lowercase
+    normalized = input_string.lower()
+
+    # Remove accents/diacritics
+    normalized = ''.join(
+        c for c in unicodedata.normalize('NFD', normalized)
+        if unicodedata.category(c) != 'Mn'
+    )
+
+    # Remove numbers
+    normalized = re.sub(r'\d+', '', normalized)
+
+    # Remove punctuation
+    normalized = re.sub(r'[^\w\s]', '', normalized)
+
+    # Remove extra whitespace
+    normalized = normalized.strip()
+
+    return normalized
 
 def chunking(text):
     """
@@ -15,12 +46,24 @@ def chunking(text):
     :rtype: list[str]
     :raises ValueError: If the input text is empty or cannot be chunked.
     """
+    text = text.strip()
+    text = normalize_string(text)
+    text = text.split()
     log.info("chunking...")
     lenght = len(text)
     max_length_chunk = 200
     chunks = []
+    i = 0
     if lenght > max_length_chunk:
         chunks.append(text)
+        log.info("No chunk needed")
         return chunks
+
     else:
-        pass
+        while i < lenght :
+            sub = text[i:i + max_length_chunk]
+            chunk = "".join(sub)
+            chunks.append(chunk)
+            i += max_length_chunk
+        log.info(f"Amount of chunks: {len(chunks)}")
+    return chunks
