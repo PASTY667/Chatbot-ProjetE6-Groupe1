@@ -13,5 +13,14 @@ log.info("Main reached")
 
 app = FastAPI()
 @app.get("/")
-async def root():
+def root():
+    """
+    Health check endpoint for the LLM backend API.
+
+    This route is used by the LAMP web server or monitoring probes to verify
+    that the FastAPI service running on the LLM VM is reachable.
+
+    :return: A simple JSON payload confirming the service is alive.
+    :rtype: dict
+    """
     return {"message": "Hello World"}
