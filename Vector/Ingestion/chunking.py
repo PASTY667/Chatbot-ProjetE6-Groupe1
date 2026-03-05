@@ -57,18 +57,22 @@ def chunking(text):
     log.info("chunking...")
     lenght = len(text)
     max_length_chunk = 200
+    amount_chunks = lenght // max_length_chunk + 1
+    # +1 if the number is not a multiple of 200
     chunks = []
-    i = 0
-    if lenght > max_length_chunk:
+
+    if lenght < max_length_chunk:
         chunks.append(text)
         log.info("No chunk needed")
         return chunks
 
     else:
-        while i < lenght :
-            sub = text[i:i + max_length_chunk]
-            chunk = "".join(sub)
-            chunks.append(chunk)
-            i += max_length_chunk
-        log.info(f"Amount of chunks: {len(chunks)}")
+        for chunk in range(amount_chunks):
+            for word in range(max_length_chunk):
+                chunks.append([])
+                chunks[chunk].append(text[word])
+                #Optional debug mode
+                #log.info("word : " + str(text[word]))
+            log.info("Chunk " + str(chunks[chunk]))
+
     return chunks
