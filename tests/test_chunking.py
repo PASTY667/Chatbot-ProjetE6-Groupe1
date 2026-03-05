@@ -25,9 +25,9 @@ class MyTestCase(unittest.TestCase):
 
     def test_chunking_non_empty_text(self):
         chunks = chunking(self.extracted_text)
-        self.assertIsInstance(chunks, list)
+        self.assertIsInstance(chunks, dict)
         print(chunks[0])
-        self.assertIsInstance(chunks[0][0], str)
+        self.assertIsInstance(chunks[0], list)
         self.assertEqual(len(chunks[0]), 200)
         print("PASS: test_chunking_non_empty_text")
         print(chunks)
@@ -51,9 +51,11 @@ class MyTestCase(unittest.TestCase):
         print(len(chunking(self.extracted_text)[0]))
         self.assertEqual(len(chunking(self.extracted_text)[0]), len(chunking(self.extracted_text)[1]))
 
-    def test_count_empty_chunks(self):
-        print(chunking(self.empty_text)[0])
 
+    def test_is_chunk_different(self):
+        print(chunking(self.extracted_text)[0])
+        print(chunking(self.extracted_text)[1])
+        self.assertNotEqual(chunking(self.extracted_text)[0], chunking(self.extracted_text)[1])
 
 if __name__ == '__main__':
     unittest.main()

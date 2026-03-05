@@ -3,6 +3,8 @@ import logging as log
 import unicodedata
 import re
 
+logger.get_logger()
+
 def normalize_string(input_string):
     """
     Normalize a string to lower case and remove punctuation.
@@ -34,17 +36,20 @@ def normalize_string(input_string):
 
 def chunking(text):
     """
-    Split extracted document text into chunks for embedding.
+    Split extracted text into chunks of up to 200 words.
 
-    This function prepares content for the RAG pipeline by creating
-    semantically sized segments (optionally with overlap) that are later
-    embedded and stored in the vector database.
+    The input text is first cleaned/normalized, then segmented into
+    word blocks for use in the RAG ingestion pipeline.
 
-    :param text: Full extracted document text.
+    :param text: Full raw text extracted from a document.
     :type text: str
-    :return: List of text chunks to embed.
-    :rtype: list[str]
-    :raises ValueError: If the input text is empty or cannot be chunked.
+    :return:
+        Dictionary of chunks where:
+        - the key is the chunk identifier (int, starting at 0),
+        - the value is a list of words (list[str]) with at most 200 items.
+        The last chunk may contain fewer than 200 words.
+    :rtype: dict[int, list[str]]
+    :raises ValueError: If the input text is empty, blank, or cannot be processed.
     """
     if not text:
         raise ValueError("Input text is empty or cannot be chunked")
@@ -55,24 +60,22 @@ def chunking(text):
     text = normalize_string(text)
     text = text.split()
     log.info("chunking...")
-    lenght = len(text)
+    length = len(text)
     max_length_chunk = 200
-    amount_chunks = lenght // max_length_chunk + 1
-    # +1 if the number is not a multiple of 200
-    chunks = []
-
-    if lenght < max_length_chunk:
-        chunks.append(text)
+    amount_chunks = (length + max_length_chunk - 1) // max_length_chunk
+    chunks = {}
+    if length <= max_length_chunk:
+        chunks[0] = [text]
         log.info("No chunk needed")
         return chunks
 
     else:
-        for chunk in range(amount_chunks):
-            for word in range(max_length_chunk):
-                chunks.append([])
-                chunks[chunk].append(text[word])
-                #Optional debug mode
-                #log.info("word : " + str(text[word]))
-            log.info("Chunk " + str(chunks[chunk]))
+        for chunk_id in range(amount_chunks):
+            start = chunk_id * max_length_chunk
+            end = start + max_length_chunk
+            chunks[chunk_id] = text[start:end]
+
+
+
 
     return chunks
