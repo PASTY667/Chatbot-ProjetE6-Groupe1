@@ -21,10 +21,15 @@ body {
     padding: 2px 18px;
     display: flex;
     flex-direction:row;
+    justify-content: space-between;
 
     .buttonSidebar{
-        align-self: center;
-        padding: 0px 10px;
+      align-self: center;
+      padding: 0px 10px;
+      border: none;
+      color: var(--light-text-color);
+      background-color: var(--dark-text-color);
+      padding: 8px 23px;
     }
   }
 
