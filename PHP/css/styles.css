@@ -1,8 +1,12 @@
 body {
-    background-color: var(--primary-bg-color);
+    background-color: var(--dark-background-color);
     display: flex;
     justify-content: center;
     margin: 0;
+}
+
+.a {
+    width: 30%;
 }
 
 #mainWindow {
@@ -11,18 +15,28 @@ body {
     height: 100%;
 }
 
-#app {
-    background-color: orange;
-    border-radius: 10px;
-    width: 20%;
-    padding: 10%;
-    text-decoration: none;
-    color: black;
-}
-
-#row {
+.row-2 {
     display: flex;
     justify-content: space-evenly;
-    margin-bottom: 5%;
+    margin: 5% 0 0 0;
     width: 100%;
+}
+
+.app {
+    background-color: var(--lightOrange-background-color);
+    border-radius: 10px;
+    width: 40%;
+    height: 10%;
+    padding: 0 2.5% 0 2.5%;
+    text-decoration: none;
+    color: #ffffff;
+}
+
+#appTitle {
+    font: bold 3em var(--primary-font-family), sans-serif;
+}
+
+#appDesc {
+    margin: -2em 0 1.5em 0;
+    font: 1.5em var(--primary-font-family), sans-serif;
 }
