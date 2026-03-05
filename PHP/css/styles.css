@@ -13,6 +13,7 @@ body {
 
 #app {
     background-color: orange;
+    border-radius: 10px;
     width: 20%;
     padding: 10%;
     text-decoration: none;
