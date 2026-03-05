@@ -1,6 +1,6 @@
 <div class="sidebar">
     <div class="headerSidebar">
-        <h3 class="titleSidebar">ChatBot</h3>
+        <h3 class="titleSidebar">Franklin</h3>
         <button class="buttonSidebar">-</button>
     </div>
     <ul class="listSidebar">
