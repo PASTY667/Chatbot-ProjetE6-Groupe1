@@ -16,6 +16,9 @@
   <body>
     <div class="newchatPage">
       <h1 class="newchatTitle">Franklin</h1>
+      <div>
+        <input type="text">
+      </div>
     </div>
   </body>
 </html>
