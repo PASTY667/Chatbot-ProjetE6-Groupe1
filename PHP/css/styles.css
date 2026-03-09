@@ -5,8 +5,14 @@ body {
     margin: 0;
 }
 
+h1 {
+    font: bold 3em var(--primary-font-family);
+    color: var(--light-text-color);
+}
+
 .a {
-    width: 30%;
+    width: 25%;
+    background-color: white;
 }
 
 #mainWindow {
@@ -15,21 +21,28 @@ body {
     height: 100%;
 }
 
+#mainTextbox {
+    margin: 0 0 20px 0;
+    border-style: none;
+    border-radius: 5px;
+    height: 50px;
+    width: 70%;
+}
+
 .row-2 {
     display: flex;
+    margin: 25px 0 25px 0;
     justify-content: space-evenly;
-    margin: 5% 0 0 0;
-    width: 100%;
+    padding: 0 40px 0 40px ; 
 }
 
 .app {
     background-color: var(--lightOrange-background-color);
-    border-radius: 10px;
+    border-radius: 5px;
     width: 40%;
-    height: 10%;
     padding: 0 2.5% 0 2.5%;
     text-decoration: none;
-    color: #ffffff;
+    color: var(--light-text-color);
 }
 
 #appTitle {
