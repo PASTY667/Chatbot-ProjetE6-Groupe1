@@ -1,9 +1,16 @@
 body {
   color: var(--light-text-color);
-  background-color: var(--dark-background-color);
+  background-color: red;
   font-family: var(--primary-font-family);
 
   display: flex;
   flex-direction: row;
+  align-content: center;
   margin: 0;
+}
+
+.newchatPage{
+  .newchatPage{
+    font-size: 2rem;
+  }
 }

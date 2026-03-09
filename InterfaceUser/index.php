@@ -8,11 +8,14 @@
     <link rel="stylesheet" href="css/sidebar.css" />
     <title>Franklin</title>
   </head>
-  <body>
+  <header>
     <?php
         include 'sidebar.php';
     ?>
-
-    <div class="main"></div>
+  </header>
+  <body>
+    <div class="newchatPage">
+      <h1 class="newchatTitle">Franklin</h1>
+    </div>
   </body>
 </html>
