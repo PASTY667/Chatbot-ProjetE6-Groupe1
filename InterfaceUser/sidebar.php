@@ -5,15 +5,14 @@
     </div>
     <ul class="listSidebar">
         <div class="listFixSidebar">
-            <li><a href="newchat.php">Nouveau chat  +</a></li>
+            <li><a href="index.php">Nouveau chat  +</a></li>
             <li><a href="history.php">Historique</a></li>    
         </div>
         <hr class="hrSidebar">
         <div class="listChatSidebar">
-            <li><a href="history.php">Chat</a></li>  
-            <li><a href="history.php">Chat</a></li>  
-            <li><a href="history.php">Chat</a></li> 
+            <li><a href="newchat.php">Chat</a></li>  
+            <li><a href="newchat.php">Chat</a></li>  
+            <li><a href="newchat.php">Chat</a></li> 
         </div>
-    
     </ul>
 </div>
