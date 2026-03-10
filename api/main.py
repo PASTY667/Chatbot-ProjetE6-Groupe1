@@ -1,6 +1,5 @@
-import models
-import routesChat
-import routesIngest
+from api import models  # local API models
+from api import routesChat, routesIngest  # local route modules
 import Backend.Config.settings as settings
 import utils.logger as logger
 import logging as log
