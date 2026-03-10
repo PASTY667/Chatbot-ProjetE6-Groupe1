@@ -1,16 +1,62 @@
 body {
   color: var(--light-text-color);
-  background-color: red;
+  background-color: var(--dark-background-color);
   font-family: var(--primary-font-family);
-
-  display: flex;
-  flex-direction: row;
-  align-content: center;
   margin: 0;
+  height: 100vh;
 }
 
 .newchatPage{
-  .newchatPage{
-    font-size: 2rem;
+  text-align: center;
+  font-size: 2rem;
+  width: 150vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+.newchatHeader{
+  display: flex;
+
+  .logo{
+    background-color: pink;
+    border-radius: 50%;
+    height: fit-content;
+    padding: 0.7em;
+    margin: 0px 15px;
+    align-self: center;
+  }
+}
+  .newchatInput{
+    color: var(--dark-text-color);
+    background-color: var(--grey-background-color);
+    padding: 0.2em 1.4em 2em 0.8em;
+    border-radius: 5px;
+    display: flex;
+    justify-content: space-between;
+
+    .addButton{
+      border: 2px solid var(--dark-text-color);
+      border-radius: 5px;
+      box-shadow: none;
+      border-color: var(--dark-text-color);
+    }
+
+    .textInput{
+      border: none;
+      background-color:var(--grey-background-color);
+      padding: 0.2em 30em 8em 0.2em;
+      align-items: start;
+    }
+
+    .textInput:active{
+      border: none;
+      border-color:var(--grey-background-color);
+      box-shadow: none;
+    }
+
+    .submitButton{
+      background-color: var(--medium-background-color);
+      border:none;
+    }
   }
 }
