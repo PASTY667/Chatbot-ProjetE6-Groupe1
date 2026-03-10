@@ -2,42 +2,67 @@ import utils.logger as logger
 import logging as log
 from pathlib import Path
 from pypdf import PdfReader
+import re
 
-def extract_file(file_path):
-    """
-    Extract raw text from a document file.
+def return_path(file_path: str):
+    return Path(file_path)
 
-    This function reads supported document formats (e.g., PDF) uploaded from
-    the LAMP web server and returns plain text for chunking and embedding.
 
-    :param file_path: Absolute or relative path to the document file.
-    :type file_path: str
-    :return: Extracted raw text content.
-    :rtype: str
-    :raises FileNotFoundError: If the provided file path does not exist.
-    :raises ValueError: If the file cannot be parsed or yields no text.
-    """
-    file_path = Path(file_path)
-    if file_path.suffix.lower() != ".pdf":
-        log.error("the provided file path does not end with '.pdf'")
-        raise ValueError(file_path)
-    if not file_path.exists():
-        log.error("The provided file path does not exist")
-        raise FileNotFoundError(file_path)
+
+def extract_file_pdf(file_path):
 
     reader = PdfReader(str(file_path))
-    text = ""
-    number_pages = len(reader.pages)
-    for page in range(number_pages):
-        p = reader.pages[page]
-        text += p.extract_text() or ""
-    log.info(f"Extracted file: {file_path}")
-    if text == "":
-        log.error("No text extracted for page")
-        raise ValueError(f"No text extracted for page")
-    text = text.strip()
-    if not text:
-        log.error("No text extracted for page")
-        raise ValueError(f"No text extracted for page")
-    return text
 
+    headers = []
+    footers = []
+    body = []
+
+    def visitor(text, cm, tm, font_dict, font_size):
+        y = tm[5]
+
+        if y > 750:
+            headers.append(text)
+        elif y < 100:
+            footers.append(text)
+        else:
+            body.append(text)
+
+    for page in reader.pages:
+        page.extract_text(visitor_text=visitor)
+
+    return {
+        "headers": "".join(headers),
+        "body": "".join(body),
+        "footers": "".join(footers),
+        "metadata": reader.metadata
+    }
+
+def extract_file_txt(file_path):
+    file = open(file_path, "rt")
+    text = file.read()
+    file.close()
+    return {
+        "headers":"",
+        "body": "".join(text),
+        "footers": "",
+        "metadata": ""
+
+    }
+
+def extract_file_md(file_path):
+    with open(file_path, "rt", encoding="utf-8") as file:
+        md_content = file.read()
+        # Remove Markdown links/images
+        text = re.sub(r'!\[.*?\]\(.*?\)|\[.*?\]\(.*?\)', '', md_content)
+        # Remove Markdown formatting symbols
+        text = re.sub(r'[#*_>`-]', '', text)
+        return {
+            "headers": "",
+            "body": "".join(text.strip),
+            "footers": "",
+            "metadata": ""
+
+        }
+
+def extract_text(file_path) :
+    pass
