@@ -1,0 +1,28 @@
+version: "3.9"
+
+services:
+  api:
+    build: .
+    container_name: rag_api
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    environment:
+      OLLAMA_URL: ${OLLAMA_URL:-http://host.docker.internal:11434}
+      CHROMA_URL: ${CHROMA_URL:-http://chromadb:8000}
+      CHROMA_COLLECTION: ${CHROMA_COLLECTION:-documents}
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+    depends_on:
+      - chromadb
+
+  chromadb:
+    image: ghcr.io/chroma-core/chroma:latest
+    container_name: chromadb
+    ports:
+      - "8001:8000"
+    volumes:
+      - chroma_data:/chroma
+
+volumes:
+  chroma_data:
