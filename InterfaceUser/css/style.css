@@ -43,20 +43,22 @@ body {
 
     .textInput{
       border: none;
+      box-shadow: none;
       background-color:var(--grey-background-color);
       padding: 0.2em 30em 8em 0.2em;
       align-items: start;
     }
 
-    .textInput:active{
-      border: none;
+    .textInput:focus{
+      outline: none;
       border-color:var(--grey-background-color);
-      box-shadow: none;
+
     }
 
     .submitButton{
       background-color: var(--medium-background-color);
       border:none;
+      border-radius: 5px;
     }
   }
 }
