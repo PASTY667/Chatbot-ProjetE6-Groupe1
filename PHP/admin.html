@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,46 +8,55 @@
     <link rel="stylesheet" href="/css/variables.css">
     <title>Document</title>
 </head>
+
 <body>
     <div class="a"></div>
 
     <div id="mainWindow">
-        <h1>aaaaaaa</h1>
+        <h1>Franklin</h1>
         <form action="post">
             <input id="mainTextbox" type="text">
         </form>
-        <div class="row-2">
-            <a id="log" class="app" href="#">
-                <p id="appTitle">HISTORIQUE UTILISATEUR</p>
-                <p id="appDesc">Alors qu'est-ce qu'on a là 😏</p>
-            </a>
-            <a class="app" href="#">
-                <p id="appTitle">LOGS</p>
-                <p id="appDesc">Alors qu'est-ce qu'on a là 😏</p>
-            </a>
-        </div>
-        <div class="row-2">
-            <a class="app" href="#">
-                <p id="appTitle">LOGS</p>
-                <p id="appDesc">Alors qu'est-ce qu'on a là 😏</p>
-            </a>
-            <a class="app" href="#">
-                <p id="appTitle">LOGS</p>
-                <p id="appDesc">Alors qu'est-ce qu'on a là 😏</p>
-            </a>
-        </div>
-        <div class="row-2">
-            <a class="app" href="#">
-                <p id="appTitle">LOGS</p>
-                <p id="appDesc">Alors qu'est-ce qu'on a là 😏</p>
-            </a>
-            <a class="app" href="#">
-                <p id="appTitle">LOGS</p>
-                <p id="appDesc">Alors qu'est-ce qu'on a là 😏</p>
-            </a>
+        <div id="selectWindow">
+            <div class="row-2">
+                <a id="log" class="app" href="#">
+                    <p id="appTitle">HISTORIQUE UTILISATEUR</p>
+                    <p id="appDesc">Alors qu'est-ce qu'on a là 😏</p>
+                </a>
+                <a class="app" href="#">
+                    <p id="appTitle">LOGS</p>
+                    <p id="appDesc">Alors qu'est-ce qu'on a là 😏</p>
+                </a>
+            </div>
+            <div class="row-2">
+                <a class="app" href="#">
+                    <p id="appTitle">LOGS</p>
+                    <p id="appDesc">Alors qu'est-ce qu'on a là 😏</p>
+                </a>
+                <a class="app" href="#">
+                    <p id="appTitle">LOGS</p>
+                    <p id="appDesc">Alors qu'est-ce qu'on a là 😏</p>
+                </a>
+            </div>
+            <div class="row-2">
+                <a class="app" href="#">
+                    <p id="appTitle">LOGS</p>
+                    <p id="appDesc">Alors qu'est-ce qu'on a là 😏</p>
+                </a>
+                <a class="app" href="#">
+                    <p id="appTitle">LOGS</p>
+                    <p id="appDesc">Alors qu'est-ce qu'on a là 😏</p>
+                </a>
+            </div>
         </div>
         <div id="currentWindow">
+            <a id="closeWindow" href="#">X</a>
+            <div id="logWindow" class="appWindow">
+                aaa
+            </div>
         </div>
     </div>
 </body>
+<script src="js/admin.js"></script>
+
 </html>
