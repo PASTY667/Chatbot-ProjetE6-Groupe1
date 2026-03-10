@@ -1,25 +1,35 @@
+html {
+    height: 100%;
+}
+
 body {
     background-color: var(--dark-background-color);
     display: flex;
     justify-content: center;
+    min-width: 100%;
     margin: 0;
 }
 
 #appWindow {
-    
-    
 }
 
 #currentWindow {
     visibility: hidden;
     position: fixed;
     top: 0; 
-    left: 1;
+    right: 0;
     width: 80%;
     height: 100%;
-    z-index:99;
+    
     background-color: var(--dark-background-color);
 }
+
+#logWindow {
+    display: flex;
+    background-color: gray;
+}
+
+
 
 h1 {
     font: bold 3em var(--primary-font-family);

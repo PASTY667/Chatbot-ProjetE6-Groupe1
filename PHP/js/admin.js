@@ -1,13 +1,14 @@
 const selectWindow = document.getElementById("selectWindow");
 const currentWindow = document.getElementById("currentWindow");
-let currentTab = "";
+const logWindow = document.getElementById("logWindow");
 
 document.getElementById("log").addEventListener("click", function() {
-    currentTab = "";
     Object.assign(currentWindow.style, {
         visibility: "visible"
     });
-    console.log("aaaaaa");
+    Object.assign(currentWindow.style, {
+        visibility: "visible"
+    });
     
 });
 
