@@ -36,7 +36,8 @@ body {
     display: none;
     }
 
-    .labelButton{
+    .uploadButton{
+      
       color: var(--dark-text-color);
       background-color: var(--grey-background-color);
       font-family: var(--primary-font-family);
@@ -45,13 +46,27 @@ body {
       border: 2px solid var(--dark-text-color);
       border-radius: 55px;
       border-color: var(--dark-text-color);
-      padding: 3px 10px;
+      padding: 5px 10px;
       margin-right: 20px;
 
       cursor: pointer;
       font-weight: bold;
       transition: background-color 0.2s ease-in-out;  
+
+      text-align: center;
+
+      .uploadIcon{
+      width: 20px;
+      height: auto;
+      margin-bottom: -4px;
+      }
+
+      .uploadButton:active {
+        transform: scale(0.98);
+      }
     }
+
+    
 
     .textInput{
       border: none;
