@@ -1,6 +1,7 @@
-const selectWindow = document.getElementById("selectWindow");
+/* const selectWindow = document.getElementById("selectWindow");
 const currentWindow = document.getElementById("currentWindow");
 const logWindow = document.getElementById("logWindow");
+const currentTitle = document.getElementById("currentTitle");
 
 document.getElementById("log").addEventListener("click", function() {
     Object.assign(currentWindow.style, {
@@ -9,6 +10,7 @@ document.getElementById("log").addEventListener("click", function() {
     Object.assign(currentWindow.style, {
         visibility: "visible"
     });
+    currentTitle.innerHTML = "LOGS";
     
 });
 
@@ -18,4 +20,4 @@ document.getElementById("closeWindow").addEventListener("click", function() {
     });
     console.log("aaaaaa");
     
-});
+}); */

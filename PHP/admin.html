@@ -10,16 +10,16 @@
 </head>
 
 <body>
-    <div class="a"></div>
+    <div class="a">a</div>
 
     <div id="mainWindow">
-        <h1>Franklin</h1>
+        <h1 id="mainTitle">Franklin</h1>
         <form action="post">
             <input id="mainTextbox" type="text">
         </form>
         <div id="selectWindow">
             <div class="row-2">
-                <a id="log" class="app" href="#">
+                <a id="log" class="app" href="log.html">
                     <p id="appTitle">HISTORIQUE UTILISATEUR</p>
                     <p id="appDesc">Alors qu'est-ce qu'on a là 😏</p>
                 </a>
@@ -50,7 +50,8 @@
             </div>
         </div>
         <div id="currentWindow">
-            <a id="closeWindow" href="#">X</a>
+            <a id="closeWindow" href="#">Retour à la fenêtre principal</a>
+            <h1 id="currentTitle"></h1>
             <div id="logWindow" class="appWindow">
                 aaaaaaa
             </div>

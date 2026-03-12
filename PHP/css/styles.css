@@ -1,5 +1,5 @@
 html {
-    height: 100%;
+    
 }
 
 body {
@@ -10,7 +10,18 @@ body {
     margin: 0;
 }
 
-#appWindow {
+table {
+    border: 1px solid black;
+    border-collapse: collapse;
+}
+
+tr {
+    border: 1px solid black;
+}
+
+#currentTitle {
+    text-align: left;
+    margin-left: 30px;
 }
 
 #currentWindow {
@@ -20,16 +31,15 @@ body {
     right: 0;
     width: 80%;
     height: 100%;
-    
     background-color: var(--dark-background-color);
 }
 
 #logWindow {
     display: flex;
     background-color: gray;
+    margin: 10px 30px 20px 30px;
+    height: max-content;
 }
-
-
 
 h1 {
     font: bold 3em var(--primary-font-family);
@@ -38,7 +48,7 @@ h1 {
 
 .a {
     width: 25%;
-    background-color: green;
+    background-color: var(--lightOrange-background-color);
 }
 
 #appIcon {
@@ -51,7 +61,7 @@ h1 {
     height: 100%;
 }
 
-#mainTextbox {
+#mainTextbox { 
     margin: 0 0 20px 0;
     border-style: none;
     border-radius: 5px;
