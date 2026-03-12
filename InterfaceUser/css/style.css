@@ -60,13 +60,20 @@ body {
       height: auto;
       margin-bottom: -4px;
       }
-
-      .uploadButton:active {
-        transform: scale(0.98);
-      }
     }
 
-    
+    .file-name{
+      color: var(--dark-text-color);
+      background-color: var(--grey-background-color);
+      font-family: var(--primary-font-family);
+      font-size: 1rem;
+
+      border: 2px solid var(--dark-text-color);
+      border-radius: 55px;
+      border-color: var(--dark-text-color);
+      padding: 5px 10px;
+      margin-right: 20px;
+    }
 
     .textInput{
       border: none;
