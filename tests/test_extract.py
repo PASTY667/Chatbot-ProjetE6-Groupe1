@@ -1,42 +1,127 @@
 import unittest
-from pathlib import Path
 import sys
+import tempfile
+from pathlib import Path
 
+from utils.logger import get_logger
+
+# Ensure project root in path
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
-from utils.logger import get_logger
-from Vector.Ingestion.extract import extract_file
+from Vector.Ingestion.extract import extract_text
 
 
-class TestExtractFile(unittest.TestCase):
+class TestExtractText(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         get_logger()
+        cls.project_root = PROJECT_ROOT
+        cls.sample_pdf = cls.project_root / "ProjetChabot_CompteRenduRevue1_DomyBonnelLouboutinDomingo.pdf"
+        # Optional repo fixtures (if user placed them)
+        cls.repo_txt = cls.project_root / "UnitTest.txt"
+        cls.repo_md = cls.project_root / "README.md"
 
-    def setUp(self):
-        self.project_root = Path(__file__).resolve().parents[1]
-        self.sample_pdf = self.project_root / "ProjetChabot_CompteRenduRevue1_DomyBonnelLouboutinDomingo.pdf"
+    def _dump_result(self, label: str, result: dict):
+        print(f"\n--- {label} ---")
+        print(f"path: {result.get('metadata', {}).get('source_path')}")
+        print(f"headers: {result.get('headers')[:80]!r}")
+        body = result.get('body', '')
+        preview = body if len(body) <= 400 else body[:400]
+        print(f"body_preview: {preview!r}")
+        print(f"body_len: {len(body)}")
+        print(f"pages_count: {len(result.get('pages', []))}")
+        print(f"metadata: {result.get('metadata')}")
 
-    def test_extract_pdf_returns_non_empty_text(self):
-        text = extract_file(self.sample_pdf)
-        self.assertIsInstance(text, str)
-        self.assertTrue(text.strip())
-        print("PASS: test_extract_pdf_returns_non_empty_text")
-        print(text)
+    def test_pdf_returns_body_and_metadata(self):
+        if not self.sample_pdf.exists():
+            self.skipTest("Sample PDF not found in repository")
+        result = extract_text(self.sample_pdf)
+        self.assertIsInstance(result, dict)
+        self.assertTrue(result["body"].strip())
+        self.assertIsInstance(result["pages"], list)
+        self.assertGreater(len(result["pages"]), 0)
+        self.assertEqual(result["metadata"].get("filetype"), "pdf")
+        self._dump_result("pdf_result", result)
 
-    def test_extract_rejects_non_pdf_extension(self):
-        fake_txt = self.project_root / "README.md"
-        with self.assertRaises(ValueError):
-            extract_file(fake_txt)
-        print("PASS: test_extract_rejects_non_pdf_extension")
-
-    def test_extract_missing_file_raises(self):
-        missing_pdf = self.project_root / "__file_that_does_not_exist__.pdf"
+    def test_missing_file_raises(self):
+        missing = self.project_root / "__missing__.pdf"
         with self.assertRaises(FileNotFoundError):
-            extract_file(missing_pdf)
-        print("PASS: test_extract_missing_file_raises")
+            extract_text(missing)
+
+    def test_unsupported_extension_raises(self):
+        with tempfile.NamedTemporaryFile(suffix=".docx", delete=False) as tmp:
+            tmp_path = Path(tmp.name)
+        try:
+            with self.assertRaises(ValueError):
+                extract_text(tmp_path)
+        finally:
+            tmp_path.unlink(missing_ok=True)
+
+    def test_txt_body_pages_and_metadata(self):
+        # Prefer real repo fixture if present
+        if self.repo_txt.exists():
+            tmp_path = self.repo_txt
+            cleanup = False
+            content = tmp_path.read_text(encoding="utf-8")
+        else:
+            content = "Ligne 1\n\nLigne 2"
+            with tempfile.NamedTemporaryFile(mode="w", suffix=".txt", delete=False, encoding="utf-8") as tmp:
+                tmp.write(content)
+                tmp_path = Path(tmp.name)
+            cleanup = True
+        try:
+            result = extract_text(tmp_path)
+            self.assertEqual(result["metadata"].get("filetype"), "txt")
+            self.assertIsInstance(result["pages"], list)
+            self.assertGreaterEqual(len(result["pages"]), 1)
+            self.assertTrue(result["body"].strip())
+            self._dump_result("txt_result", result)
+        finally:
+            if cleanup:
+                tmp_path.unlink(missing_ok=True)
+
+    def test_empty_txt_raises(self):
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".txt", delete=False, encoding="utf-8") as tmp:
+            tmp_path = Path(tmp.name)
+        try:
+            with self.assertRaises(ValueError):
+                extract_text(tmp_path)
+        finally:
+            tmp_path.unlink(missing_ok=True)
+
+    def test_md_cleaning_and_metadata(self):
+        # Prefer real repo fixture if present
+        if self.repo_md.exists():
+            tmp_path = self.repo_md
+            cleanup = False
+            md = tmp_path.read_text(encoding="utf-8")
+        else:
+            md = "# Titre\n\nVoici un [lien](http://example.com) et **gras**."
+            with tempfile.NamedTemporaryFile(mode="w", suffix=".md", delete=False, encoding="utf-8") as tmp:
+                tmp.write(md)
+                tmp_path = Path(tmp.name)
+            cleanup = True
+        try:
+            result = extract_text(tmp_path)
+            self.assertEqual(result["metadata"].get("filetype"), "md")
+            self.assertIsInstance(result["pages"], list)
+            self.assertGreaterEqual(len(result["pages"]), 1)
+            self.assertTrue(result["body"].strip())
+            self._dump_result("md_result", result)
+        finally:
+            if cleanup:
+                tmp_path.unlink(missing_ok=True)
+
+    def test_empty_md_raises(self):
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".md", delete=False, encoding="utf-8") as tmp:
+            tmp_path = Path(tmp.name)
+        try:
+            with self.assertRaises(ValueError):
+                extract_text(tmp_path)
+        finally:
+            tmp_path.unlink(missing_ok=True)
 
 
 if __name__ == "__main__":
