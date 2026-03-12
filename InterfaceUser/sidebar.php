@@ -2,7 +2,6 @@
 <link rel="stylesheet" href="css/style.css" />
 <link rel="stylesheet" href="css/sidebar.css" />
 
-
 <div class="sidebar">
     <div>
     <div class="headerSidebar">

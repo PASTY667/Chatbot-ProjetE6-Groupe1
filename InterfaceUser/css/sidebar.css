@@ -1,9 +1,8 @@
 body {
-  flex-direction: row;
-  justify-content: center;
   margin: 0;
   position: fixed;
 }
+
 
 .sidebar {
   background-color: var(--lightOrange-background-color);
@@ -93,7 +92,7 @@ body {
     text-decoration: none;;
     background-color: white;
     border-radius: 3px;
-    padding: 10px 15px;
+    padding: 10px 15px 3px 15px;
 
     .logo{
       width: 30px;
@@ -119,7 +118,6 @@ body {
     background-color: var(--dark-background-color);
     transition: 0.5s ease-in-out;  
 
-    
     .logoHover{
       display:inline;
       transition: 0.5s ease-in-out; 
