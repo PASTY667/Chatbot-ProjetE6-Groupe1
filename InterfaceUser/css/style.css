@@ -51,7 +51,7 @@ body {
 
       cursor: pointer;
       font-weight: bold;
-      transition: background-color 0.2s ease-in-out;  
+      transition: 0.2s ease-in-out;  
 
       text-align: center;
 

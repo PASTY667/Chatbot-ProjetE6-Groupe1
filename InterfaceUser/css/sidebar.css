@@ -1,5 +1,4 @@
 body {
-  display: flex;
   flex-direction: row;
   justify-content: center;
   margin: 0;
@@ -13,6 +12,9 @@ body {
   min-height: 100vh;
   width: 17em;
   margin: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 
   .headerSidebar {
     background-color: var(--pink-background-color);
@@ -25,9 +27,17 @@ body {
       align-self: center;
       padding: 0px 10px;
       border: none;
+      border-radius: 3px;
       color: var(--light-text-color);
       background-color: var(--dark-text-color);
       padding: 8px 23px;
+    }
+
+    .buttonSidebar:hover{
+      cursor: pointer;
+      color:var(--dark-text-color);
+      background-color: white;
+      transition: 0.3s ease-in-out;  
     }
   }
 
@@ -66,6 +76,53 @@ body {
   }
 }
 
-.mainChat {
+.setting{
+  color: var(--light-text-color);
+  background-color: var(--darkOrange-background-color);
+  display: flex;
   align-items: center;
+  place-content: space-between;
+  padding: 0px 20px 0px 40px;
+  
+  .settingTitle{
+    font-size: 1.3rem;
+    padding: 0;
+  }
+
+  .settingButton{
+    text-decoration: none;;
+    background-color: white;
+    border-radius: 3px;
+    padding: 10px 15px;
+
+    .logo{
+      width: 30px;
+      height: auto;
+      position: relative;
+      z-index: 5;
+      left:0;
+    }
+
+    .logoHover{
+      width: 32px;
+      height: auto;
+      display: none;
+      position: absolute;
+      z-index: 10;
+      left:14.1em;
+      padding-top: 1px;
+    }
+  }
+
+  .settingButton:hover{
+    color: var(--light-text-color);
+    background-color: var(--dark-background-color);
+    transition: 0.5s ease-in-out;  
+
+    
+    .logoHover{
+      display:inline;
+      transition: 0.5s ease-in-out; 
+    }
+  }
 }
