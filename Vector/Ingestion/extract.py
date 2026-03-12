@@ -57,10 +57,10 @@ def extract_file_pdf(file_path):
 
         page.extract_text(visitor_text=visitor)
 
-        # Clean lines
+        # Clean lines; keep empties in body to preserve paragraph breaks
         page_headers = [_clean_line(l) for l in page_headers if _clean_line(l)]
         page_footers = [_clean_line(l) for l in page_footers if _clean_line(l)]
-        page_body = [_clean_line(l) for l in page_body if _clean_line(l)]
+        page_body = [_clean_line(l) for l in page_body]
 
         all_headers.extend(page_headers)
         all_footers.extend(page_footers)
@@ -68,7 +68,7 @@ def extract_file_pdf(file_path):
         # Remove hyphenation and page numbers in body
         joined = "\n".join(page_body)
         joined = re.sub(r"-\n(?=\w)", "", joined)  # remove broken-line hyphens
-        body_lines = [l for l in joined.split("\n") if l and not _is_page_number(l)]
+        body_lines = [l for l in joined.split("\n") if not _is_page_number(l)]
 
         pages.append({"index": len(pages), "text": "\n".join(body_lines)})
 
