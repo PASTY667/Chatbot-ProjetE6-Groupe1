@@ -1,44 +1,43 @@
-html {
-    
-}
-
 body {
     background-color: var(--dark-background-color);
     display: flex;
-    justify-content: center;
+    justify-content: right;
     min-width: 100%;
     margin: 0;
 }
 
 table {
-    border: 1px solid black;
     border-collapse: collapse;
+    width: 75vmax;
 }
 
-tr {
-    border: 1px solid black;
+th, td {
+    padding: 15px 0 15px 0;
 }
 
-#currentTitle {
+tr:nth-child(even) {
+    background-color: rgb(156, 156, 156);
+}
+tr:nth-child(odd) {
+    background-color: rgb(169, 169, 169);
+}
+
+.currentTitle {
     text-align: left;
     margin-left: 30px;
 }
 
-#currentWindow {
-    visibility: hidden;
-    position: fixed;
-    top: 0; 
-    right: 0;
-    width: 80%;
-    height: 100%;
-    background-color: var(--dark-background-color);
+.logWindow {
+    border: 1px solid white;
+    margin: 0 2.5% 0 2.5%;
+    display: flex;
+    justify-content: center;
+    width: max-content;
 }
 
-#logWindow {
-    display: flex;
-    background-color: gray;
-    margin: 10px 30px 20px 30px;
-    height: max-content;
+.logUser {
+    color: black;
+    text-decoration: none;
 }
 
 h1 {
@@ -47,21 +46,24 @@ h1 {
 }
 
 .a {
-    width: 25%;
+    width: 20vi;
+    height: 100%;
     background-color: var(--lightOrange-background-color);
+    position: fixed;
+    left: 0;
 }
 
-#appIcon {
+.appIcon {
     height: 15px;
 }
 
-#mainWindow {
+.mainWindow {
     text-align: center;
-    width: 100%;
+    width: 80%;
     height: 100%;
 }
 
-#mainTextbox { 
+.mainTextbox { 
     margin: 0 0 20px 0;
     border-style: none;
     border-radius: 5px;
@@ -85,11 +87,11 @@ h1 {
     color: var(--light-text-color);
 }
 
-#appTitle {
+.appTitle {
     font: bold 3em var(--primary-font-family), sans-serif;
 }
 
-#appDesc {
+.appDesc {
     margin: -2em 0 1.5em 0;
     font: 1.5em var(--primary-font-family), sans-serif;
 }
