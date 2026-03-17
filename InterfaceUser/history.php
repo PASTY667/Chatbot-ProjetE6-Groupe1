@@ -7,15 +7,9 @@
     <link rel="stylesheet" href="css/style.css" />
     <title>Historique</title>
 </head>
-<header>
+<body>
     <?php
         include 'sidebar.php';
     ?>
-</header>
-<body>
-    <h1 class="title">Historique</h1>
-    <div class="">
-        
-    </div>
 </body>
 </html>
