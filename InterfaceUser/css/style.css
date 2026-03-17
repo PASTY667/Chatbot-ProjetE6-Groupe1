@@ -9,92 +9,91 @@ body {
   place-items: center;
 }
 
-
-.newchatPage{
+.newchatPage {
   text-align: center;
   font-size: 2rem;
   width: 80%;
   margin: 0em 12em;
 
-.newchatHeader{
-  display: flex;
-  justify-content: center;
-  
-  .logo{
-    background-color: pink;
-    border-radius: 50%;
-    height: fit-content;
-    padding: 0.7em;
-    margin: 0px 15px;
-    align-self: center;
+  .newchatHeader {
+    display: flex;
+    justify-content: center;
+
+    .logo {
+      background-color: pink;
+      border-radius: 50%;
+      height: fit-content;
+      padding: 0.7em;
+      margin: 0px 15px;
+      align-self: center;
+    }
   }
-}
-  .newchatInput{
+  .newchatInput {
     color: var(--dark-text-color);
     background-color: var(--grey-background-color);
     padding: 0.2em 0.5em 0.5em 0.6em;
     border-radius: 5px;
 
     input[type="file"] {
-    display: none;
+      display: none;
     }
 
-    .uploadButton{
-      
-      color: var(--dark-text-color);
-      background-color: var(--grey-background-color);
-      font-family: var(--primary-font-family);
-      font-size: 1rem;
+    .uploadSection {
+      justify-self: self-start;
 
-      border: 2px solid var(--dark-text-color);
-      border-radius: 55px;
-      border-color: var(--dark-text-color);
-      padding: 5px 10px;
-      margin-right: 20px;
+      .uploadButton {
+        color: var(--dark-text-color);
+        background-color: var(--grey-background-color);
+        font-family: var(--primary-font-family);
+        font-size: 1rem;
 
-      cursor: pointer;
-      font-weight: bold;
-      transition: 0.2s ease-in-out;  
+        border: 2px solid var(--dark-text-color);
+        border-radius: 55px;
+        border-color: var(--dark-text-color);
+        padding: 5px 10px;
+        margin-right: 20px;
 
-      text-align: center;
+        cursor: pointer;
+        font-weight: bold;
+        transition: 0.2s ease-in-out;
 
-      .uploadIcon{
-      width: 20px;
-      height: auto;
-      margin-bottom: -4px;
+        text-align: center;
+
+        .uploadIcon {
+          width: 20px;
+          height: auto;
+          margin-bottom: -4px;
+        }
+      }
+
+      .file-name {
+        color: var(--dark-text-color);
+        background-color: var(--grey-background-color);
+        font-family: var(--primary-font-family);
+        font-size: 1rem;
+
+        border: 2px solid var(--dark-text-color);
+        border-radius: 55px;
+        border-color: var(--dark-text-color);
+        padding: 5px 10px;
+        margin-right: 20px;
       }
     }
-
-    .file-name{
-      color: var(--dark-text-color);
-      background-color: var(--grey-background-color);
-      font-family: var(--primary-font-family);
-      font-size: 1rem;
-
-      border: 2px solid var(--dark-text-color);
-      border-radius: 55px;
-      border-color: var(--dark-text-color);
-      padding: 5px 10px;
-      margin-right: 20px;
-    }
-
-    .textInput{
+    .textInput {
       border: none;
       box-shadow: none;
-      background-color:var(--grey-background-color);
+      background-color: var(--grey-background-color);
       padding: 0.2em 30em 8em 0.2em;
-      align-items: start;
     }
 
-    .textInput:focus{
+    .textInput:focus {
       outline: none;
-      border-color:var(--grey-background-color);
-
+      border-color: var(--grey-background-color);
     }
 
-    .submitButton{
+    .submitButton {
       background-color: var(--medium-background-color);
-      border:none;
+      border: none;
       border-radius: 5px;
       padding: 10px 28px;
       cursor: pointer;
