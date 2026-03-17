@@ -7,9 +7,11 @@ import Backend.Config.settings as settings
 import unicodedata
 from collections import Counter
 
+
 HEADER_Y = settings.HEADER_Y
 FOOTER_Y = settings.FOOTER_Y
 REPEAT_THRESHOLD = settings.HEADER_FOOTER_FREQ_TRESHOLD
+ALLOWED_FILETYPES = settings.ALLOWED_FILETYPES
 
 logger.get_logger()
 
@@ -182,6 +184,9 @@ def extract_text(file_path) :
         log.error(f"File {file_path} is not a file")
         raise ValueError(f"{file_path} is not a file")
     extension = file_path.suffix.lower().lstrip(".")
+    if not extension in ALLOWED_FILETYPES:
+        log.error(f"Unsupported file type: {extension}")
+        raise ValueError(f"Unsupported file type: {extension}")
     match extension:
         case "md":
             log.info("Markdown file found")

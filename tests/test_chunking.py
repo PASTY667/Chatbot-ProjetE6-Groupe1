@@ -1,61 +1,74 @@
 import unittest
-from pathlib import Path
 import sys
-from utils.logger import get_logger
-from Vector.Ingestion.chunking import chunking
-from Vector.Ingestion.extract import extract_file
+from pathlib import Path
 
+from utils.logger import get_logger
+
+# Ensure project root is on sys.path
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
+from Vector.Ingestion.extract import extract_text
+from Vector.Ingestion.chunking import chunk_text
+import Backend.Config.settings as settings
 
 
-class MyTestCase(unittest.TestCase):
+class TestChunking(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         get_logger()
+        cls.project_root = PROJECT_ROOT
+        cls.sample_pdf = cls.project_root / "ProjetChabot_CompteRenduRevue1_DomyBonnelLouboutinDomingo.pdf"
 
-    def setUp(self):
-        self.project_root = Path(__file__).resolve().parents[1]
-        self.sample_pdf = self.project_root / "ProjetChabot_CompteRenduRevue1_DomyBonnelLouboutinDomingo.pdf"
-        self.extracted_text = extract_file(str(self.sample_pdf))
-        self.empty_text = ""
-        self.none_text = None
+    def test_chunking_from_pdf(self):
+        if not self.sample_pdf.exists():
+            self.skipTest("Sample PDF not found in repository")
 
-    def test_chunking_non_empty_text(self):
-        chunks = chunking(self.extracted_text)
-        self.assertIsInstance(chunks, dict)
-        print(chunks[0])
-        self.assertIsInstance(chunks[0], list)
-        self.assertEqual(len(chunks[0]), 200)
-        print("PASS: test_chunking_non_empty_text")
-        print(chunks)
+        extraction = extract_text(self.sample_pdf)
+        chunks = chunk_text(extraction["body"], extraction["pages"], extraction["metadata"])
 
-    def test_chunking_empty_text(self):
-        empty_chunks = chunking(self.empty_text)
-        with self.assertRaises(ValueError):
-            chunks = chunking(self.extracted_text)
-        print("PASS: test_chunking_empty_text")
-        print(chunks)
+        # Basic assertions
+        self.assertIsInstance(chunks, list)
+        self.assertGreater(len(chunks), 0)
 
-    def test_chunking_none_text(self):
-        none_chunks = chunking(self.none_text)
-        with self.assertRaises(ValueError):
-            chunks = chunking(self.extracted_text)
-        print("PASS: test_chunking_none_text")
-        print(chunks)
+        # Each chunk non-empty and under 16KB guard
+        for i, ch in enumerate(chunks):
+            self.assertIn("text", ch)
+            self.assertTrue(ch["text"].strip())
+            self.assertLessEqual(len(ch["text"].encode("utf-8")), settings.CHROMA_MAX_DOC_CHARS)
 
-    def test_count_chunks(self):
-        print(chunking(self.extracted_text)[0])
-        print(len(chunking(self.extracted_text)[0]))
-        self.assertEqual(len(chunking(self.extracted_text)[0]), len(chunking(self.extracted_text)[1]))
+            # Metadata checks
+            md = ch.get("metadata", {})
+            self.assertIsInstance(md, dict)
+            self.assertIn("doc_metadata", md)
+            self.assertIn("char_start", md)
+            self.assertIn("char_end", md)
+            # Overlap flag consistency
+            if i == 0:
+                self.assertFalse(md.get("overlap_with_prev", False))
+            else:
+                self.assertTrue(md.get("overlap_with_prev", False))
+
+            # Page offsets should be non-negative
+            self.assertGreaterEqual(ch.get("page_start", -1), 0)
+            self.assertGreaterEqual(ch.get("page_end", -1), ch.get("page_start", 0))
+
+        # Optional debug preview (first chunk)
+        first = chunks[0]
+        second = chunks[1]
+        third = chunks[2]
+        print(f"chunks_count={len(chunks)} | first_chunk_index={first['chunk_index']} | "
+              f"first_page_range=({first['page_start']},{first['page_end']}) | "
+              f"first_text_preview={first['text'][:120]!r}")
+        print(f"chunks_count={len(chunks)} | first_chunk_index={second['chunk_index']} | "
+              f"first_page_range=({second['page_start']},{second['page_end']}) | "
+              f"first_text_preview={second['text'][:120]!r}")
+        print(f"chunks_count={len(chunks)} | first_chunk_index={third['chunk_index']} | "
+              f"first_page_range=({third['page_start']},{third['page_end']}) | "
+              f"first_text_preview={third['text'][:1900]!r}")
 
 
-    def test_is_chunk_different(self):
-        print(chunking(self.extracted_text)[0])
-        print(chunking(self.extracted_text)[1])
-        self.assertNotEqual(chunking(self.extracted_text)[0], chunking(self.extracted_text)[1])
 
-if __name__ == '__main__':
-    unittest.main()
+if __name__ == "__main__":
+    unittest.main(verbosity=2)

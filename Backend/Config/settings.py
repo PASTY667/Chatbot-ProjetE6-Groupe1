@@ -9,7 +9,7 @@ HEADER_FOOTER_FREQ_TRESHOLD = 0.5
 
 #Constants for chunking
 
-CHUNK_SIZE_TOKENS = 400
+CHUNK_SIZE_TOKENS = 600
 
 CHUNK_OVERLAP_TOKENS = 75             # overlap ~20%
 

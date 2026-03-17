@@ -2,8 +2,9 @@ import utils.logger as logger
 import logging as log
 import Backend.Config.settings as settings
 from langchain_text_splitters import RecursiveCharacterTextSplitter
+import tiktoken
+import bisect
 
-from Backend.Config.settings import SENTENCE_SEPARATORS
 
 logger.get_logger()
 
@@ -13,9 +14,9 @@ max_chunk_chars = settings.CHROMA_MAX_DOC_CHARS
 paragraph_seps = settings.PARAGRAPH_SEPARATORS
 max_paragraph_tokens = settings.MAX_PARAGRAPH_TOKENS
 min_chunk_tokens = settings.MIN_CHUNK_TOKENS
+separators = paragraph_seps + settings.SENTENCE_SEPARATORS + ["\n", " "]
 
-
-def chunking(text_body: str,pages: str,metadata: dict)->list[dict]:
+def chunk_text(text_body: str, pages: list, metadata: dict) -> list[dict]:
     """Segment cleaned document text into semantically coherent chunks sized for
     the LLM (350–450 tokens, ~75-token overlap).
     Preserves paragraph boundaries when possible and propagates page/offset metadata for
@@ -27,47 +28,108 @@ def chunking(text_body: str,pages: str,metadata: dict)->list[dict]:
     :raises: ValueError if text is too long
     :raises: TypeError if input is not a string
     """
+    final_chunks = []
+    chunks = []
 
     if type(text_body) != str:
         log.error("Input text_body is not a string")
         raise TypeError("Input is not a string")
-    if type(pages) != str:
-        log.error("Input is not a string")
-        raise TypeError("Input pages is not a string")
     if type(metadata) != dict:
         log.error("Input metadata is not a dict")
         raise TypeError("Input is not a dict")
     if text_body == "":
         log.error("Input text_body is empty")
         raise ValueError("Input is an empty string")
-    if pages == "":
-        log.error("Input pages is empty")
-        raise ValueError("Input is an empty string")
-    if type(metadata) != dict:
-        log.error("Input metadata is not a dict")
-        raise TypeError("Input metadata is not a dict")
+    if type(pages) != list:
+        log.error("Input pages is not a list")
+        raise TypeError("Input pages is not a list")
+
 
     #paragraph segmentation
+    encoding = tiktoken.get_encoding("cl100k_base")
+
+    length_function = lambda s: len(encoding.encode(s))
+
     paragraph_splitter = RecursiveCharacterTextSplitter(
-        max_chunk_chars = max_chunk_chars,
-        overlap_tokens = overlap_tokens,
-        separator_chars = paragraph_seps,
+        chunk_size=target_tokens,
+        chunk_overlap=overlap_tokens,
+        separators=separators,
+        length_function=length_function,
     )
 
-    paragraphs = paragraph_splitter.split_text(text_body)
+    chunks_text = paragraph_splitter.split_text(text_body)
 
-    #Sentences segmentation
-    for paragraph in paragraphs:
-        tokens = len(paragraph)//4
-        if tokens > max_chunk_chars:
-            sentence_splitter = RecursiveCharacterTextSplitter(
-                max_chunk_chars = max_chunk_chars,
-                overlap_tokens = overlap_tokens,
-                separator_chars = settings.SENTENCE_SEPARATORS,
+
+    for chunk in chunks_text:
+        if len(chunk.encode("utf-8")) > max_chunk_chars:
+            log.info("Chunk bigger than 16KB, reduction of the size needed")
+            fallback_splitter = RecursiveCharacterTextSplitter(
+                chunk_size=int(target_tokens / 4),
+                chunk_overlap=overlap_tokens,
+                separators=separators,
+                length_function=length_function,
             )
-            sentences = sentence_splitter.split_text(paragraph)
-            pass
-            #non terminé, il faudra modifier par un indice i puis ajouter les phrases à la place du paragraphe
+            sub_chunks = fallback_splitter.split_text(chunk)
+            for sc in sub_chunks:
+                if len(sc.encode("utf-8")) > max_chunk_chars:
+                    log.error("Chunk still bigger than 16KB")
+                    raise ValueError("ChunkingError : the chunk size is bigger than 16KB.")
+                final_chunks.append(sc)
+        else:
+            final_chunks.append(chunk)
+
+
+    page_offsets = []
+    cursor_pages = 0
+    for p in pages:
+        page_offsets.append(cursor_pages)
+        cursor_pages += len(p.get("text", ""))
+
+    # Recherche des offsets dans le texte en tenant compte de l'overlap
+    cursor_text = 0
+    backtrack = overlap_tokens * 4  # approx chars correspondant à l'overlap tokens
+    for i, ch in enumerate(final_chunks):
+        search_start = max(0, cursor_text - backtrack) if i > 0 else 0
+        start = text_body.find(ch, search_start)
+        if start == -1:
+            log.error("Unable to locate chunk text in body; offsets cannot be computed.")
+            raise ValueError("Offset computation failed")
+        end = start + len(ch)
+        cursor_text = end
+
+
+        page_start = bisect.bisect_right(page_offsets, start) - 1
+        page_end = bisect.bisect_right(page_offsets, end - 1) - 1
+        overlap_with_prev = i > 0
+
+        chunks.append(
+            {
+                "page_start": page_start,
+                "page_end": page_end,
+                "chunk_index": i,
+                "text": ch,
+                "metadata": {
+                    "doc_metadata": metadata,
+                    "char_start": start,
+                    "char_end": end,
+                    "overlap_with_prev": overlap_with_prev,
+                },
+            }
+        )
+
+    if len(chunks) == 0:
+        log.error("No chunks found")
+        raise ValueError("No chunks found")
+    return chunks
+
+
+
+
+
+
+
+
+
 
 
 
