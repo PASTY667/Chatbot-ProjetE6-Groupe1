@@ -11,6 +11,8 @@ services:
       CHROMA_URL: ${CHROMA_URL:-http://chromadb:8000}
       CHROMA_COLLECTION: ${CHROMA_COLLECTION:-documents}
       LOG_LEVEL: ${LOG_LEVEL:-INFO}
+      EMBED_MODEL: nomic-embed-text
+      EMBED_BATCH_SIZE: 16
     depends_on:
       - chromadb
 

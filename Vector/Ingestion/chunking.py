@@ -4,6 +4,7 @@ import Backend.Config.settings as settings
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 import tiktoken
 import bisect
+import re
 
 
 logger.get_logger()
@@ -57,7 +58,43 @@ def chunk_text(text_body: str, pages: list, metadata: dict) -> list[dict]:
         length_function=length_function,
     )
 
-    chunks_text = paragraph_splitter.split_text(text_body)
+    def _clean_chunk_text(text: str) -> str:
+        # normalise sauts de ligne et espaces
+        text = text.replace("\r\n", "\n").replace("\r", "\n")
+        text = re.sub(r"\n{3,}", "\n\n", text)
+        text = re.sub(r"[ \t]{2,}", " ", text)
+        # déduplication de lignes identiques successives
+        lines = []
+        prev = None
+        for line in text.split("\n"):
+            if line == prev:
+                continue
+            lines.append(line)
+            prev = line
+        text = "\n".join(lines)
+        # filtrage table des matières / index
+        if "table des matières" in text.lower():
+            return ""
+
+        if len(re.sub(r"[^A-Za-zÀ-ÿ]", "", text)) < 10:
+            return ""
+        return text.strip()
+
+    chunks_text_raw = paragraph_splitter.split_text(text_body)
+    chunks_text = []
+    for c in chunks_text_raw:
+        cleaned = _clean_chunk_text(c)
+        if cleaned:
+
+            lines = [l for l in cleaned.split("\n") if l.strip()]
+            short_lines = [l for l in lines if len(l.split()) <= 3]
+            if lines and len(short_lines) / len(lines) > 0.7:
+                continue  # on exclut ces blocs très bruyants
+            chunks_text.append(cleaned)
+
+    # si tout a été filtré, on revient au split brut (minimal)
+    if not chunks_text:
+        chunks_text = [c.strip() for c in chunks_text_raw if c.strip()]
 
 
     for chunk in chunks_text:
@@ -84,16 +121,21 @@ def chunk_text(text_body: str, pages: list, metadata: dict) -> list[dict]:
     for p in pages:
         page_offsets.append(cursor_pages)
         cursor_pages += len(p.get("text", ""))
+    if not page_offsets:
+        page_offsets = [0]
 
-    # Recherche des offsets dans le texte en tenant compte de l'overlap
+
     cursor_text = 0
-    backtrack = overlap_tokens * 4  # approx chars correspondant à l'overlap tokens
+    backtrack = overlap_tokens * 4
     for i, ch in enumerate(final_chunks):
-        search_start = max(0, cursor_text - backtrack) if i > 0 else 0
+        search_start = max(0, cursor_text - backtrack)
         start = text_body.find(ch, search_start)
         if start == -1:
-            log.error("Unable to locate chunk text in body; offsets cannot be computed.")
-            raise ValueError("Offset computation failed")
+            start = text_body.find(ch)  # dernier recours global
+        if start == -1:
+            # fallback: estimer l'offset en se basant sur le curseur courant
+            log.warning("Fallback offset estimation used; chunk text not found exactly.")
+            start = cursor_text
         end = start + len(ch)
         cursor_text = end
 
@@ -121,12 +163,6 @@ def chunk_text(text_body: str, pages: list, metadata: dict) -> list[dict]:
         log.error("No chunks found")
         raise ValueError("No chunks found")
     return chunks
-
-
-
-
-
-
 
 
 

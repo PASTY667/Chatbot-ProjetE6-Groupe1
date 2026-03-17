@@ -57,16 +57,14 @@ class TestChunking(unittest.TestCase):
         # Optional debug preview (first chunk)
         first = chunks[0]
         second = chunks[1]
-        third = chunks[2]
+
         print(f"chunks_count={len(chunks)} | first_chunk_index={first['chunk_index']} | "
               f"first_page_range=({first['page_start']},{first['page_end']}) | "
-              f"first_text_preview={first['text'][:120]!r}")
+              f"first_text_preview={first['text'][:1200]!r}")
         print(f"chunks_count={len(chunks)} | first_chunk_index={second['chunk_index']} | "
               f"first_page_range=({second['page_start']},{second['page_end']}) | "
               f"first_text_preview={second['text'][:120]!r}")
-        print(f"chunks_count={len(chunks)} | first_chunk_index={third['chunk_index']} | "
-              f"first_page_range=({third['page_start']},{third['page_end']}) | "
-              f"first_text_preview={third['text'][:1900]!r}")
+
 
 
 

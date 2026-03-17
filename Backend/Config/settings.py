@@ -27,10 +27,16 @@ TABLE_GAP_THRESHOLD = 2               # number of successives spaces to detecte 
 
 MIN_CHUNK_TOKENS = 120                # avoid little chunks (enhances recall)
 
-MAX_PARAGRAPH_TOKENS = 600            # After we cut by sentences
+MAX_PARAGRAPH_TOKENS = 400            # After we cut by sentences
 
 OVERLAP_STRATEGY = "sentence_tail"    # overlap mode
 
 EMBED_BATCH_SIZE = 32                 # embedding batch
 
 ALLOWED_FILETYPES = ["pdf", "txt", "md"]
+
+EMBED_MODEL = "nomic-embed-text"
+
+EMBED_BATCH_SIZE = 16
+
+
