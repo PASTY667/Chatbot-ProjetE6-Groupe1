@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { ReactNode } from "react";
 import "./globals.css";
-import Sidebar from "@/pages/sidebar/sidebar";
+import Sidebar from "@/components/sidebar";
 
 export const metadata: Metadata = {
   title: "Franklin",
@@ -16,9 +16,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        <Sidebar />
       </head>
       <body className="layout">
+        <Sidebar />
         <main className="content">{children}</main>
       </body>
     </html>

@@ -3,8 +3,6 @@ import style from "@/pages/index/index.module.css";
 
 export default function Index() {
     return(
-        
-
   <div className={style.newchatPage}>
     <div className={style.newchatHeader}>
       {/* <img className={style.logo}>

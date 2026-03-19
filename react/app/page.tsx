@@ -1,10 +1,9 @@
-/* ex-of-import: import Herobanner from "@/Sections/hero-banner/hero-banner"; */
+import Index from "@/sections/index";
 
 export default function Home(){
     return(
       <>
-      {/* <Herobanner /> */}
-      <p>ysgiuesdhgflieufhgyep</p>
+      <Index />
       </>
     );
 }
