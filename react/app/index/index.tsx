@@ -10,9 +10,9 @@ export default function Index() {
     </div>
     <div className={style.newchatInput}>
       <div className={style.uploadSection}>
-        <label for="upload-file" className={style.uploadButton}>
-          {/* <Image className={style.uploadIcon} src="assets/upload-file.png" alt=""> PDF */}
-        </label>
+        {/* <label for="upload-file" className={style.uploadButton}>
+          <Image className={style.uploadIcon} src="assets/upload-file.png" alt=""> PDF
+        </label> */}
         <span id="file-name" className={style.fileName}></span>
         {/* <input id="upload-file" type="file" className={style.addButton} accept="application/pdf"> */}
       </div>
