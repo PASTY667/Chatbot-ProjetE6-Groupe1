@@ -4,7 +4,6 @@ body {
   font-family: var(--primary-font-family);
   margin: 0;
   height: 100%;
-  width: 100%;
   display: flex;
   place-items: center;
 }

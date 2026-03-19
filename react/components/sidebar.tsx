@@ -16,29 +16,29 @@ export default function Sidebar() {
         <ul className={style.listSidebar}>
           <div className={style.listFixSidebar}>
             <li>
-              <a href="index.php">Nouveau chat +</a>
+              <a href="index.tsx">Nouveau chat +</a>
             </li>
             <li>
-              <a href="history.php">Historique</a>
+              <a href="history.tsx">Historique</a>
             </li>
           </div>
           {/* <hr className={style.hrSidebar}> */}
           <div className={style.listChatSidebar}>
             <li>
-              <Link href="newchat.php">Chat</Link>
+              <Link href="newchat.tsx">Chat</Link>
             </li>
             <li>
-              <Link href="newchat.php">Chat</Link>
+              <Link href="newchat.tsx">Chat</Link>
             </li>
             <li>
-              <Link href="newchat.php">Chat</Link>
+              <Link href="newchat.tsx">Chat</Link>
             </li>
           </div>
         </ul>
       </div>
       <div className={style.setting}>
         <h5 className={style.settingTitle}>Paramètres</h5>
-        <a className={style.settingButton} href="settings.php">
+        <a className={style.settingButton} href="settings.tsx">
           <Image className={style.logo} src={logo} alt="logo" />
           <Image className={style.logoHover} src={logoHover} alt="logoHover" />
         </a>
