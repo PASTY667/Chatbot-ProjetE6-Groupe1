@@ -1,5 +1,10 @@
-import Image from "next/image";
+/* ex-of-import: import Herobanner from "@/Sections/hero-banner/hero-banner"; */
 
-export default function Home() {
-  return ;
+export default function Home(){
+    return(
+      <>
+      {/* <Herobanner /> */}
+      <p>ysgiuesdhgflieufhgyep</p>
+      </>
+    );
 }
