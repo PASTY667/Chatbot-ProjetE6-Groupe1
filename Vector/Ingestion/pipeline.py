@@ -41,6 +41,7 @@ def ingest_document(path_file):
     extracted = extract_text(file_path)
     log.info(f"Finished extracting {path_file}.")
     log.info(f"Starting the chunking of {path_file}.")
+    metadata = extracted["metadata"]
     chunks = chunk_text(extracted["body"], extracted["pages"], extracted["metadata"])
     log.info(f"Finished chunking {path_file}.")
     log.info(f"Starting the embedding generation of {path_file}.")
@@ -52,6 +53,10 @@ def ingest_document(path_file):
     #Statistics to return
     chunk_amount = len(chunks)
     embeddings_amount = len(embeddings)
+    document_name = file_path.stem
 
-    #ToDO: Add more statistics
 
+
+
+
+    return chunk_amount, embeddings_amount, document_name
