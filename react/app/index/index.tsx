@@ -1,11 +1,10 @@
-import style from "@/pages/index/index.module.css";
-
+import style from "@/app/index/index.module.css";
 
 export default function Index() {
-    return(
-  <div className={style.newchatPage}>
-    <div className={style.newchatHeader}>
-      {/* <img className={style.logo}>
+  return (
+    <div className={style.newchatPage}>
+      <div className={style.newchatHeader}>
+        {/* <img className={style.logo}>
       <h1 className={style.newchatTitle}>Franklin</h1>
     </div>
     <div className={style.newchatInput}>
@@ -18,7 +17,7 @@ export default function Index() {
       </div>
       <input className={style.textInput} type="text" value="Poser une question...">
       <input className={style.submitButton} style="align-self: flex-end" type="submit" value=">"> */}
+      </div>
     </div>
-  </div>
-    );
+  );
 }

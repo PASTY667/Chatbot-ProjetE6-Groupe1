@@ -39,8 +39,8 @@ export default function Sidebar() {
       <div className={style.setting}>
         <h5 className={style.settingTitle}>Paramètres</h5>
         <a className={style.settingButton} href="settings.php">
-          <Image className={style.logo} src={logo}  alt="logo"/>
-          <Image className={style.logoHover} src={logoHover} alt="logoHover"/>
+          <Image className={style.logo} src={logo} alt="logo" />
+          <Image className={style.logoHover} src={logoHover} alt="logoHover" />
         </a>
       </div>
     </div>
