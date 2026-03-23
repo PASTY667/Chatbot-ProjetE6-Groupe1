@@ -37,6 +37,5 @@ ALLOWED_FILETYPES = ["pdf", "txt", "md"]
 
 EMBED_MODEL = "nomic-embed-text"
 
-EMBED_BATCH_SIZE = 16
 
 

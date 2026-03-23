@@ -10,6 +10,7 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
+from Vector.Ingestion import extract as ex
 from Vector.Ingestion.extract import extract_text
 
 
@@ -122,6 +123,41 @@ class TestExtractText(unittest.TestCase):
                 extract_text(tmp_path)
         finally:
             tmp_path.unlink(missing_ok=True)
+
+    def test_noise_line_filtering(self):
+        lines = [
+            "1.2.3",
+            "•",
+            "Table des matières",
+            "Sommaire",
+            "Chapitre 1 Introduction",
+            "- item utile",
+            "IV",
+        ]
+        cleaned = ex.normalize_body_lines(lines)
+        self.assertIn("Chapitre 1 Introduction", cleaned)
+        self.assertIn("- item utile", cleaned)
+        self.assertNotIn("1.2.3", cleaned)
+        self.assertNotIn("Table des matières", cleaned)
+        self.assertNotIn("IV", cleaned)
+
+    def test_paragraph_merging(self):
+        lines = [
+            "Ce paragraphe commence",
+            "se poursuit sur la ligne suivante",
+            "et se termine ici.",
+            "",
+            "- élément de liste",
+            "Titre De Section",
+        ]
+        merged = ex.merge_lines_into_paragraphs(lines)
+        self.assertTrue(any("se poursuit" in m for m in merged))
+        self.assertIn("- élément de liste", merged)
+        self.assertIn("Titre De Section", merged)
+
+    def test_toc_page_detection(self):
+        lines = ["Table des matières", "1 Introduction 1", "2 Méthode 3", "3 Résultats 5"]
+        self.assertTrue(ex._is_toc_page(lines, 0))
 
 
 if __name__ == "__main__":

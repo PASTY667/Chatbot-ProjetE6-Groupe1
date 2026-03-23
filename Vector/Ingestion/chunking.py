@@ -2,9 +2,14 @@ import utils.logger as logger
 import logging as log
 import Backend.Config.settings as settings
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-import tiktoken
 import bisect
 import re
+from typing import Callable, Any, Optional
+
+try:
+    import tiktoken
+except Exception:  # pragma: no cover - tiktoken may be absent offline
+    tiktoken = None
 
 
 logger.get_logger()
@@ -17,9 +22,33 @@ max_paragraph_tokens = settings.MAX_PARAGRAPH_TOKENS
 min_chunk_tokens = settings.MIN_CHUNK_TOKENS
 separators = paragraph_seps + settings.SENTENCE_SEPARATORS + ["\n", " "]
 
+
+def _safe_length_function() -> Callable[[str], int]:
+    """
+    Return a token-length approximation function, preferring tiktoken when available.
+    """
+    if tiktoken is not None:
+        try:
+            encoding = tiktoken.get_encoding("cl100k_base")
+            return lambda s: len(encoding.encode(s))
+        except Exception as e:  # pragma: no cover - network/cache errors
+            log.warning(f"tiktoken unavailable, falling back to char/4 estimation: {e}")
+    log.warning("Using approximate token length: len(text) // 4")
+    return lambda s: max(1, len(s) // 4)
+
+
+def _normalize_for_search(text: str) -> str:
+    """
+    Light normalization to improve substring matching consistency.
+    """
+    text = text.replace("\r\n", "\n").replace("\r", "\n")
+    text = re.sub(r"[ \t]{2,}", " ", text)
+    return text
+
+
 def chunk_text(text_body: str, pages: list, metadata: dict) -> list[dict]:
     """Segment cleaned document text into semantically coherent chunks sized for
-    the LLM (350–450 tokens, ~75-token overlap).
+    the LLM (600 tokens, ~75-token overlap).
     Preserves paragraph boundaries when possible and propagates page/offset metadata for
     downstream retrieval.
     :param text: cleaned document text
@@ -32,24 +61,22 @@ def chunk_text(text_body: str, pages: list, metadata: dict) -> list[dict]:
     final_chunks = []
     chunks = []
 
-    if type(text_body) != str:
+    if not isinstance(text_body, str):
         log.error("Input text_body is not a string")
         raise TypeError("Input is not a string")
-    if type(metadata) != dict:
+    if not isinstance(metadata, dict):
         log.error("Input metadata is not a dict")
         raise TypeError("Input is not a dict")
     if text_body == "":
         log.error("Input text_body is empty")
         raise ValueError("Input is an empty string")
-    if type(pages) != list:
+    if not isinstance(pages, list):
         log.error("Input pages is not a list")
         raise TypeError("Input pages is not a list")
 
 
     #paragraph segmentation
-    encoding = tiktoken.get_encoding("cl100k_base")
-
-    length_function = lambda s: len(encoding.encode(s))
+    length_function = _safe_length_function()
 
     paragraph_splitter = RecursiveCharacterTextSplitter(
         chunk_size=target_tokens,
@@ -127,11 +154,13 @@ def chunk_text(text_body: str, pages: list, metadata: dict) -> list[dict]:
 
     cursor_text = 0
     backtrack = overlap_tokens * 4
+    normalized_body = _normalize_for_search(text_body)
     for i, ch in enumerate(final_chunks):
+        ch_norm = _normalize_for_search(ch)
         search_start = max(0, cursor_text - backtrack)
-        start = text_body.find(ch, search_start)
+        start = normalized_body.find(ch_norm, search_start)
         if start == -1:
-            start = text_body.find(ch)  # dernier recours global
+            start = normalized_body.find(ch_norm)  # dernier recours global
         if start == -1:
             # fallback: estimer l'offset en se basant sur le curseur courant
             log.warning("Fallback offset estimation used; chunk text not found exactly.")
@@ -163,7 +192,6 @@ def chunk_text(text_body: str, pages: list, metadata: dict) -> list[dict]:
         log.error("No chunks found")
         raise ValueError("No chunks found")
     return chunks
-
 
 
 
