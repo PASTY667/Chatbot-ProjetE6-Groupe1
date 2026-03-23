@@ -10,16 +10,20 @@ from Core.embeddings_fn import OllamaEmbeddingFunction
 logger.get_logger()
 
 
-
-
 def get_chroma_client():
     """
     Initialize and return a Chroma client using CHROMA_URL from environment.
+    Initialiser et retourner un client Chroma en utilisant CHROMA_URL issu de l'environnement.
 
-    The function reads connection settings (URL, auth if needed) from the
-    environment (.env) and constructs a client object ready for collection
-    operations. It should be called once at startup and reused across the
-    pipeline to avoid recreating HTTP sessions.
+    Returns
+    -------
+    chromadb.HttpClient
+        Configured Chroma HTTP client.
+
+    Raises
+    ------
+    RuntimeError
+        If no reachable Chroma instance is found.
     """
     candidates = [
         os.getenv("CHROMA_URL"),
@@ -58,20 +62,24 @@ def get_chroma_client():
     raise RuntimeError(f"Failed to connect to Chroma. Last error: {last_err}")
 
 
-
-def init_collection(client):
+def init_collection(client, collection_name: str | None = None):
     """
     Create or retrieve the target Chroma collection.
+    Créer ou récupérer la collection Chroma cible.
 
-    Uses the configured collection name (CHROMA_COLLECTION) and attaches the
-    embedding function if provided (e.g., OllamaEmbeddingFunction). This
-    collection will store document chunks with their embeddings and metadata.
+    Parameters
+    ----------
+    client : chromadb.HttpClient
+        Existing Chroma client instance.
+    collection_name : str | None, optional
+        Explicit collection name; falls back to CHROMA_COLLECTION env or ``"documents"``.
 
-    :param client: An existing Chroma client instance.
-    :param collection_name: Name of the collection to create or load.
-    :return: The Chroma collection handle.
+    Returns
+    -------
+    chromadb.api.models.Collection.Collection
+        The Chroma collection handle ready for CRUD/search operations.
     """
-    collection_name = os.getenv("CHROMA_COLLECTION", "documents")
+    collection_name = collection_name or os.getenv("CHROMA_COLLECTION", "documents")
     hnsw_params = {
         "hnsw:space": "cosine",
         "hnsw:m": int(os.getenv("CHROMA_HNSW_M", "16")),
@@ -94,17 +102,28 @@ def init_collection(client):
 def add_documents(collection, ids: list[str], documents: list[str], metadatas: list[dict], embeddings: list[list[float]] | None = None):
     """
     Insert new chunks into the collection.
+    Insérer de nouveaux chunks dans la collection.
 
-    Upserts the provided ids, raw chunk texts, metadata, and optionally
-    precomputed embeddings. If an embedding_function is attached to the
-    collection, the embeddings parameter can be omitted and Chroma will call
-    the function automatically.
+    Upserts the provided ids, raw chunk texts, metadata, and optionally precomputed embeddings.
+    Met à jour ou insère les ids fournis, les textes, les métadonnées et éventuellement les embeddings pré-calculés.
 
-    :param collection: Chroma collection handle.
-    :param ids: Unique ids per chunk (aligned with documents).
-    :param documents: Chunk texts to store for retrieval and display.
-    :param metadatas: Metadata dictionaries aligned with each chunk.
-    :param embeddings: Optional precomputed embeddings aligned with ids.
+    Parameters
+    ----------
+    collection : chromadb.api.models.Collection.Collection
+        Chroma collection handle.
+    ids : list[str]
+        Unique ids per chunk (aligned with documents).
+    documents : list[str]
+        Chunk texts to store for retrieval and display.
+    metadatas : list[dict]
+        Metadata dictionaries aligned with each chunk.
+    embeddings : list[list[float]] | None, optional
+        Optional precomputed embeddings aligned with ids.
+
+    Raises
+    ------
+    ValueError
+        If list lengths are inconsistent.
     """
     if not (len(ids) == len(documents) == len(metadatas)):
         raise ValueError("ids, documents, metadatas must have the same length")
@@ -123,16 +142,24 @@ def add_documents(collection, ids: list[str], documents: list[str], metadatas: l
 def update_documents(collection, ids: list[str], documents: list[str] | None = None, metadatas: list[dict] | None = None, embeddings: list[list[float]] | None = None):
     """
     Update existing chunks in the collection.
+    Mettre à jour des chunks existants dans la collection.
 
-    Performs an upsert on the given ids. Any provided field (documents,
-    metadatas, embeddings) replaces the stored values; omitted fields remain
-    unchanged when supported by Chroma’s upsert semantics.
+    Performs an upsert on the given ids. Any provided field (documents, metadatas, embeddings) replaces
+    stored values; omitted fields remain unchanged when supported by Chroma’s upsert semantics.
+    Effectue un upsert sur les ids donnés. Les champs fournis remplacent les valeurs existantes ; les champs omis restent inchangés.
 
-    :param collection: Chroma collection handle.
-    :param ids: Ids of chunks to update.
-    :param documents: Optional new chunk texts.
-    :param metadatas: Optional new metadata dicts.
-    :param embeddings: Optional new embeddings.
+    Parameters
+    ----------
+    collection : chromadb.api.models.Collection.Collection
+        Chroma collection handle.
+    ids : list[str]
+        Ids of chunks to update.
+    documents : list[str] | None, optional
+        Optional new chunk texts.
+    metadatas : list[dict] | None, optional
+        Optional new metadata dicts.
+    embeddings : list[list[float]] | None, optional
+        Optional new embeddings.
     """
     collection.upsert(
         ids=ids,
@@ -146,26 +173,44 @@ def update_documents(collection, ids: list[str], documents: list[str] | None = N
 def delete_documents(collection, ids: list[str]):
     """
     Delete chunks from the collection by id.
+    Supprimer des chunks de la collection via leurs identifiants.
 
-    Removes all records matching the provided ids. Use with caution, as this
-    permanently deletes the embeddings and metadata associated with those ids.
+    Removes all records matching the provided ids.
+    Supprime tous les enregistrements correspondant aux ids fournis.
 
-    :param collection: Chroma collection handle.
-    :param ids: List of ids to remove.
+    Parameters
+    ----------
+    collection : chromadb.api.models.Collection.Collection
+        Chroma collection handle.
+    ids : list[str]
+        List of ids to remove.
     """
     collection.delete(ids=ids)
     log.info(f"Deleted {len(ids)} documents from collection.")
 
+
 def search(collection, query: str, filters: dict | None = None, where_document: dict | None = None, k: int = 5):
     """
     Run a vector search (with optional metadata and document filters) against the collection.
+    Exécuter une recherche vectorielle (avec filtres optionnels) sur la collection.
 
-    :param collection: Chroma collection handle.
-    :param query: User query text. Embedding is computed by the collection's embedding_function.
-    :param filters: Optional metadata filter (`where`) for structured filtering.
-    :param where_document: Optional full-text filter (`where_document`) on document content.
-    :param k: Number of results to return.
-    :return: Query result dict (ids, documents, metadatas, distances).
+    Parameters
+    ----------
+    collection : chromadb.api.models.Collection.Collection
+        Chroma collection handle.
+    query : str
+        User query text. Embedding is computed by the collection's embedding_function.
+    filters : dict | None, optional
+        Optional metadata filter (`where`) for structured filtering.
+    where_document : dict | None, optional
+        Optional full-text filter (`where_document`) on document content.
+    k : int, optional
+        Number of results to return.
+
+    Returns
+    -------
+    dict
+        Query result dict (ids, documents, metadatas, distances).
     """
     return collection.query(
         query_texts=[query],

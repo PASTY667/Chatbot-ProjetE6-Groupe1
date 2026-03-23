@@ -69,7 +69,7 @@ class TestChromaClient(unittest.TestCase):
     def _new_collection(self):
         # Unique collection per test to avoid collisions
         name = f"test_{uuid4().hex}"
-        return init_collection(self.client), name
+        return init_collection(self.client, collection_name=name), name
 
     def test_get_chroma_client(self):
         self.assertIsNotNone(self.client)
