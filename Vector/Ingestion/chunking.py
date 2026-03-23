@@ -26,6 +26,12 @@ separators = paragraph_seps + settings.SENTENCE_SEPARATORS + ["\n", " "]
 def _safe_length_function() -> Callable[[str], int]:
     """
     Return a token-length approximation function, preferring tiktoken when available.
+    Fournit une fonction d'approximation de longueur en tokens, privilégiant tiktoken quand disponible.
+
+    Returns
+    -------
+    Callable[[str], int]
+        A callable that estimates token length for a given string.
     """
     if tiktoken is not None:
         try:
@@ -40,6 +46,17 @@ def _safe_length_function() -> Callable[[str], int]:
 def _normalize_for_search(text: str) -> str:
     """
     Light normalization to improve substring matching consistency.
+    Normalisation légère pour améliorer la cohérence de la recherche de sous-chaînes.
+
+    Parameters
+    ----------
+    text : str
+        Text to normalize.
+
+    Returns
+    -------
+    str
+        Text with unified newlines and collapsed spaces.
     """
     text = text.replace("\r\n", "\n").replace("\r", "\n")
     text = re.sub(r"[ \t]{2,}", " ", text)
@@ -47,16 +64,30 @@ def _normalize_for_search(text: str) -> str:
 
 
 def chunk_text(text_body: str, pages: list, metadata: dict) -> list[dict]:
-    """Segment cleaned document text into semantically coherent chunks sized for
-    the LLM (600 tokens, ~75-token overlap).
-    Preserves paragraph boundaries when possible and propagates page/offset metadata for
-    downstream retrieval.
-    :param text: cleaned document text
-    :type text: str
-    :return: semantically coherent chunks sized
-    :rtype: list
-    :raises: ValueError if text is too long
-    :raises: TypeError if input is not a string
+    """
+    Segment cleaned document text into semantically coherent chunks sized for the LLM.
+    Segmente un texte nettoyé en blocs cohérents dimensionnés pour le LLM.
+
+    Parameters
+    ----------
+    text_body : str
+        Cleaned full document text.
+    pages : list
+        List of page dicts as returned by extraction (used for page offset mapping).
+    metadata : dict
+        Document-level metadata propagated to each chunk.
+
+    Returns
+    -------
+    list[dict]
+        List of chunk dictionaries containing text, page range, and offset metadata.
+
+    Raises
+    ------
+    TypeError
+        If `text_body`, `pages`, or `metadata` have invalid types.
+    ValueError
+        If `text_body` is empty or if a chunk still exceeds size limits after splitting.
     """
     final_chunks = []
     chunks = []
@@ -192,7 +223,6 @@ def chunk_text(text_body: str, pages: list, metadata: dict) -> list[dict]:
         log.error("No chunks found")
         raise ValueError("No chunks found")
     return chunks
-
 
 
 

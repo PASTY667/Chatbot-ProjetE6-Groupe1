@@ -20,6 +20,8 @@ class TestChunking(unittest.TestCase):
         get_logger()
         cls.project_root = PROJECT_ROOT
         cls.sample_pdf = cls.project_root / "ProjetChabot_CompteRenduRevue1_DomyBonnelLouboutinDomingo.pdf"
+        cls.simple_pages = [{"index": 0, "text": "Hello world.\nThis is a test."}]
+        cls.simple_metadata = {"filetype": "txt", "source_path": "memory"}
 
     def test_chunking_from_pdf(self):
         if not self.sample_pdf.exists():
@@ -65,6 +67,37 @@ class TestChunking(unittest.TestCase):
               f"first_page_range=({second['page_start']},{second['page_end']}) | "
               f"first_text_preview={second['text'][:120]!r}")
 
+    def test_type_validation(self):
+        with self.assertRaises(TypeError):
+            chunk_text(123, [], {})
+        with self.assertRaises(TypeError):
+            chunk_text("ok", "not_a_list", {})
+        with self.assertRaises(TypeError):
+            chunk_text("ok", [], "not_a_dict")
+
+    def test_empty_body_raises(self):
+        with self.assertRaises(ValueError):
+            chunk_text("", self.simple_pages, self.simple_metadata)
+
+    def test_basic_small_text_chunking(self):
+        text = "Line one.\nLine two continues.\n\nAnother paragraph starts here."
+        chunks = chunk_text(text, self.simple_pages, self.simple_metadata)
+        self.assertEqual(len(chunks), 1)
+        ch = chunks[0]
+        self.assertEqual(ch["page_start"], 0)
+        self.assertEqual(ch["page_end"], 0)
+        self.assertIn("Line one", ch["text"])
+        self.assertGreaterEqual(ch["metadata"]["char_start"], 0)
+
+    def test_fallback_length_function_without_tiktoken(self):
+        import Vector.Ingestion.chunking as ch
+        original = ch.tiktoken
+        ch.tiktoken = None
+        try:
+            chunks = ch.chunk_text("a " * 50, self.simple_pages, self.simple_metadata)
+            self.assertGreaterEqual(len(chunks), 1)
+        finally:
+            ch.tiktoken = original
 
 
 
