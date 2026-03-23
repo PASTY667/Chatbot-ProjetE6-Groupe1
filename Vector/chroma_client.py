@@ -14,28 +14,19 @@ def get_chroma_client():
     """
     Initialize and return a Chroma client using CHROMA_URL from environment.
     Initialiser et retourner un client Chroma en utilisant CHROMA_URL issu de l'environnement.
-
-    Returns
-    -------
-    chromadb.HttpClient
-        Configured Chroma HTTP client.
-
-    Raises
-    ------
-    RuntimeError
-        If no reachable Chroma instance is found.
     """
-    candidates = []
-    for url in [
-        os.getenv("CHROMA_URL"),
-        "http://localhost:8001",  # host access to docker-mapped Chroma
-        "http://localhost:8000",
-        "http://chromadb:8000",   # docker-to-docker access
-    ]:
-        if url and url not in candidates:
-            candidates.append(url)
+    env_url = os.getenv("CHROMA_URL")
 
-    last_err = None
+    if env_url:
+        candidates = [env_url]
+    else:
+        candidates = [
+            "http://localhost:8001",
+            "http://localhost:8000",
+        ]
+
+    first_real_error = None
+
     for url in candidates:
         try:
             hb = httpx.get(f"{url}/api/v1/heartbeat", timeout=3)
@@ -62,15 +53,16 @@ def get_chroma_client():
                 settings=settings,
             )
 
-            cols = client.list_collections()  # reachability check
+            cols = client.list_collections()
             log.info(f"Chroma client initialized with {host}:{port} ssl={ssl}, collections={cols}")
             return client
-        except Exception as exc:
-            last_err = exc
-            log.warning(f"[ChromaDebug] Chroma unreachable at {url}: {exc}")
-            continue
 
-    raise RuntimeError(f"Failed to connect to Chroma. Last error: {last_err}")
+        except Exception as exc:
+            if first_real_error is None:
+                first_real_error = exc
+            log.warning(f"[ChromaDebug] Chroma unreachable at {url}: {exc}")
+
+    raise RuntimeError(f"Failed to connect to Chroma. First error: {first_real_error}")
 
 
 def init_collection(client, collection_name: str | None = None):

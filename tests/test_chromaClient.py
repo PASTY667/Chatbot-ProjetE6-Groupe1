@@ -35,12 +35,13 @@ class TestChromaClient(unittest.TestCase):
 
         # debug: test raw HTTP reachability
         import httpx
-        candidates = [
+        candidates = []
+        for url in [
             os.getenv("CHROMA_URL"),
             "http://localhost:8001",
-            "http://localhost:8000",
-            "http://chromadb:8000",
-        ]
+        ]:
+            if url and url not in candidates:
+                candidates.append(url)
         for url in candidates:
             if not url:
                 continue
