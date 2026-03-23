@@ -6,6 +6,7 @@ from urllib.parse import urlparse
 from chromadb import HttpClient
 from chromadb.config import Settings
 from Core.embeddings_fn import OllamaEmbeddingFunction
+from typing import Any, Dict
 
 logger.get_logger()
 
@@ -60,6 +61,40 @@ def get_chroma_client():
             log.warning(f"[ChromaDebug] Chroma unreachable at {url}: {exc}")
             continue
     raise RuntimeError(f"Failed to connect to Chroma. Last error: {last_err}")
+
+
+def _sanitize_metadata_for_chroma(meta: Dict[str, Any]) -> Dict[str, Any]:
+    """
+    Flatten and filter a metadata dictionary to keep only scalar fields acceptable by Chroma.
+    Aplatir et filtrer un dictionnaire de métadonnées pour ne conserver que des scalaires acceptés par Chroma.
+
+    Parameters
+    ----------
+    meta : dict
+        Raw metadata (may include nested `doc_metadata`).
+
+    Returns
+    -------
+    dict
+        Flattened metadata with only scalar values.
+    """
+    flattened: Dict[str, Any] = {}
+    if not meta:
+        return flattened
+
+    # Pull nested doc_metadata up one level if present
+    doc_meta = meta.get("doc_metadata")
+    if isinstance(doc_meta, dict):
+        for k, v in doc_meta.items():
+            if isinstance(v, (str, int, float, bool)):
+                flattened[str(k)] = v
+    # Copy other scalar fields
+    for k, v in meta.items():
+        if k == "doc_metadata":
+            continue
+        if isinstance(v, (str, int, float, bool)):
+            flattened[str(k)] = v
+    return flattened
 
 
 def init_collection(client, collection_name: str | None = None):
@@ -130,10 +165,12 @@ def add_documents(collection, ids: list[str], documents: list[str], metadatas: l
     if embeddings is not None and len(embeddings) != len(ids):
         raise ValueError("embeddings length must match ids length")
 
+    clean_metas = [_sanitize_metadata_for_chroma(m) for m in metadatas]
+
     collection.upsert(
         ids=ids,
         documents=documents,
-        metadatas=metadatas,
+        metadatas=clean_metas,
         embeddings=embeddings,
     )
     log.info(f"Upserted {len(ids)} documents into collection.")
@@ -161,10 +198,11 @@ def update_documents(collection, ids: list[str], documents: list[str] | None = N
     embeddings : list[list[float]] | None, optional
         Optional new embeddings.
     """
-    collection.upsert(
+    clean_metas = None if metadatas is None else [_sanitize_metadata_for_chroma(m) for m in metadatas]
+    collection.update(
         ids=ids,
         documents=documents,
-        metadatas=metadatas,
+        metadatas=clean_metas,
         embeddings=embeddings,
     )
     log.info(f"Updated {len(ids)} documents in collection.")
