@@ -16,20 +16,11 @@ export default function Sidebar() {
         <ul className={style.listSidebar}>
           <div className={style.listFixSidebar}>
             <li>
-              <a href="index.tsx">Nouveau chat +</a>
-            </li>
-            <li>
-              <a href="history.tsx">Historique</a>
+              <a href="/">Nouveau chat +</a>
             </li>
           </div>
-          {/* <hr className={style.hrSidebar}> */}
+          <hr className={style.hrSidebar} />
           <div className={style.listChatSidebar}>
-            <li>
-              <Link href="newchat.tsx">Chat</Link>
-            </li>
-            <li>
-              <Link href="newchat.tsx">Chat</Link>
-            </li>
             <li>
               <Link href="newchat.tsx">Chat</Link>
             </li>

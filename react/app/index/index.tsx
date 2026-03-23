@@ -1,5 +1,7 @@
 import Image from "next/image";
 import style from "@/app/index/index.module.css";
+import uploadIcon from "@/assets/upload-file.png";
+import logo from "@/assets/frankLogo.png";
 
 export default function Index() {
   return (
@@ -10,14 +12,14 @@ export default function Index() {
     </div>
     <div className={style.newchatInput}>
       <div className={style.uploadSection}>
-        {/* <label for="upload-file" className={style.uploadButton}>
-          <Image className={style.uploadIcon} src="assets/upload-file.png" alt=""> PDF
-        </label> */}
+        <label htmlFor="upload-file" className={style.uploadButton}>
+          <Image className={style.uploadIcon} src={uploadIcon} alt="i" /> PDF
+        </label>
         <span id="file-name" className={style.fileName}></span>
-        {/* <input id="upload-file" type="file" className={style.addButton} accept="application/pdf"> */}
+        <input id="upload-file" type="file" className={style.addButton} accept="application/pdf" />
       </div>
-      {/* <input className={style.textInput} type="text" value="Poser une question...">
-      <input className={style.submitButton} style="align-self: flex-end" type="submit" value=">"> */}
+      {/* <input className={style.textInput} type="text" value="Poser une question..." /> */}
+      <input className={style.submitButton} type="submit" value=">" />
       </div>
     </div>
   );

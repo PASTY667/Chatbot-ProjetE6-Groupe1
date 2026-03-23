@@ -21,7 +21,7 @@ body {
     .logo {
       background-color: pink;
       border-radius: 50%;
-      height: fit-content;
+      height: 7em;
       padding: 0.7em;
       margin: 0px 15px;
       align-self: center;
@@ -91,6 +91,8 @@ body {
     }
 
     .submitButton {
+      align-self: flex-end;
+
       background-color: var(--medium-background-color);
       border: none;
       border-radius: 5px;
