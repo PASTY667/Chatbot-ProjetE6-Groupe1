@@ -6,7 +6,6 @@ from urllib.parse import urlparse
 from chromadb import HttpClient
 from chromadb.config import Settings
 from Core.embeddings_fn import OllamaEmbeddingFunction
-from typing import Any, Dict
 
 logger.get_logger()
 
@@ -26,17 +25,21 @@ def get_chroma_client():
     RuntimeError
         If no reachable Chroma instance is found.
     """
-    candidates = [
+    candidates = []
+    for url in [
         os.getenv("CHROMA_URL"),
-        "http://localhost:8001",  # port mapped in docker-compose (8001:8000)
+        "http://localhost:8001",  # host access to docker-mapped Chroma
         "http://localhost:8000",
-    ]
+        "http://chromadb:8000",   # docker-to-docker access
+    ]:
+        if url and url not in candidates:
+            candidates.append(url)
+
     last_err = None
     for url in candidates:
-        if not url:
-            continue
         try:
             hb = httpx.get(f"{url}/api/v1/heartbeat", timeout=3)
+            hb.raise_for_status()
             log.info(f"[ChromaDebug] Heartbeat {url}/api/v1/heartbeat -> {hb.status_code} {hb.text}")
 
             parsed = urlparse(url)
@@ -52,7 +55,13 @@ def get_chroma_client():
                 anonymized_telemetry=False,
             )
 
-            client = HttpClient(settings=settings)
+            client = HttpClient(
+                host=host,
+                port=port,
+                ssl=ssl,
+                settings=settings,
+            )
+
             cols = client.list_collections()  # reachability check
             log.info(f"Chroma client initialized with {host}:{port} ssl={ssl}, collections={cols}")
             return client
@@ -60,41 +69,8 @@ def get_chroma_client():
             last_err = exc
             log.warning(f"[ChromaDebug] Chroma unreachable at {url}: {exc}")
             continue
+
     raise RuntimeError(f"Failed to connect to Chroma. Last error: {last_err}")
-
-
-def _sanitize_metadata_for_chroma(meta: Dict[str, Any]) -> Dict[str, Any]:
-    """
-    Flatten and filter a metadata dictionary to keep only scalar fields acceptable by Chroma.
-    Aplatir et filtrer un dictionnaire de métadonnées pour ne conserver que des scalaires acceptés par Chroma.
-
-    Parameters
-    ----------
-    meta : dict
-        Raw metadata (may include nested `doc_metadata`).
-
-    Returns
-    -------
-    dict
-        Flattened metadata with only scalar values.
-    """
-    flattened: Dict[str, Any] = {}
-    if not meta:
-        return flattened
-
-    # Pull nested doc_metadata up one level if present
-    doc_meta = meta.get("doc_metadata")
-    if isinstance(doc_meta, dict):
-        for k, v in doc_meta.items():
-            if isinstance(v, (str, int, float, bool)):
-                flattened[str(k)] = v
-    # Copy other scalar fields
-    for k, v in meta.items():
-        if k == "doc_metadata":
-            continue
-        if isinstance(v, (str, int, float, bool)):
-            flattened[str(k)] = v
-    return flattened
 
 
 def init_collection(client, collection_name: str | None = None):
@@ -165,12 +141,10 @@ def add_documents(collection, ids: list[str], documents: list[str], metadatas: l
     if embeddings is not None and len(embeddings) != len(ids):
         raise ValueError("embeddings length must match ids length")
 
-    clean_metas = [_sanitize_metadata_for_chroma(m) for m in metadatas]
-
     collection.upsert(
         ids=ids,
         documents=documents,
-        metadatas=clean_metas,
+        metadatas=metadatas,
         embeddings=embeddings,
     )
     log.info(f"Upserted {len(ids)} documents into collection.")
@@ -198,11 +172,10 @@ def update_documents(collection, ids: list[str], documents: list[str] | None = N
     embeddings : list[list[float]] | None, optional
         Optional new embeddings.
     """
-    clean_metas = None if metadatas is None else [_sanitize_metadata_for_chroma(m) for m in metadatas]
-    collection.update(
+    collection.upsert(
         ids=ids,
         documents=documents,
-        metadatas=clean_metas,
+        metadatas=metadatas,
         embeddings=embeddings,
     )
     log.info(f"Updated {len(ids)} documents in collection.")
