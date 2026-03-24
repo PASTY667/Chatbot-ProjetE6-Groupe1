@@ -32,6 +32,8 @@ body {
     background-color: var(--grey-background-color);
     padding: 0.2em 0.5em 0.5em 0.6em;
     border-radius: 5px;
+    text-align: justify;
+
 
     input[type="file"] {
       display: none;
@@ -82,7 +84,8 @@ body {
       border: none;
       box-shadow: none;
       background-color: var(--grey-background-color);
-      padding: 0.2em 30em 8em 0.2em;
+      font-size: 1.3rem;
+      padding: 0.2em 5em 2em 1em;
     }
 
     .textInput:focus {
@@ -91,7 +94,7 @@ body {
     }
 
     .submitButton {
-      align-self: flex-end;
+      
 
       background-color: var(--medium-background-color);
       border: none;
