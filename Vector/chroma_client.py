@@ -82,23 +82,12 @@ def init_collection(client, collection_name: str | None = None):
     chromadb.api.models.Collection.Collection
         The Chroma collection handle ready for CRUD/search operations.
     """
-    collection_name = collection_name or os.getenv("CHROMA_COLLECTION", "documents")
-    hnsw_params = {
-        "hnsw:space": "cosine",
-        "hnsw:m": int(os.getenv("CHROMA_HNSW_M", "16")),
-        "hnsw:ef_construction": int(os.getenv("CHROMA_HNSW_EF_CONSTRUCTION", "200")),
-    }
     embedding_function = OllamaEmbeddingFunction()
     collection = client.get_or_create_collection(
         name=collection_name,
         embedding_function=embedding_function,
-        metadata=hnsw_params,
     )
-    log.info(
-        f"Chroma collection ready: {collection_name} "
-        f"(EF attached, space={hnsw_params['hnsw:space']}, m={hnsw_params['hnsw:m']}, "
-        f"ef_construction={hnsw_params['hnsw:ef_construction']})"
-    )
+    log.info(f"Chroma collection ready: {collection_name} (EF attached)")
     return collection
 
 
