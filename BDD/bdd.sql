@@ -95,9 +95,42 @@ CREATE TABLE deposer (
   CONSTRAINT deposer_id_user_FK FOREIGN KEY (id_user) REFERENCES user (id_user)
 )ENGINE=InnoDB;
 
--- ----------------------------
--- Table: vector_document
--- ----------------------------
+CREATE TABLE auth_session (
+  id_auth_session BIGINT AUTO_INCREMENT PRIMARY KEY,
+  id_user INT NOT NULL,
+  session_uid CHAR(36) NOT NULL,          -- UUID côté API
+  user_agent VARCHAR(255) NULL,
+  ip_address VARCHAR(50) NULL,
+  created_at DATETIME NOT NULL,
+  expires_at DATETIME NOT NULL,
+  revoked_at DATETIME NULL,
+  UNIQUE KEY uk_auth_session_uid (session_uid),
+  KEY idx_auth_session_user (id_user),
+  CONSTRAINT fk_auth_session_user FOREIGN KEY (id_user) REFERENCES user(id_user)
+) ENGINE=InnoDB;
+
+CREATE TABLE refresh_token (
+  id_refresh BIGINT AUTO_INCREMENT PRIMARY KEY,
+  id_auth_session BIGINT NOT NULL,
+  token_hash CHAR(64) NOT NULL,           -- SHA-256 du refresh token
+  created_at DATETIME NOT NULL,
+  expires_at DATETIME NOT NULL,
+  revoked_at DATETIME NULL,
+  replaced_by BIGINT NULL,
+  UNIQUE KEY uk_refresh_hash (token_hash),
+  KEY idx_refresh_session (id_auth_session),
+  CONSTRAINT fk_refresh_session FOREIGN KEY (id_auth_session) REFERENCES auth_session(id_auth_session)
+) ENGINE=InnoDB;
+
+CREATE TABLE jwt_denylist (
+  id_deny BIGINT AUTO_INCREMENT PRIMARY KEY,
+  jti CHAR(36) NOT NULL,
+  expires_at DATETIME NOT NULL,
+  created_at DATETIME NOT NULL,
+  UNIQUE KEY uk_jti (jti),
+  KEY idx_jti_exp (expires_at)
+) ENGINE=InnoDB;
+
 CREATE TABLE vector_document (
   id_vector_doc BIGINT AUTO_INCREMENT PRIMARY KEY,
   id_file INT NOT NULL,
@@ -117,49 +150,4 @@ CREATE TABLE vector_document (
   CONSTRAINT fk_vector_file FOREIGN KEY (id_file) REFERENCES file(id_file),
   CONSTRAINT fk_vector_user FOREIGN KEY (id_user) REFERENCES user(id_user),
   CONSTRAINT fk_vector_session FOREIGN KEY (id_session) REFERENCES session(id_session)
-) ENGINE=InnoDB;
-
--- ----------------------------
--- Table: jwt_denylist
--- ----------------------------
-CREATE TABLE jwt_denylist (
-  id_deny BIGINT AUTO_INCREMENT PRIMARY KEY,
-  jti CHAR(36) NOT NULL,
-  expires_at DATETIME NOT NULL,
-  created_at DATETIME NOT NULL,
-  UNIQUE KEY uk_jti (jti),
-  KEY idx_jti_exp (expires_at)
-) ENGINE=InnoDB;
-
--- ----------------------------
--- Table: refresh_token
--- ----------------------------
-CREATE TABLE refresh_token (
-  id_refresh BIGINT AUTO_INCREMENT PRIMARY KEY,
-  id_auth_session BIGINT NOT NULL,
-  token_hash CHAR(64) NOT NULL,           -- SHA-256 du refresh token
-  created_at DATETIME NOT NULL,
-  expires_at DATETIME NOT NULL,
-  revoked_at DATETIME NULL,
-  replaced_by BIGINT NULL,
-  UNIQUE KEY uk_refresh_hash (token_hash),
-  KEY idx_refresh_session (id_auth_session),
-  CONSTRAINT fk_refresh_session FOREIGN KEY (id_auth_session) REFERENCES auth_session(id_auth_session)
-) ENGINE=InnoDB;
-
--- ----------------------------
--- Table: auth_token
--- ----------------------------
-CREATE TABLE auth_session (
-  id_auth_session BIGINT AUTO_INCREMENT PRIMARY KEY,
-  id_user INT NOT NULL,
-  session_uid CHAR(36) NOT NULL,          -- UUID côté API
-  user_agent VARCHAR(255) NULL,
-  ip_address VARCHAR(50) NULL,
-  created_at DATETIME NOT NULL,
-  expires_at DATETIME NOT NULL,
-  revoked_at DATETIME NULL,
-  UNIQUE KEY uk_auth_session_uid (session_uid),
-  KEY idx_auth_session_user (id_user),
-  CONSTRAINT fk_auth_session_user FOREIGN KEY (id_user) REFERENCES user(id_user)
 ) ENGINE=InnoDB;
