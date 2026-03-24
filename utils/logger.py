@@ -1,5 +1,6 @@
 import logging as log
 from pathlib import Path
+import os
 
 def get_logger():
     """
@@ -18,12 +19,18 @@ def get_logger():
 
     log_file = LOG_DIR / "mainLog.log"
 
+    root = log.getLogger()
+    if root.handlers:
+        return
+
+    level_name = os.getenv("LOG_LEVEL", "INFO").upper()
+    level = getattr(log, level_name, log.INFO)
+
     log.basicConfig(
         filename=log_file,
-        level=log.INFO,
-        filemode="w",
+        level=level,
+        filemode="a",
         format="%(asctime)s - %(levelname)s - %(message)s",
-        force=True
     )
 
     log.info("logging started")
