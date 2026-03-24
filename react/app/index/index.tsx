@@ -1,19 +1,35 @@
 import Image from "next/image";
-import { TextField, Button, Container, Grid, LinearProgress, CircularProgress } from "@mui/material";
+import React, { useState } from "react";
+import {
+  TextField,
+  Button,
+  Container,
+  Grid,
+  LinearProgress,
+  CircularProgress,
+} from "@mui/material";
 
 import style from "@/app/index/index.module.css";
 import uploadIcon from "@/assets/upload-file.png";
 import ChatInput from "@/components/ChatInput/chatInput";
 import logo from "@/assets/frankLogo.png";
 
-
+type Message = {
+  role: "user" | "assistant";
+  content: string;
+};
 
 export default function Index() {
-  const handleSendMessage = (msg: string) => {
-    console.log("Message reçu :", msg);
+  const [messages, setMessages] = useState<Message[]>([]);
 
-    // - appel API
-    // - ajout dans messages[]
+  //Gérer l'envoi d'un message
+  const handleSendMessage = (msg: string) => {
+    const newMessage: Message = {
+      role: "user",
+      content: msg,
+    };
+
+    setMessages((prev) => [...prev, newMessage]);
   };
 
   return (
@@ -24,10 +40,11 @@ export default function Index() {
         <h1 className={style.newchatTitle}>Franklin</h1>
       </div>
 
-      <Grid container direction="column" spacing={2} paddingBottom={2}>
-        {}
+      <Grid>
+        {messages.map((msg, index) => (
+          <div key={index}>{msg.content}</div>
+        ))}
       </Grid>
-
 
       {/* ZONE D'INPUT */}
       <div className={style.newchatInput}>
