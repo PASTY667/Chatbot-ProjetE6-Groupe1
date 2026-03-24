@@ -1,5 +1,6 @@
 import utils.logger as logger
 import logging as log
+import time
 from extract import extract_text, return_path
 from chunking import chunk_text
 from Core.embeddings_fn import OllamaEmbeddingFunction
@@ -27,27 +28,27 @@ def ingest_document(path_file):
     :raises Exception: If embedding generation or vector store insertion fails.
     """
 
-    log.info(f"Ingestion of  {path_file} started.")
+    start_ts = time.time()
+    log.info(f"[pipeline][ingest] started path={path_file}")
     file_path = return_path(path_file)
 
     if not file_path.exists():
-        log.error(f"The provided file path does not exist: {file_path}")
+        log.warning(f"[pipeline][ingest] missing file path={file_path}")
         raise FileNotFoundError(f"The provided file path does not exist: {file_path}")
     if not file_path.is_file():
-        log.error(f"The provided file path is not a file: {file_path}")
+        log.warning(f"[pipeline][ingest] path is not a file path={file_path}")
         raise ValueError(f"The provided file path is not a file: {file_path}")
 
-    log.info(f"Starting the extraction of {path_file}.")
+    log.info(f"[pipeline][extract] started path={path_file}")
     extracted = extract_text(file_path)
-    log.info(f"Finished extracting {path_file}.")
-    log.info(f"Starting the chunking of {path_file}.")
-    metadata = extracted["metadata"]
+    log.info(f"[pipeline][extract] finished path={path_file}")
+    log.info(f"[pipeline][chunk] started path={path_file}")
     chunks = chunk_text(extracted["body"], extracted["pages"], extracted["metadata"])
-    log.info(f"Finished chunking {path_file}.")
-    log.info(f"Starting the embedding generation of {path_file}.")
+    log.info(f"[pipeline][chunk] finished path={path_file} chunks={len(chunks)}")
+    log.info(f"[pipeline][embed] started path={path_file}")
     EmbeddingFunction = OllamaEmbeddingFunction
     embeddings = EmbeddingFunction(chunks)
-    log.info(f"Finished embedding generation of {path_file}.")
+    log.info(f"[pipeline][embed] finished path={path_file} embeddings={len(embeddings)}")
 
     #ToDO: Store chunks into ChromaDb
     #Statistics to return
@@ -58,5 +59,11 @@ def ingest_document(path_file):
 
 
 
+
+    elapsed_ms = int((time.time() - start_ts) * 1000)
+    log.info(
+        f"[pipeline][ingest] finished path={path_file} "
+        f"doc={document_name} chunks={chunk_amount} embeddings={embeddings_amount} elapsed_ms={elapsed_ms}"
+    )
 
     return chunk_amount, embeddings_amount, document_name
