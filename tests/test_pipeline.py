@@ -27,7 +27,7 @@ class TestPipelineUnit(unittest.TestCase):
             {"chunk_index": 1, "text": "b", "metadata": {"m": 2}},
         ]
         ids, docs, metas = pipeline.build_chroma_payloads(chunks, "doc")
-        self.assertEqual(ids, ["doc_0", "doc_1"])
+        self.assertEqual(ids, ["doc_c0", "doc_c1"])
         self.assertEqual(docs, ["a", "b"])
         self.assertEqual(metas[0]["m"], 1)
 
