@@ -1,0 +1,33 @@
+.chatInput {
+  .textInput {
+    
+    color:var(--light-text-color);
+    border: none;
+    box-shadow: none;
+    background-color: var(--grey-background-color);
+    font-size: 1.3rem;
+    padding: 0.2em 5em 2em 1em;
+  }
+
+  .textInput:focus {
+    outline: none;
+    border-color: var(--grey-background-color);
+  }
+
+  .submitButton {
+    color:var(--light-text-color);
+    background-color: var(--lightOrange-background-color);
+    border: none;
+    border-radius: 5px;
+    padding: 6px 28px;
+    font-size: 1.8rem;
+    cursor: pointer;
+    display: flex;
+    justify-self: end;
+  }
+
+  .submitButton:hover {
+    background-color: var(--darkOrange-background-color);
+    transition: 0.2s ease-in-out;
+  }
+}

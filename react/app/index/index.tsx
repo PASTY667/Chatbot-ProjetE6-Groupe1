@@ -3,11 +3,19 @@ import { TextField, Button, Container, Grid, LinearProgress, CircularProgress } 
 
 import style from "@/app/index/index.module.css";
 import uploadIcon from "@/assets/upload-file.png";
+import ChatInput from "@/components/ChatInput/chatInput";
 import logo from "@/assets/frankLogo.png";
 
 
 
 export default function Index() {
+  const handleSendMessage = (msg: string) => {
+    console.log("Message reçu :", msg);
+
+    // - appel API
+    // - ajout dans messages[]
+  };
+
   return (
     <div className={style.newchatPage}>
       {/* HEADER DE LA PAGE */}
@@ -39,18 +47,7 @@ export default function Index() {
         </div>
 
         {/* INPUT D'UN MESSAGE AU CHABOT */}
-        <input
-          className={style.textInput}
-          type="text"
-          // value={message}
-          // onChange={(e) => setMessage(e.target.value)}
-          placeholder="Poser une question..."
-          // value={query}
-          // onChange={test}
-        />
-
-        {/* BOUTON SOUMETTRE LE MESSAGE */}
-        <input className={style.submitButton} type="submit" value=">" />
+        <ChatInput onSend={handleSendMessage} />
       </div>
     </div>
   );

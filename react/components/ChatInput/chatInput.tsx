@@ -1,23 +1,39 @@
+"use client";
 import React, { useState } from "react";
+import style from "@/components/ChatInput/chatInput.module.css";
 
-
-type Message = {
-  role: "user" | "assistant";
-  content: string;
+type Props = {
+  onSend: (message: string) => void;
 };
 
-const ChatInputConst = () => {
+export default function ChatInput({ onSend }: Props) {
   const [message, setMessage] = useState("");
 
   //fonction d'envoi
   const handleSend = async () => {
     //Empêche d’envoyer une chaîne vide ou juste des espaces
-    // if (!messages.trim()) return;
+    if (!message.trim()) return;
 
+    onSend(message);
+    // Vide l'input après l'envoi
     setMessage("");
-  }
-};
+  };
 
-export default function ChatInput(){
-
+  return (
+    <div className={style.chatInput}>
+      <input
+        className={style.textInput}
+        type="text"
+        value={message}
+        onChange={(e) => setMessage(e.target.value)}
+        placeholder="Poser une question..."
+        onKeyDown={(e) => {
+          if (e.key === "Enter") handleSend();
+        }}
+      />
+      
+      {/* BOUTON SOUMETTRE LE MESSAGE */}
+      <input className={style.submitButton} type="submit" value=">" onClick={handleSend} />
+    </div>
+  );
 }
