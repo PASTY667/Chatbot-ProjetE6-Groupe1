@@ -1,8 +1,11 @@
 import Image from "next/image";
 import { TextField, Button, Container, Grid, LinearProgress, CircularProgress } from "@mui/material";
+
 import style from "@/app/index/index.module.css";
 import uploadIcon from "@/assets/upload-file.png";
 import logo from "@/assets/frankLogo.png";
+
+
 
 export default function Index() {
   return (
@@ -12,6 +15,10 @@ export default function Index() {
         {/* <Image className={style.logo} src={} alt="" /> */}
         <h1 className={style.newchatTitle}>Franklin</h1>
       </div>
+
+      <Grid container direction="column" spacing={2} paddingBottom={2}>
+        {}
+      </Grid>
 
 
       {/* ZONE D'INPUT */}
@@ -35,6 +42,8 @@ export default function Index() {
         <input
           className={style.textInput}
           type="text"
+          // value={message}
+          // onChange={(e) => setMessage(e.target.value)}
           placeholder="Poser une question..."
           // value={query}
           // onChange={test}
