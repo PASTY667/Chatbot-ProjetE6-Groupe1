@@ -45,8 +45,6 @@ tr:nth-child(odd) {
 }
 
 .gestChatWindow {
-    display: flex;
-    justify-content: center;
     background-color: gray;
 }
 
@@ -61,8 +59,7 @@ h1 {
 }
 
 .a {
-    width: 20vi;
-    height: 100%;
+    width: 20dvi;
     background-color: var(--lightOrange-background-color);
 /*     position: fixed;
     left: 0; */
@@ -74,8 +71,6 @@ h1 {
 
 .mainWindow {
     text-align: center;
-    width: 80%;
-    height: 100%;
 }
 
 .mainTextbox {
