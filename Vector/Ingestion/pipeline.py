@@ -1,6 +1,9 @@
 import utils.logger as logger
 import logging as log
-import hashlib
+import time
+from extract import extract_text, return_path
+from chunking import chunk_text
+from Core.embeddings_fn import OllamaEmbeddingFunction
 from pathlib import Path
 from typing import List, Tuple
 
@@ -66,52 +69,27 @@ def build_chroma_payloads(chunks: List[dict], doc_id: str) -> Tuple[List[str], L
     log.info(f"[pipeline] Built payloads: ids={len(ids)} documents={len(documents)} metadatas={len(metadatas)}")
     return ids, documents, metadatas
 
-
-def ingest_document(path_file: str, collection_name: str | None = None, doc_id: str | None = None) -> dict:
-    """
-    Run the end-to-end ingestion pipeline for a single file.
-    Exécuter le pipeline d’ingestion de bout en bout pour un fichier.
-
-    Parameters
-    ----------
-    path_file : str
-        Absolute or relative path to the file to ingest.
-    collection_name : str | None, optional
-        Optional target collection name.
-    doc_id : str | None, optional
-        Optional document identifier; hashed from path if absent.
-
-    Returns
-    -------
-    dict
-        Summary containing collection name, doc_id, chunk count, inserted id count, and source path.
-
-    Raises
-    ------
-    FileNotFoundError
-        If the path does not exist.
-    ValueError
-        If the path is not a file or chunking/extraction fails.
-    """
-    log.info(f"Ingestion of {path_file} started.")
-    file_path: Path = return_path(path_file)
+    start_ts = time.time()
+    log.info(f"[pipeline][ingest] started path={path_file}")
+    file_path = return_path(path_file)
 
     if not file_path.exists():
-        log.error(f"The provided file path does not exist: {file_path}")
-        log.info("[pipeline] Aborting ingestion before extraction because file is missing.")
+        log.warning(f"[pipeline][ingest] missing file path={file_path}")
         raise FileNotFoundError(f"The provided file path does not exist: {file_path}")
     if not file_path.is_file():
-        log.error(f"The provided file path is not a file: {file_path}")
+        log.warning(f"[pipeline][ingest] path is not a file path={file_path}")
         raise ValueError(f"The provided file path is not a file: {file_path}")
 
-    try:
-        extracted = extract_text(file_path)
-        log.info(f"[pipeline] Extracted body length={len(extracted.get('body',''))} pages={len(extracted.get('pages',[]))}")
-        chunks = chunk_text(extracted["body"], extracted["pages"], extracted["metadata"])
-        log.info(f"[pipeline] Chunking produced {len(chunks)} chunks")
-    except Exception:
-        log.exception("[pipeline] Ingestion failed during extract/chunk phase.")
-        raise
+    log.info(f"[pipeline][extract] started path={path_file}")
+    extracted = extract_text(file_path)
+    log.info(f"[pipeline][extract] finished path={path_file}")
+    log.info(f"[pipeline][chunk] started path={path_file}")
+    chunks = chunk_text(extracted["body"], extracted["pages"], extracted["metadata"])
+    log.info(f"[pipeline][chunk] finished path={path_file} chunks={len(chunks)}")
+    log.info(f"[pipeline][embed] started path={path_file}")
+    EmbeddingFunction = OllamaEmbeddingFunction
+    embeddings = EmbeddingFunction(chunks)
+    log.info(f"[pipeline][embed] finished path={path_file} embeddings={len(embeddings)}")
 
     if doc_id is None:
         doc_id = hashlib.sha256(str(file_path).encode("utf-8")).hexdigest()
@@ -141,15 +119,10 @@ def update_metadata_document(collection_name: str | None = None, ids: List[str] 
     Update metadata for existing documents/chunks in Chroma.
     Mettre à jour les métadonnées pour des documents/chunks existants dans Chroma.
 
-    Parameters
-    ----------
-    collection_name : str | None, optional
-        Target collection name.
-    ids : list[str] | None
-        Ids to update.
-    metadata : list[dict] | None
-        New metadata values aligned with ids.
-    """
-    collection = ensure_collection(collection_name)
-    log.info(f"[pipeline] Updating metadata for {len(ids or [])} ids in collection={getattr(collection,'name',collection)}")
-    update_documents(collection, ids=ids or [], metadatas=metadata or [])
+    elapsed_ms = int((time.time() - start_ts) * 1000)
+    log.info(
+        f"[pipeline][ingest] finished path={path_file} "
+        f"doc={document_name} chunks={chunk_amount} embeddings={embeddings_amount} elapsed_ms={elapsed_ms}"
+    )
+
+    return chunk_amount, embeddings_amount, document_name
