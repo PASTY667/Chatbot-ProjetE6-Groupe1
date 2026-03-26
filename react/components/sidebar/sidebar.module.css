@@ -1,11 +1,12 @@
 body {
   margin: 0;
-  position: fixed;
-  z-index: 100;
 }
 
 
 .sidebar {
+  position: fixed;
+  z-index: 100;
+  
   background-color: var(--lightOrange-background-color);
   font-family: var(--secondary-font-family);
   font-size: 1.4rem;
