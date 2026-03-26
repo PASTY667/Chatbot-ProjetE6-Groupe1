@@ -1,19 +1,16 @@
 html, body {
     height: 100%;
+    margin: 0;
 }
 
 body {
     background-color: var(--dark-background-color);
     display: grid;
-    grid-template-areas: "a mainWindow";
-    grid-area: a;
-    grid-area: mainWindow;
-    margin: 0;
+    grid-template-columns: 1fr 4fr;
 }
 
 table {
     border-collapse: collapse;
-    width: 75vmax;
 }
 
 th,
@@ -29,12 +26,12 @@ tr:nth-child(odd) {
     background-color: rgb(169, 169, 169);
 }
 
-.currentTitle {
+.appTitle {
     text-align: left;
     margin-left: 30px;
 }
 
-.logWindow {
+.logContent {
     background-color: darkgray;
     border: 1px solid white;
     border-radius: 5px;
@@ -44,12 +41,12 @@ tr:nth-child(odd) {
     width: max-content;
 }
 
-.gestChatWindow {
+.gestChatContent {
     background-color: gray;
 }
 
 .logUser {
-    color: black;
+    color: #000000;
     text-decoration: none;
 }
 
@@ -58,18 +55,15 @@ h1 {
     color: var(--light-text-color);
 }
 
-.a {
-    width: 20dvi;
+.sideBar {
     background-color: var(--lightOrange-background-color);
-/*     position: fixed;
-    left: 0; */
 }
 
 .appIcon {
     height: 15px;
 }
 
-.mainWindow {
+.mainContent {
     text-align: center;
 }
 
@@ -78,7 +72,7 @@ h1 {
     padding-left: 15px;
     border-style: none;
     border-radius: 5px;
-    height: 50px;
+    height: 40px;
     width: 70%;
     font-size: larger;
 }
@@ -99,11 +93,11 @@ h1 {
     color: var(--light-text-color);
 }
 
-.appTitle {
+.appIconTitle {
     font: bold 3em var(--primary-font-family), sans-serif;
 }
 
 .appDesc {
-    margin: -2em 0 1.5em 0;
     font: 1.5em var(--primary-font-family), sans-serif;
+    word-break: break-all;
 }
