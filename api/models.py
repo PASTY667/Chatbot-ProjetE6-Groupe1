@@ -21,13 +21,16 @@ class ErrorPayload(BaseModel):
 class APIError(BaseModel):
     error: ErrorPayload
 
+class IngestRequest(BaseModel):
+    path_file: str = Field(..., description="Chemin du fichier à ingérer")
+    collection_name: str | None = Field(default=None)
+    doc_id: str | None = Field(default=None)
+
 class IngestResponse(BaseModel):
-    status: Literal["ok"] = "ok"
-    scope: Scope
     collection_name: str
     doc_id: str
-    chunks_count:int
-    inserted_id: int
+    chunks_count: int
+    inserted_id_count: int
     source_path: str
 
 class SourceItem(BaseModel):
@@ -39,12 +42,17 @@ class SourceItem(BaseModel):
     metadata: Optional[Dict[str, Any]] = None
 
 class ChatRequest(BaseModel):
-    message: str = Field(min_length=1, max_length=4000)
-    use_company_docs: bool = True
-    use_user_docs: bool = True
-    k_company: int = Field(default=4, ge=0, le=20)
-    k_user: int = Field(default=4, ge=0, le=20)
+    query: str = Field(..., min_length=2)
+    collection_name: str | None = None
+    k: int = Field(default=5, ge=1, le=20)
 
 class ChatResponse(BaseModel):
     answer: str
-    sources: List[SourceItem] = []
+    contexts: list[str]
+    metadatas: list[dict[str, Any]]
+
+
+class HealthResponse(BaseModel):
+    status: str
+    chroma_ok: bool
+    ollama_ok: bool
