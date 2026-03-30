@@ -41,7 +41,7 @@ export default function Index() {
           <h1 className={style.newchatTitle}>Franklin</h1>
         </div>
 
-        <Grid>
+        <Grid className={style.grid}>
           {messages.map((msg, index) => (
             <div className={style.message} key={index}>{msg.content}</div>
           ))}

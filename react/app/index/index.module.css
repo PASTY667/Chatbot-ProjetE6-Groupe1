@@ -11,7 +11,8 @@ body {
 .newchatPage {
   text-align: center;
   font-size: 2rem;
-  width: 80%;
+  width: 100%;
+  justify-items: center;
   margin: 0em 12em;
 
   .newchatHeader {
@@ -28,14 +29,18 @@ body {
     }
   }
 
-  .message {
-    color: white;
+  .grid {
+    width: 19.5%;
     justify-self: end;
-    background-color: var(--lightOrange-background-color);
-    padding: 10px 20px;
-    margin: 15px 0px;
-    border-radius: 5px;
-    box-shadow: 0px 0px 5px 0px var(--pink-background-color);
+    .message {
+      color: white;
+      justify-self: end;
+      background-color: var(--lightOrange-background-color);
+      padding: 10px 20px;
+      margin: 15px 0px;
+      border-radius: 5px;
+      box-shadow: 0px 0px 5px 0px var(--pink-background-color);
+    }
   }
 
   .newchatInput {
@@ -44,6 +49,7 @@ body {
     padding: 0.2em 0.5em 0.5em 0.6em;
     border-radius: 5px;
     text-align: justify;
+    width: 75%;
 
     input[type="file"] {
       display: none;

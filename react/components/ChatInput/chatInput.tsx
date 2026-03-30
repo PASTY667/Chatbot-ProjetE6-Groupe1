@@ -22,9 +22,8 @@ export default function ChatInput({ onSend }: Props) {
   return (
     <div className={style.chatInput}>
       {/* Configuration du champ d'input */}
-      <input
+      <textarea
         className={style.textInput}
-        type="text"
         value={message}
         onChange={(e) => setMessage(e.target.value)}
         placeholder="Poser une question..."
