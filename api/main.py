@@ -25,19 +25,14 @@ def root():
     """
     return {"message": "Hello World"}
 
-@app.post("api/v1/admin/ingest")
-def ingest():
+@app.post("/api/v1/admin/ingest")
+def ingest(document,doc_id):
     """
 
-
-    :return: Json payload containing :
-    {
-      "status": "ok",
-      "scope": "company",
-      "collection_name": "company_docs",
-      "doc_id": "company_123_abcd",
-      "chunks_count": 42,
-      "inserted_id_count": 42
-    }
+    :return:
     """
+    ingest_document(document,"company_docs",doc_id=doc_id)
+
+@app.post("api/v1/sessions/{session_id}/chat")
+def chat(session_id,chat_id):
     pass
