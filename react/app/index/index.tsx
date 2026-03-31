@@ -33,33 +33,22 @@ export default function Index() {
   };
 
   return (
-    <main
-      className={`${style.main} ${messages.length === 0 ? style.centered : ""}`}
-    >
+    <main className={style.main}>
       <div className={style.newchatPage}>
         {/* HEADER DE LA PAGE */}
-        {messages.length === 0 && (
-          <div className={style.newchatHeader}>
-            {/* <Image className={style.logo} src={} alt="" /> */}
-
-            <h1 className={style.newchatTitle}>Franklin</h1>
-          </div>
-        )}
+        <div className={style.newchatHeader}>
+          {/* <Image className={style.logo} src={} alt="" /> */}
+          <h1 className={style.newchatTitle}>Franklin</h1>
+        </div>
 
         <Grid className={style.grid}>
           {messages.map((msg, index) => (
-            <div className={style.message} key={index}>
-              {msg.content}
-            </div>
+            <div className={style.message} key={index}>{msg.content}</div>
           ))}
         </Grid>
 
         {/* ZONE D'INPUT */}
-        <div
-          className={`${style.newchatInput} ${
-            messages.length === 0 ? style.inputCentered : style.inputBottom
-          }`}
-        >
+        <div className={style.newchatInput}>
           {/* UPLOAD UN FICHIER (PDF OU WORD) */}
           <div className={style.uploadSection}>
             <label htmlFor="upload-file" className={style.uploadButton}>
@@ -79,7 +68,6 @@ export default function Index() {
           {/* INPUT D'UN MESSAGE AU CHABOT */}
           <ChatInput onSend={handleSendMessage} />
         </div>
-        <div className={style.footer}>footer</div>
       </div>
     </main>
   );

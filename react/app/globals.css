@@ -1,11 +1,10 @@
 html,
 body {
-  
 }
 
 main {
-  margin: 2em 0em 0em 24em;
-  width: 66%;
+  margin-left: 6em;
+  
 }
 
 .layout {

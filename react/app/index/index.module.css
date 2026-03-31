@@ -9,126 +9,93 @@ body {
 }
 
 .newchatPage {
-  max-width: 900px;
+  text-align: center;
   font-size: 2rem;
-}
+  width: 100%;
+  justify-items: center;
+  margin: 0em 12em;
 
-.centered {
-  justify-content: center;
-}
+  .newchatHeader {
+    display: flex;
+    justify-content: center;
 
-.inputCentered {
-  position: static;
-  margin-top: 2rem;
-}
-
-.newchatHeader{
-  text-align: center;
-}
-.logo {
-  background-color: pink;
-  border-radius: 50%;
-  height: 7em;
-  padding: 0.7em;
-  margin: 0px 15px;
-  align-self: center;
-}
-
-.grid {
-  width: 70%;
-  justify-self: end;
-  margin-bottom: 8em;
-}
-
-.message {
-  color: white;
-  font-size: 1.5rem;
-  justify-self: end;
-  background-color: var(--lightOrange-background-color);
-  padding: 10px 20px;
-  margin: 15px 0px;
-  border-radius: 10px;
-  box-shadow: 0px 0px 5px 0px var(--pink-background-color);
-  text-align: start;
-  white-space: pre-wrap;
-}
-
-.newchatInput {
-  z-index: 10;
-  position: fixed;
-  bottom: 0;
-  margin-bottom: 15px;
-  margin-left: -80px;
-  width: 50%;
-
-  color: var(--dark-text-color);
-  background-color: var(--grey-background-color);
-  padding: 0.2em 0.5em 0.5em 0.6em;
-  border-radius: 5px;
-  text-align: justify;
-
-  input[type="file"] {
-    display: none;
+    .logo {
+      background-color: pink;
+      border-radius: 50%;
+      height: 7em;
+      padding: 0.7em;
+      margin: 0px 15px;
+      align-self: center;
+    }
   }
-}
 
+  .grid {
+    width: 19.5%;
+    justify-self: end;
+    .message {
+      color: white;
+      justify-self: end;
+      background-color: var(--lightOrange-background-color);
+      padding: 10px 20px;
+      margin: 15px 0px;
+      border-radius: 5px;
+      box-shadow: 0px 0px 5px 0px var(--pink-background-color);
+    }
+  }
 
-/* INPUT CENTRÉ */
-.inputCentered {
-  margin-bottom: 8em;
-}
+  .newchatInput {
+    color: var(--dark-text-color);
+    background-color: var(--grey-background-color);
+    padding: 0.2em 0.5em 0.5em 0.6em;
+    border-radius: 5px;
+    text-align: justify;
+    width: 75%;
 
+    input[type="file"] {
+      display: none;
+    }
 
+    .uploadSection {
+      justify-self: self-start;
 
-.uploadSection {
-  justify-self: self-start;
-}
+      .uploadButton {
+        color: var(--dark-text-color);
+        background-color: var(--grey-background-color);
+        font-family: var(--primary-font-family);
+        font-size: 1rem;
 
-.uploadButton {
-  color: var(--dark-text-color);
-  background-color: var(--grey-background-color);
-  font-family: var(--primary-font-family);
-  font-size: 1rem;
+        border: 2px solid var(--dark-text-color);
+        border-radius: 55px;
+        border-color: var(--dark-text-color);
+        padding: 5px 10px;
+        margin-right: 20px;
+        box-shadow: none;
 
-  border: 2px solid var(--dark-text-color);
-  border-radius: 55px;
-  border-color: var(--dark-text-color);
-  padding: 5px 10px;
-  margin-right: 20px;
-  box-shadow: none;
+        cursor: pointer;
+        font-weight: bold;
+        transition: 0.2s ease-in-out;
 
-  cursor: pointer;
-  font-weight: bold;
-  transition: 0.2s ease-in-out;
+        text-align: center;
 
-  text-align: center;
-}
+        .uploadIcon {
+          width: 20px;
+          height: auto;
+          margin-bottom: -4px;
+        }
+      }
 
-.uploadIcon {
-  width: 20px;
-  height: auto;
-  margin-bottom: -4px;
-}
+      .fileName {
+        color: var(--dark-text-color);
+        background-color: var(--grey-background-color);
+        font-family: var(--primary-font-family);
+        font-size: 1rem;
 
-.fileName {
-  color: var(--dark-text-color);
-  background-color: var(--grey-background-color);
-  font-family: var(--primary-font-family);
-  font-size: 1rem;
-
-  border: 2px solid var(--dark-text-color);
-  border-radius: 55px;
-  border-color: var(--dark-text-color);
-  padding: 5px 10px;
-  margin-right: 20px;
-}
-
-.footer {
-  z-index: 5;
-  position: fixed;
-  bottom: 0;
-  width: 110%;
-  color:var(--dark-background-color);
-  background-color: var(--dark-background-color);
-  padding: 0.5px 0px;
+        border: 2px solid var(--dark-text-color);
+        border-radius: 55px;
+        border-color: var(--dark-text-color);
+        padding: 5px 10px;
+        margin-right: 20px;
+      }
+    }
+  }
 }
