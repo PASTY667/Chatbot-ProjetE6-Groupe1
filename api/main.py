@@ -1,13 +1,62 @@
-# api/main.py
+import os
+
+import httpx
 from fastapi import FastAPI
-from api.routesIngest import router as ingest_router
+from fastapi.middleware.cors import CORSMiddleware
+
+import utils.logger as logger
+from api.auth import router as auth_router
+from api.models import HealthResponse
 from api.routesChat import router as chat_router
+from api.routesIngest import router as ingest_router
+from api.secret_manager import SecretManagerError, get_jwt_secret
+from Vector.chroma_client import get_chroma_client
 
-app = FastAPI(title="Chatbot API", version="1.0.0")
+logger.get_logger()
 
-@app.get("/health")
+app = FastAPI(title="RAG API", version="1.0.0")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[o.strip() for o in os.getenv("ALLOWED_ORIGINS", "*").split(",") if o.strip()],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+
+@app.get("/")
+def root():
+    return {"message": "Hello World"}
+
+
+@app.get("/health", response_model=HealthResponse)
 def health():
-    return {"status": "ok"}
+    chroma_ok = True
+    ollama_ok = True
+    jwt_secret_ok = True
 
+    try:
+        _ = get_chroma_client()
+    except Exception:
+        chroma_ok = False
+
+    try:
+        ollama_url = os.getenv("OLLAMA_URL", "http://localhost:11434")
+        resp = httpx.get(f"{ollama_url}/api/tags", timeout=3)
+        resp.raise_for_status()
+    except Exception:
+        ollama_ok = False
+
+    try:
+        _ = get_jwt_secret()
+    except SecretManagerError:
+        jwt_secret_ok = False
+
+    status = "ok" if chroma_ok and ollama_ok and jwt_secret_ok else "degraded"
+    return HealthResponse(status=status, chroma_ok=chroma_ok, ollama_ok=ollama_ok, jwt_secret_ok=jwt_secret_ok)
+
+
+app.include_router(auth_router)
 app.include_router(ingest_router)
 app.include_router(chat_router)

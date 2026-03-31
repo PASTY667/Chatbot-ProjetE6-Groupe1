@@ -1,30 +1,27 @@
+from typing import Any
 from pydantic import BaseModel, Field
-from typing import Literal, Optional, List, Dict, Any
 
-Role = Literal["admin", "user"]
-Scope = Literal["company", "user_session"]
 
-class JWTClaims(BaseModel):
-    sub:str
-    role: Role
-    sid : str
-    exp: int
-    iat: int
-    iss: Optional[str] = None
-    aud: Optional[str] = None
+class ErrorResponse(BaseModel):
+    detail: str
 
-class ErrorPayload(BaseModel):
-    code: str
-    message: str
-    details: Optional[Dict[str, Any]] = None
 
-class APIError(BaseModel):
-    error: ErrorPayload
+class TokenRequest(BaseModel):
+    api_key: str = Field(..., min_length=8)
+    subject: str = Field(default="service-account")
+
+
+class TokenResponse(BaseModel):
+    access_token: str
+    token_type: str = "bearer"
+    expires_in: int
+
 
 class IngestRequest(BaseModel):
-    path_file: str = Field(..., description="Chemin du fichier à ingérer")
-    collection_name: str | None = Field(default=None)
-    doc_id: str | None = Field(default=None)
+    path_file: str = Field(..., description="Absolute or relative path to file")
+    collection_name: str | None = None
+    doc_id: str | None = None
+
 
 class IngestResponse(BaseModel):
     collection_name: str
@@ -33,18 +30,12 @@ class IngestResponse(BaseModel):
     inserted_id_count: int
     source_path: str
 
-class SourceItem(BaseModel):
-    scope: Scope
-    collection_name: str
-    doc_id: str
-    score: float
-    snippet: Optional[str] = None
-    metadata: Optional[Dict[str, Any]] = None
 
 class ChatRequest(BaseModel):
     query: str = Field(..., min_length=2)
     collection_name: str | None = None
     k: int = Field(default=5, ge=1, le=20)
+
 
 class ChatResponse(BaseModel):
     answer: str
@@ -56,3 +47,4 @@ class HealthResponse(BaseModel):
     status: str
     chroma_ok: bool
     ollama_ok: bool
+    jwt_secret_ok: bool

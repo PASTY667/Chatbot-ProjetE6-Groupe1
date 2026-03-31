@@ -15,6 +15,9 @@ from Vector.chroma_client import (
 import utils.logger as logger
 from Vector.chroma_client import get_chroma_client, init_collection, add_documents
 
+import utils.logger as logger
+from Vector.chroma_client import get_chroma_client, init_collection, add_documents
+
 logger.get_logger()
 
 

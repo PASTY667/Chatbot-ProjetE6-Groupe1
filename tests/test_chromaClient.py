@@ -65,6 +65,24 @@ class TestChromaClientIntegration(unittest.TestCase):
     def test_get_chroma_client(self):
         self.assertIsNotNone(self.client)
 
+    def test_sanitize_metadata_for_chroma(self):
+        source = {
+            "doc_metadata": {
+                "/Author": "Arthur",
+                "page_count": 17,
+                "active": True,
+            },
+            "char_start": 12,
+            "score": 0.8,
+        }
+        out = _sanitize_metadata_for_chroma(source)
+        self.assertIn("doc_metadata_/Author", out)
+        self.assertEqual(out["doc_metadata_/Author"], "Arthur")
+        self.assertEqual(out["doc_metadata_page_count"], 17)
+        self.assertEqual(out["doc_metadata_active"], True)
+        self.assertEqual(out["char_start"], 12)
+        self.assertEqual(out["score"], 0.8)
+
     def test_init_collection(self):
         col, name = self._new_collection()
         self.assertIsNotNone(col)
