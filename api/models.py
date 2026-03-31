@@ -17,18 +17,17 @@ class TokenResponse(BaseModel):
     expires_in: int
 
 
+# remplace IngestRequest + ChatRequest
+
 class IngestRequest(BaseModel):
     path_file: str = Field(..., description="Absolute or relative path to file")
-    collection_name: str | None = None
+    target: str = Field(default="user", pattern="^(official|user)$")
     doc_id: str | None = None
 
 
-class IngestResponse(BaseModel):
-    collection_name: str
-    doc_id: str
-    chunks_count: int
-    inserted_id_count: int
-    source_path: str
+class ChatRequest(BaseModel):
+    query: str = Field(..., min_length=2)
+    k: int = Field(default=5, ge=1, le=20)
 
 
 class ChatRequest(BaseModel):
