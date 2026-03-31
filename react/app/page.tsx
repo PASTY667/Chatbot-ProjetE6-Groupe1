@@ -1,5 +1,10 @@
-import Image from "next/image";
+"use client";
+import Index from "@/app/index/index";
 
-export default function Home() {
-  return ;
+export default function Home(){
+    return(
+      <>
+      <Index />
+      </>
+    );
 }

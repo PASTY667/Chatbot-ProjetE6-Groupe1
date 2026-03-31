@@ -1,0 +1,129 @@
+body {
+  margin: 0;
+}
+
+
+.sidebar {
+  position: fixed;
+  z-index: 100;
+  
+  background-color: var(--lightOrange-background-color);
+  font-family: var(--secondary-font-family);
+  font-size: 1.4rem;
+  min-height: 100vh;
+  align-self: baseline;
+  width: 17em;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+
+  .headerSidebar {
+    background-color: var(--pink-background-color);
+    padding: 2px 18px;
+    display: flex;
+    flex-direction:row;
+    justify-content: space-between;
+
+    .buttonSidebar{
+      align-self: center;
+      padding: 0px 10px;
+      border: none;
+      border-radius: 3px;
+      color: var(--light-text-color);
+      background-color: var(--dark-text-color);
+      padding: 8px 23px;
+    }
+
+    .buttonSidebar:hover{
+      cursor: pointer;
+      color:var(--dark-text-color);
+      background-color: white;
+      transition: 0.3s ease-in-out;  
+    }
+  }
+
+  .listSidebar {
+    list-style: none;
+    padding-left: 0px;
+
+    .hrSidebar {
+      color: var(--darkOrange-background-color);
+    }
+    a:link {
+      border: none;
+      border-radius: 2px;
+      text-decoration: none;
+      background-color: none;
+      color: var(--light-text-color);
+      display: block;
+      margin: 0px 5px;
+      padding: 2px 35px 4px 15px;
+    }
+    a:visited {
+      text-decoration: none;
+      color: var(--light-text-color);
+    }
+
+    a:hover {
+      color: #be7827;
+      transition-duration: 0.4s;
+      background-color: var(--darkOrange-background-color);
+      padding-left: 20px;
+    }
+
+    a:active {
+      color: var(--dark-text-color);
+    }
+  }
+}
+
+.setting{
+  color: var(--light-text-color);
+  background-color: var(--darkOrange-background-color);
+  display: flex;
+  align-items: center;
+  place-content: space-between;
+  padding: 0px 20px 0px 40px;
+  
+  .settingTitle{
+    font-size: 1.3rem;
+    padding: 0;
+  }
+
+  .settingButton{
+    text-decoration: none;;
+    background-color: white;
+    border-radius: 3px;
+    padding: 10px 15px 3px 15px;
+
+    .logo{
+      width: 30px;
+      height: auto;
+      position: relative;
+      z-index: 5;
+      left:0;
+    }
+
+    .logoHover{
+      width: 32px;
+      height: auto;
+      display: none;
+      position: absolute;
+      z-index: 10;
+      left:14.1em;
+      padding-top: 1px;
+    }
+  }
+
+  .settingButton:hover{
+    color: var(--light-text-color);
+    background-color: var(--dark-background-color);
+    transition: 0.5s ease-in-out;  
+
+    .logoHover{
+      display:inline;
+      transition: 0.5s ease-in-out; 
+    }
+  }
+}
