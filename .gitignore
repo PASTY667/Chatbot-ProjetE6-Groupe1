@@ -4,6 +4,7 @@ logs/mainLog.log
 
 /.venv
 
+docs
 
 /_pycache_
 

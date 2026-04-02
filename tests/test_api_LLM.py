@@ -23,7 +23,7 @@ from api.auth import create_access_token
 from Vector.chroma_client import get_chroma_client, init_collection, search
 
 
-class TestApiE2E(unittest.TestCase):
+class TestApiLLM(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.sample_pdf = PROJECT_ROOT / "ProjetChabot_CompteRenduRevue1_DomyBonnelLouboutinDomingo.pdf"
