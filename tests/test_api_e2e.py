@@ -20,7 +20,7 @@ os.environ.setdefault("OLLAMA_GENERATE_TIMEOUT_SECONDS", "180")
 
 from api.main import app
 from api.auth import create_access_token
-from Vector.chroma_client import get_chroma_client
+from Vector.chroma_client import get_chroma_client, init_collection, search
 
 
 class TestApiE2E(unittest.TestCase):
@@ -106,7 +106,19 @@ class TestApiE2E(unittest.TestCase):
         self.assertGreater(data["chunks_count"], 0)
         self.assertGreater(data["inserted_id_count"], 0)
 
-    def test_02_chat_question_on_project_network_plan(self):
+    def test_02_retrieve_contexts_only_dev_friendly(self):
+        """
+        Dev-friendly retrieval-only e2e:
+        validates that relevant contexts are retrievable without waiting for LLM generation.
+        """
+        collection = init_collection(self.chroma_client, self.collection_name)
+        res = search(collection, query="plan d'adressage réseau", k=3)
+        contexts = (res.get("documents") or [[]])[0]
+
+        self.assertGreater(len(contexts), 0)
+        print(f"[E2E RETRIEVE] contexts_found={len(contexts)}")  # visible in test output
+
+    def test_03_chat_question_on_project_network_plan(self):
         payload = {
             "query": "quel est le plan d'adressage réseau du projet",
             "collection_name": self.collection_name,
@@ -126,6 +138,29 @@ class TestApiE2E(unittest.TestCase):
         self.assertIn("answer", data)
         self.assertIsInstance(data["answer"], str)
         self.assertTrue(data["answer"].strip())
+        print(f"[E2E LLM ANSWER] {data['answer']}")  # visible in test output
+
+    def test_04_chat_smoke_short_prompt_dev_friendly(self):
+        """
+        Short-prompt smoke test to keep local runs lighter.
+        """
+        payload = {
+            "query": "résume en une phrase le plan réseau",
+            "collection_name": self.collection_name,
+            "k": 1,
+        }
+        response = self.client.post("/chat/query", json=payload, headers=self.headers)
+
+        if response.status_code == 502 and "timed out" in response.text.lower():
+            self.skipTest(
+                "Short smoke prompt still timed out on this machine; "
+                "increase OLLAMA_GENERATE_TIMEOUT_SECONDS if needed."
+            )
+
+        self.assertEqual(response.status_code, 200, msg=response.text)
+        data = response.json()
+        self.assertTrue(data.get("answer", "").strip())
+        print(f"[E2E LLM SMOKE ANSWER] {data['answer']}")
 
 
 if __name__ == "__main__":
