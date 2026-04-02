@@ -1,0 +1,84 @@
+.login {
+}
+
+.headline {
+  font-family: var(--primary-font-family);
+  font-size: 4.5rem;
+  background-color: var(--dark-background-color);
+  color: var(--light-text-color);
+  text-align: center;
+}
+
+.loginSection {
+  background-color: var(--lightOrange-background-color);
+  color: var(--dark-text-color);
+  padding: 30px 70px 45px 70px;
+  border-radius: 5px;
+  font-family: var(--terciary-font-family);
+  justify-self: center;
+  box-shadow: 0px 0px 5px 0px var(--pink-background-color);
+}
+
+.loginTitle {
+  color: var(--light-text-color);
+  font-size: 3rem;
+  font-family: var(--secondary-font-family);
+  text-align: center;
+  margin: 0px;
+}
+
+.loginText {
+  font-size: 1.5rem;
+  margin: 30px 0px 3px 0px;
+}
+
+.inputUser {
+  width: 100%;
+  resize: none;
+  border: none;
+  border-radius: 5px;
+  padding: 10px 5px;
+  align-content: center;
+  font-size: 1.2rem;
+  font-family: var(--primary-font-family);
+  color: var(--light-text-color);
+  background-color: var(--darkOrange-background-color);
+}
+
+.inputUser:focus {
+  outline: none;
+}
+
+.inputPwd {
+  width: 100%;
+  border: none;
+  border-radius: 5px;
+  padding: 10px 5px;
+  align-content: center;
+  font-size: 1.2rem;
+  color: var(--light-text-color);
+  background-color: var(--darkOrange-background-color);
+}
+.inputPwd:focus {
+  outline: none;
+}
+
+.divButton {
+  justify-self: center;
+}
+
+.loginButton {
+  font-size: 1.5rem;
+  font-family: var(--secondary-font-family);
+  background-color: var(--dark-background-color);
+  color: var(--light-text-color);
+  border: none;
+  border-radius: 5px;
+  padding: 10px 15px 15px 15px;
+  margin: 50px 0px 0px 0px;
+}
+.loginButton:hover{
+    cursor: pointer;
+    color: var(--light-text-color);
+    background-color: #b1acb4;
+}
