@@ -17,7 +17,7 @@ router = APIRouter(prefix="/auth", tags=["auth"])
 security = HTTPBearer(auto_error=False)
 
 
-def create_access_token(subject: str, expires_seconds: int = DEFAULT_TTL_SECONDS) -> str:
+def create_access_token(subject: str, expires_seconds: int = DEFAULT_TTL_SECONDS, extra_claims: dict | None = None) -> str:
     secret = get_jwt_secret()
     now = datetime.now(timezone.utc)
     payload = {
@@ -25,6 +25,8 @@ def create_access_token(subject: str, expires_seconds: int = DEFAULT_TTL_SECONDS
         "iat": int(now.timestamp()),
         "exp": int((now + timedelta(seconds=expires_seconds)).timestamp()),
     }
+    if extra_claims:
+        payload.update(extra_claims)
     header = {"alg": ALGORITHM, "typ": "JWT"}
     return _encode_jwt(header, payload, secret)
 
