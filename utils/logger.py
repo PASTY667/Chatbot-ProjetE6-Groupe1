@@ -36,6 +36,13 @@ def get_logger():
     level_name = os.getenv("LOG_LEVEL", "INFO").upper()
     level = getattr(log, level_name, log.INFO)
 
+    root = log.getLogger()
+    if root.handlers:
+        return
+
+    level_name = os.getenv("LOG_LEVEL", "INFO").upper()
+    level = getattr(log, level_name, log.INFO)
+
     log.basicConfig(
         filename=log_file,
         level=level,

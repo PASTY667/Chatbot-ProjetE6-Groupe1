@@ -16,6 +16,7 @@ services:
       JWT_EXPIRES_SECONDS: ${JWT_EXPIRES_SECONDS:-3600}
       EMBED_MODEL: nomic-embed-text
       EMBED_BATCH_SIZE: 16
+      CHAT_MODEL: mistral:7b
     depends_on:
       - chromadb
 
