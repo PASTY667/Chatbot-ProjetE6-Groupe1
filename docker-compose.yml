@@ -17,6 +17,7 @@ services:
       CHAT_MODEL: ${CHAT_MODEL:-mistral:7b}
       EMBED_MODEL: nomic-embed-text
       EMBED_BATCH_SIZE: 16
+      CHAT_MODEL: mistral:7b
     depends_on:
       - chromadb
 
