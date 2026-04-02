@@ -35,7 +35,7 @@ class TestAPI(unittest.TestCase):
         self.assertIn("access_token", response.json())
 
     def test_ingest_requires_auth(self):
-        response = self.client.post("/ingest/file", json={"path_file": "dummy.pdf"})
+        response = self.client.post("/ingest/file", json={"path_file": "ProjetChabot_CompteRenduRevue1_DomyBonnelLouboutinDomingo.pdf"})
         self.assertEqual(response.status_code, 401)
 
     @mock.patch("api.routesIngest.ingest_document")
@@ -45,12 +45,12 @@ class TestAPI(unittest.TestCase):
             "doc_id": "doc-1",
             "chunks_count": 3,
             "inserted_id_count": 3,
-            "source_path": "/tmp/doc.txt",
+            "source_path": "ProjetChabot_CompteRenduRevue1_DomyBonnelLouboutinDomingo.pdf",
         }
         token = create_access_token("tester")
         response = self.client.post(
             "/ingest/file",
-            json={"path_file": "/tmp/doc.txt"},
+            json={"path_file": "ProjetChabot_CompteRenduRevue1_DomyBonnelLouboutinDomingo.pdf"},
             headers={"Authorization": f"Bearer {token}"},
         )
         self.assertEqual(response.status_code, 200)

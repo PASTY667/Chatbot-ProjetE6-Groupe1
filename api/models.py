@@ -24,6 +24,12 @@ class IngestRequest(BaseModel):
     target: str = Field(default="user", pattern="^(official|user)$")
     doc_id: str | None = None
 
+class IngestResponse(BaseModel):
+    collection_name: str
+    doc_id: str
+    chunks_count: int
+    inserted_id_count: int
+    source_path: str
 
 class ChatRequest(BaseModel):
     query: str = Field(..., min_length=2)
