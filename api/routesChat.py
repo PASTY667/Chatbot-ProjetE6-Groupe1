@@ -11,7 +11,7 @@ router = APIRouter(prefix="/chat", tags=["chat"])
 
 
 def _generate_answer_with_ollama(query: str, contexts: list[str]) -> str:
-    ollama_url = os.getenv("OLLAMA_URL", "http://localhost:11434")
+    ollama_url = os.getenv("OLLAMA_URL", "http://127.0.0.1:11434")
     chat_model = os.getenv("CHAT_MODEL", "mistral:7b")
     system_prompt = (
         "Tu es un assistant RAG. Réponds uniquement avec le contexte fourni. "

@@ -14,7 +14,7 @@ if str(PROJECT_ROOT) not in sys.path:
 os.environ.setdefault("API_ADMIN_KEY", "super-secret-admin")
 os.environ.setdefault("JWT_SECRET", "unit-test-jwt-secret")
 os.environ.setdefault("CHROMA_URL", "http://localhost:8001")
-os.environ.setdefault("OLLAMA_URL", "http://localhost:11434")
+os.environ.setdefault("OLLAMA_URL", "http://127.0.0.1:11434")
 os.environ.setdefault("CHAT_MODEL", "mistral:7b")
 
 from api.main import app
@@ -36,18 +36,7 @@ class TestApiE2E(unittest.TestCase):
         except Exception as exc:
             raise unittest.SkipTest(f"Chroma not reachable: {exc}")
 
-        try:
-            ollama_url = os.getenv("OLLAMA_URL", "http://localhost:11434")
-            r = httpx.get(f"{ollama_url}/api/tags", timeout=3)
-            r.raise_for_status()
-            chat_model = os.getenv("CHAT_MODEL", "mistral:7b")
-            available_models = {m.get("name") for m in r.json().get("models", [])}
-            if chat_model not in available_models:
-                raise unittest.SkipTest(
-                    f"Configured CHAT_MODEL '{chat_model}' not found in Ollama tags: {sorted(available_models)}"
-                )
-        except Exception as exc:
-            raise unittest.SkipTest(f"Ollama not reachable: {exc}")
+        cls._ensure_ollama_and_model_or_skip()
 
         cls.client = TestClient(app)
         cls.token = create_access_token(
@@ -60,6 +49,40 @@ class TestApiE2E(unittest.TestCase):
         )
         cls.headers = {"Authorization": f"Bearer {cls.token}"}
         cls.collection_name = f"test_api_e2e_{uuid4().hex}"
+
+    @classmethod
+    def _ensure_ollama_and_model_or_skip(cls):
+        """
+        On Windows, localhost may resolve in ways that cause intermittent connection refused.
+        Try explicit candidates and lock the first reachable URL in OLLAMA_URL.
+        """
+        configured = os.getenv("OLLAMA_URL", "http://127.0.0.1:11434")
+        candidates = []
+        for url in [configured, "http://127.0.0.1:11434", "http://localhost:11434", "http://host.docker.internal:11434"]:
+            if url and url not in candidates:
+                candidates.append(url)
+
+        last_error = None
+        tags = None
+        for url in candidates:
+            try:
+                r = httpx.get(f"{url}/api/tags", timeout=3)
+                r.raise_for_status()
+                os.environ["OLLAMA_URL"] = url
+                tags = r.json()
+                break
+            except Exception as exc:
+                last_error = exc
+
+        if tags is None:
+            raise unittest.SkipTest(f"Ollama not reachable on {candidates}. Last error: {last_error}")
+
+        chat_model = os.getenv("CHAT_MODEL", "mistral:7b")
+        available_models = {m.get("name") for m in tags.get("models", [])}
+        if chat_model not in available_models:
+            raise unittest.SkipTest(
+                f"Configured CHAT_MODEL '{chat_model}' not found in Ollama tags: {sorted(available_models)}"
+            )
 
     @classmethod
     def tearDownClass(cls):
