@@ -14,6 +14,7 @@ services:
       API_ADMIN_KEY: ${API_ADMIN_KEY:-change-this-admin-key}
       JWT_SECRET: ${JWT_SECRET:-change-this-jwt-secret}
       JWT_EXPIRES_SECONDS: ${JWT_EXPIRES_SECONDS:-3600}
+      CHAT_MODEL: ${CHAT_MODEL:-mistral:7b}
       EMBED_MODEL: nomic-embed-text
       EMBED_BATCH_SIZE: 16
       CHAT_MODEL: mistral:7b

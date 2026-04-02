@@ -15,6 +15,7 @@ os.environ.setdefault("API_ADMIN_KEY", "super-secret-admin")
 os.environ.setdefault("JWT_SECRET", "unit-test-jwt-secret")
 os.environ.setdefault("CHROMA_URL", "http://localhost:8001")
 os.environ.setdefault("OLLAMA_URL", "http://localhost:11434")
+os.environ.setdefault("CHAT_MODEL", "mistral:7b")
 
 from api.main import app
 from api.auth import create_access_token
@@ -39,6 +40,12 @@ class TestApiE2E(unittest.TestCase):
             ollama_url = os.getenv("OLLAMA_URL", "http://localhost:11434")
             r = httpx.get(f"{ollama_url}/api/tags", timeout=3)
             r.raise_for_status()
+            chat_model = os.getenv("CHAT_MODEL", "mistral:7b")
+            available_models = {m.get("name") for m in r.json().get("models", [])}
+            if chat_model not in available_models:
+                raise unittest.SkipTest(
+                    f"Configured CHAT_MODEL '{chat_model}' not found in Ollama tags: {sorted(available_models)}"
+                )
         except Exception as exc:
             raise unittest.SkipTest(f"Ollama not reachable: {exc}")
 
