@@ -13,6 +13,7 @@ router = APIRouter(prefix="/chat", tags=["chat"])
 def _generate_answer_with_ollama(query: str, contexts: list[str]) -> str:
     ollama_url = os.getenv("OLLAMA_URL", "http://127.0.0.1:11434")
     chat_model = os.getenv("CHAT_MODEL", "mistral:7b")
+    timeout_seconds = float(os.getenv("OLLAMA_GENERATE_TIMEOUT_SECONDS", "120"))
     system_prompt = (
         "Tu es un assistant RAG. Réponds uniquement avec le contexte fourni. "
         "Si le contexte est insuffisant, dis explicitement que tu ne sais pas."
@@ -26,7 +27,7 @@ def _generate_answer_with_ollama(query: str, contexts: list[str]) -> str:
         "Réponse:"
     )
 
-    with httpx.Client(timeout=45.0) as client:
+    with httpx.Client(timeout=timeout_seconds) as client:
         resp = client.post(
             f"{ollama_url}/api/generate",
             json={"model": chat_model, "prompt": prompt, "stream": False},
