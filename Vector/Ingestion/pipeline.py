@@ -1,6 +1,40 @@
 import hashlib
 import logging as log
 from pathlib import Path
+from typing import List, Tuple
+
+from Vector.Ingestion.extract import extract_text, return_path
+from Vector.Ingestion.chunking import chunk_text
+from Vector.chroma_client import (
+    get_chroma_client,
+    init_collection,
+    add_documents,
+    update_documents,
+)
+
+import utils.logger as logger
+from Vector.chroma_client import get_chroma_client, init_collection, add_documents
+
+import utils.logger as logger
+from Vector.chroma_client import get_chroma_client, init_collection, add_documents
+
+import utils.logger as logger
+from Vector.chroma_client import get_chroma_client, init_collection, add_documents
+
+import utils.logger as logger
+from Vector.chroma_client import get_chroma_client, init_collection, add_documents
+
+import utils.logger as logger
+from Vector.chroma_client import get_chroma_client, init_collection, add_documents
+
+import utils.logger as logger
+from Vector.chroma_client import get_chroma_client, init_collection, add_documents
+
+import utils.logger as logger
+from Vector.chroma_client import get_chroma_client, init_collection, add_documents
+
+import utils.logger as logger
+from Vector.chroma_client import get_chroma_client, init_collection, add_documents
 
 import utils.logger as logger
 from Vector.chroma_client import get_chroma_client, init_collection, add_documents
