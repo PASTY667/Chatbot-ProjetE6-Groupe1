@@ -1,13 +1,6 @@
 import Image from "next/image";
-import React, { useState } from "react";
-import {
-  TextField,
-  Button,
-  Container,
-  Grid,
-  LinearProgress,
-  CircularProgress,
-} from "@mui/material";
+import { useState } from "react";
+import { Grid } from "@mui/material";
 
 import style from "@/app/index/index.module.css";
 import uploadIcon from "@/assets/upload-file.png";
@@ -21,6 +14,7 @@ type Message = {
 
 export default function Index() {
   const [messages, setMessages] = useState<Message[]>([]);
+  const [files, setFiles] = useState<File[]>([]);
 
   //Gérer l'envoi d'un message
   const handleSendMessage = (msg: string) => {
@@ -30,6 +24,19 @@ export default function Index() {
     };
 
     setMessages((prev) => [...prev, newMessage]);
+  };
+
+  //Gérer l'envoi des fichiers
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files) return;
+
+    const selectedFiles = Array.from(e.target.files);
+    setFiles((prev) => [...prev, ...selectedFiles]);
+  };
+
+  //Gérer la suppression des fichiers
+  const removeFile = (indexToRemove: number) => {
+    setFiles((prev) => prev.filter((_, index) => index !== indexToRemove));
   };
 
   return (
@@ -50,6 +57,11 @@ export default function Index() {
           {messages.map((msg, index) => (
             <div className={style.message} key={index}>
               {msg.content}
+              {files.map((file, index) => (
+                <div key={index} className={style.fileItem}>
+                  <p>{file.name}</p>
+                </div>
+              ))}
             </div>
           ))}
         </Grid>
@@ -62,18 +74,35 @@ export default function Index() {
         >
           {/* UPLOAD UN FICHIER (PDF OU WORD) */}
           <div className={style.uploadSection}>
-            <label htmlFor="upload-file" className={style.uploadButton}>
+            <label className={style.uploadButton} htmlFor="upload-file">
               <Image className={style.uploadIcon} src={uploadIcon} alt="i" />{" "}
               PDF
             </label>
-            {/* <span id="file-name" className={style.fileName}></span> */}
-            {/* A AJOUTER COMPOSANT POUR L'AFFICHAGE DES FICHIERS + IMAGE EXTENSION */}
+
+            {/* INPUT DE FICHIERS */}
             <input
               id="upload-file"
               type="file"
               className={style.addButton}
               accept=".doc, .docx, .pdf"
+              multiple
+              onChange={handleFileChange}
             />
+
+            {/* AFFICHAGE DES FICHIERS */}
+            <div className={style.fileList}>
+              {files.map((file, index) => (
+                <div key={index} className={style.fileItem}>
+                  <button
+                    className={style.deleteButton}
+                    onClick={() => removeFile(index)}
+                  >
+                    X
+                  </button>
+                  <p>{file.name}</p>
+                </div>
+              ))}
+            </div>
           </div>
 
           {/* INPUT D'UN MESSAGE AU CHABOT */}
