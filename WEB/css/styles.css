@@ -1,5 +1,10 @@
+/* RESET & BASE */
+* {
+    box-sizing: border-box;
+}
+
 html, body {
-    min-height: 100dvh;
+    height: 100%;
     margin: 0;
 }
 
@@ -7,95 +12,303 @@ body {
     background-color: var(--dark-background-color);
     display: grid;
     grid-template-columns: 1fr 4fr;
+    font-family: var(--primary-font-family), sans-serif;
+    overflow: hidden; 
 }
 
-table {
-    border-collapse: collapse;
+/* SIDEBAR */
+.sidebar {
+    background-color: var(--lightOrange-background-color);
+    padding: 2rem;
 }
 
-.app:hover{
-    transform:scale(1.03);
+.sidebar a {
+    color: var(--light-text-color);
+    text-decoration: none;
+    font-size: 1.5rem;
+    font-weight: bold;
 }
 
-th,
-td {
-    padding: 15px 0 15px 0;
+/* MAIN */
+.main {
+    display: flex;
+    flex-direction: column;
+    padding: 2rem;
+    height: 100%;
+    overflow: hidden; /* On garde le hidden ici pour la structure globale */
 }
 
-tr:nth-child(even) {
-    background-color: rgb(156, 156, 156);
+/* HEADER */
+.page-header {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1.4rem;
+    margin-bottom: 3rem;
+    flex-shrink: 0;
 }
 
-tr:nth-child(odd) {
-    background-color: rgb(169, 169, 169);
+.page-header::before {
+    content: "";
+    width: 32px;
+    height: 32px;
+    background-color: pink;
+    border-radius: 50%;
 }
 
-.appTitle {
-    text-align: left;
-    margin-left: 30px;
+.page-title {
+    font-size: 3rem;
+    font-weight: bold;
+    color: var(--light-text-color);
+    margin: 0;
 }
 
-.logContent {
+/* GRID 2×2 FIXE */
+.apps-grid {
+    flex: 1;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+    gap: 2rem;
+    padding: 0 3rem 2rem 3rem;
+    min-height: 0;
+    
+    /* MODIFICATION : On passe en visible pour ne pas couper le hover */
+    overflow: visible; 
+}
+
+/* APP CARD */
+.app-card {
+    background-color: var(--lightOrange-background-color);
+    border-radius: 10px;
+    color: var(--light-text-color);
+    text-decoration: none;
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    
+    /* On garde le hidden ici pour que le texte ne sorte pas de la carte */
+    overflow: hidden; 
+    min-height: 0;
+    position: relative;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.app-card:hover {
+    transform: scale(1.04); /* L'effet d'agrandissement */
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    z-index: 99; /* La carte passe au-dessus de tout le reste */
+}
+
+/* TEXTES */
+.app-title {
+    font-size: 2rem;
+    font-weight: bold;
+    margin: 0 0 1rem 0;
+    flex-shrink: 0;
+}
+
+.app-desc {
+    font-size: 1.1rem;
+    line-height: 1.4;
+    margin: 0;
+    overflow-y: auto;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    max-width: 100%;
+}
+
+/* RESPONSIVE */
+@media (max-width: 900px) {
+    body {
+        grid-template-columns: 1fr;
+    }
+
+    .apps-grid {
+        grid-template-columns: 1fr;
+        grid-template-rows: repeat(4, 1fr);
+        padding: 0 1rem 1rem 1rem;
+    }
+}
+
+/* --- Ajustements du conteneur principal --- */
+.log-content {
     background-color: darkgray;
     border: 1px solid white;
     border-radius: 5px;
-    margin: 2.5dvw;
-    display: flex;
-    justify-content: center;
-    width: max-content;
+    margin: 20px auto; /* Centré avec un peu d'espace */
+    width: 90%;        /* Prend 90% de la partie droite */
+    max-width: 1200px; /* Évite que ce soit trop large sur très grand écran */
+    padding: 20px;
+    box-sizing: border-box;
 }
 
-.gestChatContent {
-    background-color: gray;
+td .log-user:hover {
+    transform: scale(1.04);
 }
 
-.logUser {
-    color: #000000;
-    text-decoration: none;
-}
-
-h1 {
-    font: bold 3em var(--primary-font-family);
+/* --- Style de la description --- */
+.app-description {
     color: var(--light-text-color);
+    margin-left: 30px;
+    text-align: center;
+    font-family: var(--primary-font-family);
+    opacity: 0.8;
 }
 
-.sideBar {
-    background-color: var(--lightOrange-background-color);
+/* --- Gestion du Scroll du tableau --- */
+.table-container {
+    max-height: 60vh;   /* Le tableau prendra au max 60% de la hauteur de l'écran */
+    overflow-y: auto;   /* Scroll vertical si débordement */
+    margin-top: 15px;
+    border: 1px solid rgba(255,255,255,0.2);
 }
 
-.appIcon {
-    height: 15px;
+.show-data {
+    width: 100%;        /* Le tableau occupe toute la largeur du conteneur */
+    border-collapse: collapse;
 }
 
-.mainContent {
+/* Fixer l'en-tête pour qu'il reste visible au scroll */
+.show-data th {
+    position: sticky;
+    top: 0;
+    background-color: #676767; /* Couleur de fond pour l'en-tête */
+    color: white;
+    z-index: 10;
+}
+
+.log-data {
+    width: 100%;
+}
+
+.log-user {
+    text-decoration: none;
+    color: #000000;
+}
+
+/* Optionnel : styliser la barre de défilement pour qu'elle soit plus discrète */
+.table-container::-webkit-scrollbar {
+    width: 8px;
+}
+.table-container::-webkit-scrollbar-thumb {
+}
+
+tr {
+    height: 45px;
     text-align: center;
 }
 
-.adminLayout {
-    grid-template-rows: repeat(3, auto);
+/* --- NOUVELLE STRUCTURE STATS --- */
+
+.stats-container {
+    display: flex;
+    gap: 20px;
+    min-height: 500px;
 }
 
-.app {
+/* Partie Gauche (1/5) */
+.stats-filters {
+    flex: 1; /* Prend 1 part */
+    background-color: rgba(255, 255, 255, 0.1);
+    padding: 20px;
+    border-radius: 8px;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.stats-filters h3 {
+    margin-top: 0;
+    border-bottom: 1px solid var(--lightOrange-background-color);
+    padding-bottom: 10px;
+}
+
+.filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.filter-group label {
+    font-size: 0.9rem;
+    font-weight: bold;
+}
+
+.filter-group select, 
+.filter-group input[type="date"] {
+    padding: 8px;
+    border-radius: 4px;
+    border: none;
+    background: #f0f0f0;
+}
+
+.checkbox-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.9rem;
+}
+
+.btn-apply {
+    margin-top: auto;
+    padding: 10px;
     background-color: var(--lightOrange-background-color);
+    color: white;
+    border: none;
     border-radius: 5px;
-    color: var(--light-text-color);
-    text-decoration: none;
-    width: 100%;
-    overflow-wrap: break-word;
+    cursor: pointer;
+    font-weight: bold;
+    transition: opacity 0.2s;
 }
 
-.apps {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 2rem;
-    margin: 10%;
-
+.btn-apply:hover {
+    opacity: 0.8;
 }
 
-.appIconTitle {
-    font: bold 3em var(--primary-font-family), sans-serif;
+/* Partie Droite (4/5) */
+.stats-visual {
+    flex: 4; /* Prend 4 parts */
+    background-color: white;
+    border-radius: 8px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
 }
 
-.appIconDesc {
-    font: 1.5em var(--primary-font-family), sans-serif;
+.chart-header h2 {
+    margin-top: 0;
+    color: #333;
+}
+
+.chart-placeholder {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #f9f9f9;
+    border: 2px dashed #ccc;
+    border-radius: 10px;
+    position: relative;
+    color: #999;
+}
+
+/* Responsive : On empile tout sur mobile */
+@media (max-width: 768px) {
+    .stats-container {
+        flex-direction: column;
+    }
+    
+    .stats-filters {
+        order: 2;
+    }
+    
+    .stats-visual {
+        order: 1;
+        min-height: 300px;
+    }
 }

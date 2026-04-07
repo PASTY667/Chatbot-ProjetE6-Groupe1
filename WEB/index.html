@@ -1,70 +1,52 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="/css/styles.css">
     <link rel="stylesheet" href="/css/variables.css">
+    <link rel="stylesheet" href="/css/styles.css">
     <title>Franklin - Administrateur</title>
 </head>
 
 <body>
-    <nav class="sideBar">
+
+    <nav class="sidebar">
         <a href="index.html">Franklin</a>
     </nav>
 
-    <main class="mainContent">
+    <main class="main">
 
-        <div class="adminLayout">
-            <header class="header">
-                <h1 class="mainTitle">Franklin</h1>
-            </header>
-            <div class="apps">
-                <a class="app" href="log.html">
-                    <p class="appIconTitle">Logs</p>
-                    <p class="appIconDesc">Alors qu'est-ce qu'on a làaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-                    </p>
-                </a>
-                <a class="app" href="log.html">
-                    <p class="appIconTitle">Logs</p>
-                    <p class="appIconDesc">Alors qu'est-ce qu'on a là
-                    </p>
-                </a>
-                <a class="app" href="log.html">
-                    <p class="appIconTitle">Logs</p>
-                    <p class="appIconDesc">Alors qu'est-ce qu'on a là
-                    </p>
-                </a>
-                <a class="app" href="log.html">
-                    <p class="appIconTitle">Logs</p>
-                    <p class="appIconDesc">Alors qu'est-ce qu'on a là
-                    </p>
-                </a>
-            </div>
-            <!-- <div class="selectApp">
-                <div class="row-2">
+        <header class="page-header">
+            <h1 class="page-title">Franklin</h1>
+        </header>
 
-                    <a class="app" href="log.html">
-                        <p class="appIconTitle">Statistiques utilisateur</p>
-                        <p class="appIconDesc">Alors qu'est-ce qu'on a là</p>
-                    </a>
-                </div>
-                <div class="row-2">
-                    <a class="app" href="log.html">
-                        <p class="appIconTitle">Gestion des utilisateurs</p>
-                        <p class="appIconDesc">Alors qu'est-ce qu'on a là</p>
-                    </a>
-                    <a class="app" href="gestion-chat.html">
-                        <p class="appIconTitle">Gestion du chatbot</p>
-                        <p class="appIconDesc">Alors qu'est-ce qu'on a là</p>
-                    </a>
-                </div>
-            </div> -->
-        </div>
+        <section class="apps-grid">
+
+            <a class="app-card" href="logs.html">
+                <p class="app-title">Logs</p>
+                <p class="app-desc">Alors qu'est-ce qu'on a là</p>
+            </a>
+
+            <a class="app-card" href="gestion-files.html">
+                <p class="app-title">Gestion des fichiers</p>
+                <p class="app-desc">Alors qu'est-ce qu'on a là</p>
+            </a>
+
+            <a class="app-card" href="stats-users.html">
+                <p class="app-title">Statistiques utilisateur</p>
+                <p class="app-desc">Alors qu'est-ce qu'on a là</p>
+            </a>
+
+            <a class="app-card" href="gestion-users.html">
+                <p class="app-title">Gestion des utilisateurs</p>
+                <p class="app-desc">Alors qu'est-ce qu'on a là</p>
+            </a>
+
+        </section>
 
     </main>
+
 </body>
-<script src="js/admin.js"></script>
 
 </html>
