@@ -63,6 +63,32 @@ class TestAPI(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json()["doc_id"], "doc-1")
 
+    @mock.patch("api.routesIngest.ingest_document")
+    @mock.patch("api.routesIngest.resolve_collection_name")
+    @mock.patch("api.routesIngest.save_uploaded_file")
+    def test_ingest_upload_success(self, mock_save, mock_resolve_collection, mock_ingest):
+        mock_save.return_value = Path("/data/users/chat_arthur_001/projet.pdf")
+        mock_resolve_collection.return_value = "documents_user_chat_arthur_001"
+        mock_ingest.return_value = {
+            "collection_name": "documents_user_chat_arthur_001",
+            "doc_id": "doc-upload-1",
+            "chunks_count": 2,
+            "inserted_id_count": 2,
+            "source_path": "/data/users/chat_arthur_001/projet.pdf",
+        }
+
+        token = create_access_token("tester")
+        response = self.client.post(
+            "/ingest/upload",
+            headers={"Authorization": f"Bearer {token}"},
+            files={"file": ("projet.pdf", b"dummy pdf content", "application/pdf")},
+            data={"scope": "user", "chat_id": "chat_arthur_001"},
+        )
+        self.assertEqual(response.status_code, 200, msg=response.text)
+        self.assertEqual(response.json()["doc_id"], "doc-upload-1")
+        mock_save.assert_called_once()
+        mock_ingest.assert_called_once()
+
     @mock.patch("api.main.get_chroma_client", side_effect=RuntimeError("no chroma"))
     @mock.patch("api.main.httpx.get", side_effect=RuntimeError("no ollama"))
     def test_health_degraded(self, _mock_ollama, _mock_chroma):

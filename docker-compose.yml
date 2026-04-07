@@ -16,8 +16,13 @@ services:
       JWT_EXPIRES_SECONDS: ${JWT_EXPIRES_SECONDS:-3600}
       CHAT_MODEL: ${CHAT_MODEL:-mistral:7b}
       OLLAMA_GENERATE_TIMEOUT_SECONDS: ${OLLAMA_GENERATE_TIMEOUT_SECONDS:-120}
+      STORAGE_ROOT: ${STORAGE_ROOT:-/data}
+      OFFICIAL_SUBDIR: ${OFFICIAL_SUBDIR:-official}
+      USERS_SUBDIR: ${USERS_SUBDIR:-users}
       EMBED_MODEL: nomic-embed-text
       EMBED_BATCH_SIZE: 16
+    volumes:
+      - rag_files:/data
     depends_on:
       - chromadb
 
@@ -31,3 +36,4 @@ services:
 
 volumes:
   chroma_data:
+  rag_files:
