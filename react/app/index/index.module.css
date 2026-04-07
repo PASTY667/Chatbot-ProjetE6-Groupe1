@@ -9,7 +9,7 @@ body {
 }
 
 .newchatPage {
-  max-width: 900px;
+  min-width: 900px;
   font-size: 2rem;
 }
 
