@@ -10,10 +10,6 @@ const APPS = [
 export default function Dashboard() {
   return (
     <>
-      <header className="page-header">
-        <h1 className="page-title">Franklin</h1>
-      </header>
-
       <section className="apps-grid">
         {APPS.map((app) => (
           <AppCard key={app.href} {...app} />
