@@ -1,25 +1,62 @@
-from api import models  # local API models
-from api import routesChat, routesIngest  # local route modules
-import Backend.Config.settings as settings
-import utils.logger as logger
-import logging as log
 import os
-import json
-from fastapi import FastAPI, HTTPException
+
+import httpx
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+
+import utils.logger as logger
+from api.auth import router as auth_router
+from api.models import HealthResponse
+from api.routesChat import router as chat_router
+from api.routesIngest import router as ingest_router
+from api.secret_manager import SecretManagerError, get_jwt_secret
+from Vector.chroma_client import get_chroma_client
 
 logger.get_logger()
-log.info("Main reached")
 
-app = FastAPI()
+app = FastAPI(title="RAG API", version="1.0.0")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[o.strip() for o in os.getenv("ALLOWED_ORIGINS", "*").split(",") if o.strip()],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+
 @app.get("/")
 def root():
-    """
-    Health check endpoint for the LLM backend API.
-
-    This route is used by the LAMP web server or monitoring probes to verify
-    that the FastAPI service running on the LLM VM is reachable.
-
-    :return: A simple JSON payload confirming the service is alive.
-    :rtype: dict
-    """
     return {"message": "Hello World"}
+
+
+@app.get("/health", response_model=HealthResponse)
+def health():
+    chroma_ok = True
+    ollama_ok = True
+    jwt_secret_ok = True
+
+    try:
+        _ = get_chroma_client()
+    except Exception:
+        chroma_ok = False
+
+    try:
+        ollama_url = os.getenv("OLLAMA_URL", "http://localhost:11434")
+        resp = httpx.get(f"{ollama_url}/api/tags", timeout=3)
+        resp.raise_for_status()
+    except Exception:
+        ollama_ok = False
+
+    try:
+        _ = get_jwt_secret()
+    except SecretManagerError:
+        jwt_secret_ok = False
+
+    status = "ok" if chroma_ok and ollama_ok and jwt_secret_ok else "degraded"
+    return HealthResponse(status=status, chroma_ok=chroma_ok, ollama_ok=ollama_ok, jwt_secret_ok=jwt_secret_ok)
+
+
+app.include_router(auth_router)
+app.include_router(ingest_router)
+app.include_router(chat_router)
