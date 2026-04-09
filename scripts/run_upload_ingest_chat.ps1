@@ -6,10 +6,12 @@ param(
     [string]$Scope = "user", # user|official
     [int]$K = 5,
     [string]$Question = "quelles sont les mesures de sécurité envisagées dans le projet ?",
-    [string]$FilePath = ""
+    [string]$FilePath = "",
+    [switch]$StreamResponse
 )
 
 $ErrorActionPreference = "Stop"
+$fileStream = $null
 
 if ([string]::IsNullOrWhiteSpace($FilePath)) {
     throw "FilePath is required. Example: -FilePath 'C:\\Users\\...\\document.pdf'"
@@ -50,9 +52,8 @@ try {
     if ($ChatId) { $multipart.Add([System.Net.Http.StringContent]::new($ChatId), "chat_id") }
     $multipart.Add([System.Net.Http.StringContent]::new($collection), "collection_name")
 
-    $fileBytes = [System.IO.File]::ReadAllBytes($FilePath)
-    # IMPORTANT: unary comma avoids PowerShell array unrolling into millions of ctor args
-    $fileContent = [System.Net.Http.ByteArrayContent]::new((, $fileBytes))
+    $fileStream = [System.IO.File]::OpenRead($FilePath)
+    $fileContent = [System.Net.Http.StreamContent]::new($fileStream)
     $fileContent.Headers.ContentType = [System.Net.Http.Headers.MediaTypeHeaderValue]::Parse("application/pdf")
     $fileName = [System.IO.Path]::GetFileName($FilePath)
     $multipart.Add($fileContent, "file", $fileName)
@@ -67,16 +68,42 @@ try {
 
     Write-Host "=== 4) Chat Query ===" -ForegroundColor Cyan
     $chatBody = @{ query = $Question; collection_name = $collection; k = $K } | ConvertTo-Json -Compress
-    $chatResp = Invoke-RestMethod -Uri "$ApiBase/chat/query" -Method POST -Headers @{ Authorization = "Bearer $token" } -ContentType "application/json" -Body $chatBody
-    $chatResp | ConvertTo-Json -Depth 10
 
-    Write-Host "`n=== Réponse LLM ===" -ForegroundColor Green
-    Write-Host $chatResp.answer
+    if ($StreamResponse.IsPresent) {
+        Write-Host "=== Streaming response ===" -ForegroundColor Yellow
+        $request = [System.Net.Http.HttpRequestMessage]::new([System.Net.Http.HttpMethod]::Post, "$ApiBase/chat/query/stream")
+        $request.Headers.Authorization = [System.Net.Http.Headers.AuthenticationHeaderValue]::new("Bearer", $token)
+        $request.Content = [System.Net.Http.StringContent]::new($chatBody, [System.Text.Encoding]::UTF8, "application/json")
+
+        $streamResp = $client.SendAsync($request, [System.Net.Http.HttpCompletionOption]::ResponseHeadersRead).GetAwaiter().GetResult()
+        if (-not $streamResp.IsSuccessStatusCode) {
+            $streamErr = $streamResp.Content.ReadAsStringAsync().GetAwaiter().GetResult()
+            throw "Stream chat failed: HTTP $($streamResp.StatusCode) - $streamErr"
+        }
+
+        $responseStream = $streamResp.Content.ReadAsStreamAsync().GetAwaiter().GetResult()
+        $reader = [System.IO.StreamReader]::new($responseStream)
+        while (-not $reader.EndOfStream) {
+            $charCode = $reader.Read()
+            if ($charCode -ge 0) {
+                Write-Host -NoNewline ([char]$charCode)
+            }
+        }
+        Write-Host ""
+    }
+    else {
+        $chatResp = Invoke-RestMethod -Uri "$ApiBase/chat/query" -Method POST -Headers @{ Authorization = "Bearer $token" } -ContentType "application/json" -Body $chatBody
+        $chatResp | ConvertTo-Json -Depth 10
+
+        Write-Host "`n=== Réponse LLM ===" -ForegroundColor Green
+        Write-Host $chatResp.answer
+    }
 }
 catch {
     Write-Host "`nERREUR:" -ForegroundColor Red
     Write-Host $_.Exception.Message -ForegroundColor Red
 }
 finally {
+    if ($fileStream) { $fileStream.Dispose() }
     Read-Host "`nAppuie sur Entrée pour fermer"
 }

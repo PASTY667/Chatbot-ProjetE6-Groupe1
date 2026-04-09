@@ -96,6 +96,23 @@ class TestAPI(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json()["status"], "degraded")
 
+    @mock.patch("api.routesChat.search")
+    @mock.patch("api.routesChat.init_collection")
+    @mock.patch("api.routesChat.get_chroma_client")
+    def test_chat_stream_no_contexts(self, mock_get_client, mock_init_collection, mock_search):
+        mock_get_client.return_value = object()
+        mock_init_collection.return_value = object()
+        mock_search.return_value = {"documents": [[]], "metadatas": [[]]}
+
+        token = create_access_token("tester")
+        response = self.client.post(
+            "/chat/query/stream",
+            headers={"Authorization": f"Bearer {token}"},
+            json={"query": "test", "collection_name": "documents", "k": 2},
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("aucun passage pertinent", response.text.lower())
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
