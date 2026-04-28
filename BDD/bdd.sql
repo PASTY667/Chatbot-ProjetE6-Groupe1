@@ -7,7 +7,7 @@
 -- Table: file
 -- ----------------------------
 CREATE TABLE file (
-  id_file INT NOT NULL,
+  id_file INT NOT NULL AUTO_INCREMENT,
   filename VARCHAR(100) NOT NULL,
   CONSTRAINT file_PK PRIMARY KEY (id_file)
 )ENGINE=InnoDB;
@@ -17,7 +17,7 @@ CREATE TABLE file (
 -- Table: session
 -- ----------------------------
 CREATE TABLE session (
-  id_session INT NOT NULL,
+  id_session INT NOT NULL AUTO_INCREMENT,
   name VARCHAR(50) NOT NULL,
   last_updated DATETIME NOT NULL,
   created_at DATETIME NOT NULL,
@@ -29,7 +29,7 @@ CREATE TABLE session (
 -- Table: user
 -- ----------------------------
 CREATE TABLE user (
-  id_user INT NOT NULL,
+  id_user INT NOT NULL AUTO_INCREMENT,
   id_LDAP VARCHAR(50) NOT NULL,
   admin TINYINT(1) NOT NULL,
   enabled TINYINT(1) NOT NULL,
@@ -44,7 +44,7 @@ CREATE TABLE user (
 -- Table: log
 -- ----------------------------
 CREATE TABLE log (
-  id_log INT NOT NULL,
+  id_log INT NOT NULL AUTO_INCREMENT,
   date DATETIME NOT NULL,
   ip_address VARCHAR(50) NOT NULL,
   state TINYINT(1) NOT NULL,
@@ -58,7 +58,7 @@ CREATE TABLE log (
 -- Table: message
 -- ----------------------------
 CREATE TABLE message (
-  id_message INT NOT NULL,
+  id_message INT NOT NULL AUTO_INCREMENT,
   content VARCHAR(4000) NOT NULL,
   date DATETIME NOT NULL,
   sender VARCHAR(50) NOT NULL,

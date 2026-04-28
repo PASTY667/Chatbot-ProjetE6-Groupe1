@@ -5,6 +5,7 @@ generator client {
 
 datasource db {
   provider = "mysql"
+  url      = env("DATABASE_URL")
 }
 
 model auth_session {
@@ -49,7 +50,7 @@ model deposer {
 }
 
 model file {
-  id_file         Int               @id
+  id_file         Int               @id @default(autoincrement())
   filename        String            @db.VarChar(100)
   deposer         deposer[]
   vector_document vector_document[]
@@ -65,7 +66,7 @@ model jwt_denylist {
 }
 
 model log {
-  id_log     Int      @id
+  id_log     Int      @id @default(autoincrement())
   date       DateTime @db.DateTime(0)
   ip_address String   @db.VarChar(50)
   state      Boolean
@@ -76,7 +77,7 @@ model log {
 }
 
 model message {
-  id_message Int        @id
+  id_message Int        @id @default(autoincrement())
   content    String     @db.VarChar(4000)
   date       DateTime   @db.DateTime(0)
   sender     String     @db.VarChar(50)
@@ -102,7 +103,7 @@ model refresh_token {
 }
 
 model session {
-  id_session      Int               @id
+  id_session      Int               @id @default(autoincrement())
   name            String            @db.VarChar(50)
   last_updated    DateTime          @db.DateTime(0)
   created_at      DateTime          @db.DateTime(0)
@@ -112,7 +113,7 @@ model session {
 }
 
 model user {
-  id_user         Int               @id
+  id_user         Int               @id @default(autoincrement())
   id_LDAP         String            @db.VarChar(50)
   admin           Boolean
   enabled         Boolean
