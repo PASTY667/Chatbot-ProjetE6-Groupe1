@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from "react";
-import style from "@/components/ChatInput/chatInput.module.css";
+import style from "@/components/user/ChatInput/chatInput.module.css";
 
 type Props = {
   onSend: (message: string) => void;

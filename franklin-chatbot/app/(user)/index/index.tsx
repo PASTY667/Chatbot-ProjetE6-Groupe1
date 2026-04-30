@@ -1,11 +1,7 @@
 import Image from "next/image";
 import { useState } from "react";
-import { Grid } from "@mui/material";
-
-import style from "@/app/index/index.module.css";
-import uploadIcon from "@/assets/upload-file.png";
-import ChatInput from "@/components/ChatInput/chatInput";
-import logo from "@/assets/frankLogo.png";
+import style from "@/app/(user)/index/index.module.css";
+import ChatInput from "@/components/user/ChatInput/chatInput";
 
 type Message = {
   role: "user" | "assistant";
@@ -53,7 +49,7 @@ export default function Index() {
           </div>
         )}
 
-        <Grid className={style.grid}>
+        <div className={style.grid}>
           {messages.map((msg, index) => (
             <div className={style.message} key={index}>
               {msg.content}
@@ -64,7 +60,7 @@ export default function Index() {
               ))}
             </div>
           ))}
-        </Grid>
+        </div>
 
         {/* ZONE D'INPUT */}
         <div
@@ -75,7 +71,7 @@ export default function Index() {
           {/* UPLOAD UN FICHIER (PDF OU WORD) */}
           <div className={style.uploadSection}>
             <label className={style.uploadButton} htmlFor="upload-file">
-              <Image className={style.uploadIcon} src={uploadIcon} alt="i" />{" "}
+              <Image className={style.uploadIcon} src="/file.svg" alt="i" width={18} height={18} />{" "}
               PDF
             </label>
 
