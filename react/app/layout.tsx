@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
-import { ReactNode } from "react";
 import "./globals.css";
-import Sidebar from "@/components/sidebar/sidebar";
 import "./variables.css";
+import LayoutShell from "@/components/LayoutShell";
 
 export const metadata: Metadata = {
   title: "Franklin",
@@ -20,10 +19,8 @@ export default function RootLayout({
         <title>Franklin</title>
       </head>
       <body className="layout">
-        <Sidebar />
-        <main className="content">{children}</main>
+        <LayoutShell>{children}</LayoutShell>
       </body>
     </html>
   );
 }
-

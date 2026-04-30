@@ -55,7 +55,7 @@ export default function LogsPage() {
                     {/* On peut utiliser log.id ou index + 1 */}
                     <td>{index + 1}</td>
                     <td>
-                      <Link href={`/users/${log.id}`} className="log-user">
+                      <Link href={`/admin/users/${log.id}`} className="log-user">
                         {log.user}
                       </Link>
                     </td>

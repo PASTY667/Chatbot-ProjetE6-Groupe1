@@ -56,7 +56,7 @@ export default function FilesPage() {
                     <td>{file.name}</td>
                     <td>{file.format}</td>
                     <td>
-                      <Link href={`/users/${file.id}`} className="log-user">
+                      <Link href={`/admin/users/${file.id}`} className="log-user">
                         {file.user}
                       </Link>
                     </td>
