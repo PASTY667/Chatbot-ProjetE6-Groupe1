@@ -1,4 +1,4 @@
-import style from "@/components/PDFinput/input.module.css";
+import style from "@/components/Upload/upload.module.css";
 import Image, { StaticImageData } from "next/image";
 
 type InputProps = {

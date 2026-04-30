@@ -1,36 +1,38 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Franklin (application unifiée)
 
-## Getting Started
+Cette application Next.js regroupe:
+- l'interface utilisateur (chat) sur les routes existantes (`/`, `/settings`)
+- l'interface administrateur sous le préfixe `/admin`
 
-First, run the development server:
+## Lancement local
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Puis ouvrir `http://localhost:3000`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Routes principales
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- User:
+  - `/`
+  - `/settings`
+- Admin:
+  - `/admin`
+  - `/admin/logs`
+  - `/admin/files`
+  - `/admin/stats`
+  - `/admin/users`
 
-## Learn More
+## Compatibilité de routes admin historiques
 
-To learn more about Next.js, take a look at the following resources:
+Les anciennes routes directes sont redirigées vers `/admin/*`:
+- `/logs` -> `/admin/logs`
+- `/files` -> `/admin/files`
+- `/stats` -> `/admin/stats`
+- `/users` -> `/admin/users`
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Base de données
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Aucune base de données locale n'est requise pour afficher les pages user/admin actuelles de cette application fusionnée.
