@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="/css/variables.css">
+    <title>Document</title>
+</head>
+
+<body>
+    <nav class="sidebar">
+        <a href="index.html">Franklin</a>
+    </nav>
+    <main class="main">
+        <header class="page-header">
+            <h1 class="page-title">Franklin</h1>
+        </header>
+        <p class="app-description">Consultez ici l'historique complet des accès et des tentatives de connexion au
+            système.</p>
+
+        <div class="log-content">
+            <div class="stats-container">
+                <aside class="stats-filters">
+                    <h3>Filtres</h3>
+
+                    <div class="filter-group">
+                        <label for="user-select">Sélectionner Utilisateur</label>
+                        <select id="user-select" name="user">
+                            <option value="all">Tous les utilisateurs</option>
+                            <option value="1">Utilisateur Alpha</option>
+                            <option value="2">Utilisateur Beta</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <label>Période</label>
+                        <input type="date" name="start-date">
+                        <input type="date" name="end-date">
+                    </div>
+
+                    <div class="filter-group">
+                        <label>Type d'accès</label>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="success" checked> <label for="success">Réussis</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="fail" checked> <label for="fail">Échecs</label>
+                        </div>
+                    </div>
+
+                    <button class="btn-apply">Appliquer les filtres</button>
+                </aside>
+
+                <section class="stats-visual">
+                    <div class="chart-header">
+                        <h2>Statistiques d'utilisation</h2>
+                    </div>
+                    <div class="chart-placeholder">
+                        <p>Emplacement du graphique (Stats Utilisateurs)</p>
+                        <div class="fake-chart-bar"></div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </main>
+</body>
+<script src="js/admin.js"></script>
+
+</html>

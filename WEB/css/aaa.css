@@ -1,0 +1,101 @@
+html, body {
+    min-height: 100dvh;
+    margin: 0;
+}
+
+body {
+    background-color: var(--dark-background-color);
+    display: grid;
+    grid-template-columns: 1fr 4fr;
+}
+
+table {
+    border-collapse: collapse;
+}
+
+.app:hover{
+    transform:scale(1.03);
+}
+
+th,
+td {
+    padding: 15px 0 15px 0;
+}
+
+tr:nth-child(even) {
+    background-color: rgb(156, 156, 156);
+}
+
+tr:nth-child(odd) {
+    background-color: rgb(169, 169, 169);
+}
+
+.appTitle {
+    text-align: left;
+    margin-left: 30px;
+}
+
+.logContent {
+    background-color: darkgray;
+    border: 1px solid white;
+    border-radius: 5px;
+    margin: 2.5dvw;
+    display: flex;
+    justify-content: center;
+    width: max-content;
+}
+
+.gestChatContent {
+    background-color: gray;
+}
+
+.logUser {
+    color: #000000;
+    text-decoration: none;
+}
+
+h1 {
+    font: bold 3em var(--primary-font-family);
+    color: var(--light-text-color);
+}
+
+.sideBar {
+    background-color: var(--lightOrange-background-color);
+}
+
+.appIcon {
+    height: 15px;
+}
+
+.mainContent {
+    text-align: center;
+}
+
+.adminLayout {
+    grid-template-rows: repeat(3, auto);
+}
+
+.app {
+    background-color: var(--lightOrange-background-color);
+    border-radius: 5px;
+    color: var(--light-text-color);
+    text-decoration: none;
+    width: 100%;
+    overflow-wrap: break-word;
+}
+
+.apps {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 2rem;
+    margin: 10%;
+
+}
+
+.appIconTitle {
+    font: bold 3em var(--primary-font-family), sans-serif;
+}
+
+.appIconDesc {
+    font: 1.5em var(--primary-font-family), sans-serif;
+}
