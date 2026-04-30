@@ -1,5 +1,5 @@
 "use client";
-import Index from "@/app/index/index";
+import Index from "@/app/(user)/index/index";
 
 export default function Home(){
     return(

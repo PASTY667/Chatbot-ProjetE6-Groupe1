@@ -1,5 +1,4 @@
-import style from "@/app/settings/settings.module.css";
-import { Grid } from "@mui/material";
+import style from "@/app/(user)/settings/settings.module.css";
 
 export default function Settings() {
   return (
@@ -9,7 +8,7 @@ export default function Settings() {
         <h4 className={style.settingUsername}>Nom d'utilisateur</h4>
         <input className={style.settingsInput} type="text" />
         <h4 className={style.settingsUploads}>Fichiers importés</h4>
-        <Grid></Grid>
+        <div></div>
       </div>
     </div>
   );

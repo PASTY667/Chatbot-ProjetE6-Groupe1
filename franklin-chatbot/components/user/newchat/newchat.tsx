@@ -1,4 +1,4 @@
-import style from "@/components/newchat/newchat.module.css";
+import style from "@/components/user/newchat/newchat.module.css";
 
 type NewchatProps = {
 
