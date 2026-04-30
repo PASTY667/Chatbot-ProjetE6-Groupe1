@@ -33,6 +33,9 @@ Les anciennes routes directes sont redirigées vers `/admin/*`:
 - `/stats` -> `/admin/stats`
 - `/users` -> `/admin/users`
 
-## Base de données
+## Prisma / DB
 
-Aucune base de données locale n'est requise pour afficher les pages user/admin actuelles de cette application fusionnée.
+Les dépendances Prisma des deux versions sont prises en compte (`prisma`, `@prisma/client`, `pg`, `dotenv`) ainsi que le schéma `prisma/schema.prisma`.
+
+Les pages user/admin ne dépendent pas d'une DB locale pour s'afficher.
+Le helper `lib/prisma.ts` retourne `null` si `DATABASE_URL` n'est pas définie afin de ne pas bloquer le boot local.
