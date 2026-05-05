@@ -80,5 +80,5 @@
 .loginButton:hover{
     cursor: pointer;
     color: var(--light-text-color);
-    background-color: #b1acb4;
+    background-color: #d49596;
 }
