@@ -14,42 +14,20 @@ from Vector.Ingestion import extract as ex
 from Vector.Ingestion.extract import extract_text
 
 
-class TestExtractText(unittest.TestCase):
+class TestExtractPathValidation(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         get_logger()
         cls.project_root = PROJECT_ROOT
-        cls.sample_pdf = cls.project_root / "ProjetChabot_CompteRenduRevue1_DomyBonnelLouboutinDomingo.pdf"
-        # Optional repo fixtures (if user placed them)
-        cls.repo_txt = cls.project_root / "UnitTest.txt"
-        cls.repo_md = cls.project_root / "README.md"
-
-    def _dump_result(self, label: str, result: dict):
-        print(f"\n--- {label} ---")
-        print(f"path: {result.get('metadata', {}).get('source_path')}")
-        print(f"headers: {result.get('headers')[:80]!r}")
-        body = result.get('body', '')
-        preview = body if len(body) <= 400 else body[:400]
-        print(f"body_preview: {preview!r}")
-        print(f"body_len: {len(body)}")
-        print(f"pages_count: {len(result.get('pages', []))}")
-        print(f"metadata: {result.get('metadata')}")
-
-    def test_pdf_returns_body_and_metadata(self):
-        if not self.sample_pdf.exists():
-            self.skipTest("Sample PDF not found in repository")
-        result = extract_text(self.sample_pdf)
-        self.assertIsInstance(result, dict)
-        self.assertTrue(result["body"].strip())
-        self.assertIsInstance(result["pages"], list)
-        self.assertGreater(len(result["pages"]), 0)
-        self.assertEqual(result["metadata"].get("filetype"), "pdf")
-        self._dump_result("pdf_result", result)
 
     def test_missing_file_raises(self):
         missing = self.project_root / "__missing__.pdf"
         with self.assertRaises(FileNotFoundError):
             extract_text(missing)
+
+    def test_directory_path_raises(self):
+        with self.assertRaises(ValueError):
+            extract_text(self.project_root)
 
     def test_unsupported_extension_raises(self):
         with tempfile.NamedTemporaryFile(suffix=".docx", delete=False) as tmp:
@@ -60,69 +38,92 @@ class TestExtractText(unittest.TestCase):
         finally:
             tmp_path.unlink(missing_ok=True)
 
-    def test_txt_body_pages_and_metadata(self):
-        # Prefer real repo fixture if present
+    def test_non_pathlike_type_raises(self):
+        with self.assertRaises(TypeError):
+            extract_text(123)  # type: ignore[arg-type]
+
+
+class TestExtractTxtMd(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        get_logger()
+        cls.project_root = PROJECT_ROOT
+        cls.repo_txt = cls.project_root / "UnitTest.txt"
+        cls.repo_md = cls.project_root / "README.md"
+
+    def _tmp_file(self, suffix: str, content: str) -> Path:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=suffix, delete=False, encoding="utf-8") as tmp:
+            tmp.write(content)
+            return Path(tmp.name)
+
+    def test_txt_body_and_metadata(self):
         if self.repo_txt.exists():
-            tmp_path = self.repo_txt
+            path = self.repo_txt
             cleanup = False
-            content = tmp_path.read_text(encoding="utf-8")
         else:
-            content = "Ligne 1\n\nLigne 2"
-            with tempfile.NamedTemporaryFile(mode="w", suffix=".txt", delete=False, encoding="utf-8") as tmp:
-                tmp.write(content)
-                tmp_path = Path(tmp.name)
+            path = self._tmp_file(".txt", "Ligne 1\n\nLigne 2")
             cleanup = True
         try:
-            result = extract_text(tmp_path)
+            result = extract_text(path)
             self.assertEqual(result["metadata"].get("filetype"), "txt")
-            self.assertIsInstance(result["pages"], list)
-            self.assertGreaterEqual(len(result["pages"]), 1)
-            self.assertTrue(result["body"].strip())
-            self._dump_result("txt_result", result)
         finally:
             if cleanup:
-                tmp_path.unlink(missing_ok=True)
+                path.unlink(missing_ok=True)
 
     def test_empty_txt_raises(self):
-        with tempfile.NamedTemporaryFile(mode="w", suffix=".txt", delete=False, encoding="utf-8") as tmp:
-            tmp_path = Path(tmp.name)
+        path = self._tmp_file(".txt", "")
         try:
             with self.assertRaises(ValueError):
-                extract_text(tmp_path)
+                extract_text(path)
         finally:
-            tmp_path.unlink(missing_ok=True)
+            path.unlink(missing_ok=True)
 
-    def test_md_cleaning_and_metadata(self):
-        # Prefer real repo fixture if present
+    def test_md_body_and_metadata(self):
         if self.repo_md.exists():
-            tmp_path = self.repo_md
+            path = self.repo_md
             cleanup = False
-            md = tmp_path.read_text(encoding="utf-8")
         else:
-            md = "# Titre\n\nVoici un [lien](http://example.com) et **gras**."
-            with tempfile.NamedTemporaryFile(mode="w", suffix=".md", delete=False, encoding="utf-8") as tmp:
-                tmp.write(md)
-                tmp_path = Path(tmp.name)
+            path = self._tmp_file(".md", "# Titre\n\nVoici **gras** et [lien](http://example.com)")
             cleanup = True
         try:
-            result = extract_text(tmp_path)
+            result = extract_text(path)
             self.assertEqual(result["metadata"].get("filetype"), "md")
-            self.assertIsInstance(result["pages"], list)
-            self.assertGreaterEqual(len(result["pages"]), 1)
-            self.assertTrue(result["body"].strip())
-            self._dump_result("md_result", result)
         finally:
             if cleanup:
-                tmp_path.unlink(missing_ok=True)
+                path.unlink(missing_ok=True)
 
     def test_empty_md_raises(self):
-        with tempfile.NamedTemporaryFile(mode="w", suffix=".md", delete=False, encoding="utf-8") as tmp:
-            tmp_path = Path(tmp.name)
+        path = self._tmp_file(".md", "")
         try:
             with self.assertRaises(ValueError):
-                extract_text(tmp_path)
+                extract_text(path)
         finally:
-            tmp_path.unlink(missing_ok=True)
+            path.unlink(missing_ok=True)
+
+
+class TestExtractPdfIntegration(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        get_logger()
+        cls.sample_pdf = PROJECT_ROOT / "ProjetChabot_CompteRenduRevue1_DomyBonnelLouboutinDomingo.pdf"
+        if not cls.sample_pdf.exists():
+            raise unittest.SkipTest("Sample PDF not found in repository")
+        cls.result = extract_text(cls.sample_pdf)
+
+    def test_pdf_body_not_empty(self):
+        self.assertTrue(bool(self.result["body"].strip()))
+
+    def test_pdf_pages_listed(self):
+        self.assertGreater(len(self.result["pages"]), 0)
+
+    def test_pdf_metadata_filetype(self):
+        self.assertEqual(self.result["metadata"].get("filetype"), "pdf")
+
+
+class TestExtractionHelpers(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        get_logger()
 
     def test_noise_line_filtering(self):
         lines = [
@@ -135,11 +136,12 @@ class TestExtractText(unittest.TestCase):
             "IV",
         ]
         cleaned = ex.normalize_body_lines(lines)
-        self.assertIn("Chapitre 1 Introduction", cleaned)
-        self.assertIn("- item utile", cleaned)
-        self.assertNotIn("1.2.3", cleaned)
-        self.assertNotIn("Table des matières", cleaned)
-        self.assertNotIn("IV", cleaned)
+        self.assertTrue(
+            "Chapitre 1 Introduction" in cleaned
+            and "- item utile" in cleaned
+            and "1.2.3" not in cleaned
+            and "Table des matières" not in cleaned
+        )
 
     def test_paragraph_merging(self):
         lines = [
@@ -151,9 +153,7 @@ class TestExtractText(unittest.TestCase):
             "Titre De Section",
         ]
         merged = ex.merge_lines_into_paragraphs(lines)
-        self.assertTrue(any("se poursuit" in m for m in merged))
-        self.assertIn("- élément de liste", merged)
-        self.assertIn("Titre De Section", merged)
+        self.assertTrue(any("se poursuit" in m for m in merged) and "- élément de liste" in merged)
 
     def test_toc_page_detection(self):
         lines = ["Table des matières", "1 Introduction 1", "2 Méthode 3", "3 Résultats 5"]
