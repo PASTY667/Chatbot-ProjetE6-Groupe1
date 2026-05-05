@@ -2,11 +2,10 @@ body {
   margin: 0;
 }
 
-
 .sidebar {
   position: fixed;
   z-index: 100;
-  
+
   background-color: var(--lightOrange-background-color);
   font-family: var(--secondary-font-family);
   font-size: 1.4rem;
@@ -22,10 +21,23 @@ body {
     background-color: var(--pink-background-color);
     padding: 2px 18px;
     display: flex;
-    flex-direction:row;
+    flex-direction: row;
     justify-content: space-between;
 
-    .buttonSidebar{
+    .titleSidebar {
+      border: none;
+      text-decoration: none;
+      font-size: 2rem;
+      font-weight: bold;
+      padding: 15px 0px;
+    }
+
+    .titleSidebar:visited {
+      text-decoration: none;
+      color: var(--light-text-color);
+    }
+
+    .buttonSidebar {
       align-self: center;
       padding: 0px 10px;
       border: none;
@@ -33,13 +45,14 @@ body {
       color: var(--light-text-color);
       background-color: var(--dark-text-color);
       padding: 8px 23px;
+      font-weight: bolder;
     }
 
-    .buttonSidebar:hover{
+    .buttonSidebar:hover {
       cursor: pointer;
-      color:var(--dark-text-color);
+      color: var(--dark-text-color);
       background-color: white;
-      transition: 0.3s ease-in-out;  
+      transition: 0.3s ease-in-out;
     }
   }
 
@@ -78,52 +91,77 @@ body {
   }
 }
 
-.setting{
+.setting {
   color: var(--light-text-color);
   background-color: var(--darkOrange-background-color);
   display: flex;
   align-items: center;
   place-content: space-between;
   padding: 0px 20px 0px 40px;
-  
-  .settingTitle{
+
+  .settingTitle {
     font-size: 1.3rem;
     padding: 0;
   }
 
-  .settingButton{
-    text-decoration: none;;
+  .settingButton {
+    text-decoration: none;
     background-color: white;
     border-radius: 3px;
     padding: 10px 15px 3px 15px;
 
-    .logo{
+    .logo {
       width: 30px;
       height: auto;
       position: relative;
       z-index: 5;
-      left:0;
+      left: 0;
     }
 
-    .logoHover{
+    .logoHover {
       width: 32px;
       height: auto;
       display: none;
       position: absolute;
       z-index: 10;
-      left:14.1em;
+      left: 14.1em;
       padding-top: 1px;
     }
   }
 
-  .settingButton:hover{
+  .settingButton:hover {
     color: var(--light-text-color);
     background-color: var(--dark-background-color);
-    transition: 0.5s ease-in-out;  
+    transition: 0.5s ease-in-out;
 
-    .logoHover{
-      display:inline;
-      transition: 0.5s ease-in-out; 
+    .logoHover {
+      display: inline;
+      transition: 0.5s ease-in-out;
     }
   }
+}
+
+
+/* COLLAPSED */
+.collapsed {
+  width: 95px;
+}
+.collapsed .buttonSidebar{
+  margin: 0;
+  padding: 5px;
+}
+.collapsed .listSidebar {
+  opacity: 0;
+  width: 0;
+  overflow: hidden;
+}
+.collapsed .titleSidebar{
+  opacity: 0;
+  width: 0;
+  overflow: hidden;
+}
+.collapsed .setting {
+  opacity: 0;
+  width: 0;
+  overflow: hidden;
 }

@@ -19,16 +19,26 @@ export default function ChatInput({ onSend }: Props) {
     setMessage("");
   };
 
+  //Pour mettre, automatiquement, la première lettre du message en majuscule
+  const capitalizeFirstLetter = (value: string) => {
+  if (!value) return value;
+  return value.charAt(0).toUpperCase() + value.slice(1);
+};
+
+
   return (
     <div className={style.chatInput}>
       {/* Configuration du champ d'input */}
       <textarea
         className={style.textInput}
         value={message}
-        onChange={(e) => setMessage(e.target.value)}
+        onChange={(e) => {setMessage(capitalizeFirstLetter(e.target.value))}}
         placeholder="Poser une question..."
         onKeyDown={(e) => {
-          if (e.key === "Enter") handleSend();
+          if (e.key === "Enter") {
+            e.preventDefault();
+            handleSend();
+          }
         }}
       />
 

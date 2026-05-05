@@ -1,4 +1,5 @@
 "use client";
+import React, { useState } from "react";
 import Image from "next/image";
 import logo from "@/assets/settingLogo.png";
 import logoHover from "@/assets/settingLogoHover.png";
@@ -6,12 +7,22 @@ import style from "./sidebar.module.css";
 import Link from "next/link";
 
 export default function Sidebar() {
+  const [collapsed, setCollapsed] = useState(false);
+
   return (
-    <div className={style.sidebar}>
-      <div>
+    <div className={`${style.sidebar} ${collapsed ? style.collapsed : ""}`}>
+      <div className={style.upperContent}>
         <div className={style.headerSidebar}>
-          <h3 className={style.titleSidebar}>Franklin</h3>
-          <button className={style.buttonSidebar}>-</button>
+          <a href="/" className={style.titleSidebar}>
+            Franklin
+          </a>
+          <button
+            className={style.buttonSidebar}
+            onClick={() => setCollapsed((prev) => !prev)}
+            aria-label="Toggle sidebar"
+          >
+            {collapsed ? ">" : "<"}
+          </button>
         </div>
         <ul className={style.listSidebar}>
           <div className={style.listFixSidebar}>
