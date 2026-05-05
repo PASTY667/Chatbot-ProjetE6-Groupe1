@@ -85,7 +85,7 @@ try {
             $uploadResp = $client.PostAsync("$ApiBase/ingest/upload", $multipart).GetAwaiter().GetResult()
             $uploadText = $uploadResp.Content.ReadAsStringAsync().GetAwaiter().GetResult()
             if (-not $uploadResp.IsSuccessStatusCode) {
-                throw "Upload/Ingest failed for scope=$UploadScope, collection=$UploadCollection: HTTP $($uploadResp.StatusCode) - $uploadText"
+                throw "Upload/Ingest failed for scope=${UploadScope}, collection=${UploadCollection}: HTTP $($uploadResp.StatusCode) - $uploadText"
             }
             return ($uploadText | ConvertFrom-Json)
         }
@@ -107,7 +107,7 @@ try {
         $streamResp = $client.SendAsync($request, [System.Net.Http.HttpCompletionOption]::ResponseHeadersRead).GetAwaiter().GetResult()
         if (-not $streamResp.IsSuccessStatusCode) {
             $streamErr = $streamResp.Content.ReadAsStringAsync().GetAwaiter().GetResult()
-            throw "Stream chat failed for collection=$StreamCollection: HTTP $($streamResp.StatusCode) - $streamErr"
+            throw "Stream chat failed for collection=${StreamCollection}: HTTP $($streamResp.StatusCode) - $streamErr"
         }
 
         $responseStream = $streamResp.Content.ReadAsStreamAsync().GetAwaiter().GetResult()
