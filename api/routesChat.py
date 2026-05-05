@@ -11,26 +11,43 @@ from Vector.chroma_client import get_chroma_client, init_collection, search
 
 router = APIRouter(prefix="/chat", tags=["chat"])
 
-def _resolve_target_collections(payload):
-    warnings: list[str] = []
+OFFICIAL_COLLECTION = "documents_official"
 
+def _resolve_target_collections(payload):
+    warnings = []
+
+    # Si une collection est explicitement forcée, on la respecte
     if payload.collection_name:
         return [payload.collection_name], warnings
 
-    collections: list[str] = []
+    collections = []
 
+    # Résoudre la collection utilisateur si demandé
+    user_col = None
     if payload.include_user_collection:
         if payload.user_collection_name:
-            collections.append(payload.user_collection_name)
+            user_col = payload.user_collection_name
         elif payload.chat_id:
             chat = payload.chat_id.strip().lower().replace(" ", "_")
-            collections.append(f"document_user_{chat}")
+            user_col = f"documents_user_{chat}"
         else:
-            warnings.append("User collection not requested because chat_id/user_collection_name is missing.")
-    collections = list(dict.fromkeys(collections))
+            warnings.append(
+                "User collection ignorée : chat_id et user_collection_name absents."
+            )
+
+    # Logique finale : officielle par défaut, fusion si l'utilisateur a une collection
+    if user_col:
+        # L'utilisateur a un document → on cherche dans les deux
+        collections = [OFFICIAL_COLLECTION, user_col]
+    elif payload.use_official:
+        # Pas de document utilisateur → collection officielle seulement
+        collections = [OFFICIAL_COLLECTION]
 
     if not collections:
-        raise HTTPException(status_code=400, detail="No target collection resolved.")
+        raise HTTPException(
+            status_code=400,
+            detail="Aucune collection cible résolue."
+        )
 
     return collections, warnings
 
@@ -154,7 +171,7 @@ def _build_prompt(query: str, contexts: list[str]) -> tuple[str, str]:
     response_model=ChatResponse,
     responses={401: {"model": ErrorResponse}, 500: {"model": ErrorResponse}, 502: {"model": ErrorResponse}},
 )
-def chat_query_stream(payload: ChatRequest, _auth: dict = Depends(require_auth)):
+def chat_query(payload: ChatRequest, _auth: dict = Depends(require_auth)):
     try:
         client = get_chroma_client()
 
@@ -165,41 +182,31 @@ def chat_query_stream(payload: ChatRequest, _auth: dict = Depends(require_auth))
             k=payload.k,
             collection_names=collection_names,
         )
-        contexts, _, _ = _rank_and_compact(items, max_contexts=5)
+        contexts, metadatas, sources_used = _rank_and_compact(items, max_contexts=5)
+
+        warnings = warnings1 + warnings2
 
         if not contexts:
-            warn_txt = " | ".join(warnings1 + warnings2)
-            msg = "Je n'ai trouvé aucun passage pertinent dans les sources demandées."
-            if warn_txt:
-                msg += f"\n[INFO] {warn_txt}"
-            return StreamingResponse(iter([msg]), media_type="text/plain")
+            return ChatResponse(
+                answer="Je n'ai trouvé aucun passage pertinent dans les sources demandées.",
+                contexts=[],
+                metadatas=[],
+                sources_used=sources_used,
+                warnings=warnings,
+            )
 
-        chat_model = os.getenv("CHAT_MODEL", "mistral:7b")
-        ollama_url, prompt = _build_prompt(payload.query, contexts)
-        timeout_seconds = float(os.getenv("OLLAMA_GENERATE_TIMEOUT_SECONDS", "300"))
+        try:
+            answer = _generate_answer_with_ollama(payload.query, contexts)
+        except Exception as exc:
+            raise HTTPException(status_code=502, detail=f"LLM backend unavailable: {exc}")
 
-        def _stream():
-            try:
-                with httpx.Client(timeout=timeout_seconds) as stream_client:
-                    with stream_client.stream(
-                        "POST",
-                        f"{ollama_url}/api/generate",
-                        json={"model": chat_model, "prompt": prompt, "stream": True},
-                    ) as resp:
-                        resp.raise_for_status()
-                        for line in resp.iter_lines():
-                            if not line:
-                                continue
-                            data = json.loads(line)
-                            chunk = data.get("response", "")
-                            if chunk:
-                                yield chunk
-                            if data.get("done"):
-                                break
-            except Exception:
-                yield "\n[ERREUR] génération interrompue (timeout ou backend indisponible)\n"
-
-        return StreamingResponse(_stream(), media_type="text/plain")
+        return ChatResponse(
+            answer=answer,
+            contexts=contexts,
+            metadatas=metadatas,
+            sources_used=sources_used,
+            warnings=warnings,
+        )
     except HTTPException:
         raise
     except Exception as exc:
