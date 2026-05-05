@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { prisma } from '@/lib/prisma'
+import { prisma } from '@/lib/prisma';
 
 export default async function UsersManagementPage() {
   // Données fictives pour les utilisateurs
@@ -19,10 +19,10 @@ export default async function UsersManagementPage() {
       setUsers(users.filter(user => user.id !== id));
     }
   }; */
-
   const users = await prisma.user.findMany();
 
   type UserType = typeof users[number];
+
 
   return (
     <>
@@ -33,15 +33,6 @@ export default async function UsersManagementPage() {
 
       <div className="log-content">
         <div className="log-data">
-          
-          {/* <form onSubmit={(e) => e.preventDefault()}>
-            <input 
-              type="submit" 
-              value="Actualiser la liste" 
-              className="btn-apply"
-              style={{ marginBottom: '20px', width: 'auto' }}
-            />
-          </form> */}
 
           <div className="table-container">
             <table className="show-data">
@@ -50,6 +41,8 @@ export default async function UsersManagementPage() {
                   <th>#</th>
                   <th>Nom de l'utilisateur</th>
                   <th>Rôle</th>
+                  <th>Adresse IP</th>
+                  <th>Dernière connexion</th>
                   <th>Bloquer / Supprimer</th>
                 </tr>
               </thead>
@@ -59,10 +52,12 @@ export default async function UsersManagementPage() {
                     <td>{user.id_user}</td>
                     <td>{user.id_LDAP}</td>
                     <td>{user.admin ? "Administrateur" : "Utilisateur"}</td>
+                    <td>{user.ip}</td>
+                    <td>{user.lastLogin}</td>
                     <td>
                       <div style={{ display: 'flex', gap: '15px', justifyContent: 'center' }}>
                         <button 
-                          //onClick={() => handleBlock(user.id)}
+                          //onClick={() => }
                           title="Bloquer"
                           style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.2rem' }}
                         >
