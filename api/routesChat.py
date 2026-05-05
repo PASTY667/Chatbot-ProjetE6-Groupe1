@@ -217,15 +217,27 @@ def chat_query(payload: ChatRequest, _auth: dict = Depends(require_auth)):
     "/query/stream",
     responses={401: {"model": ErrorResponse}, 500: {"model": ErrorResponse}, 502: {"model": ErrorResponse}},
 )
+@router.post("/query/stream")
 def chat_query_stream(payload: ChatRequest, _auth: dict = Depends(require_auth)):
     try:
         client = get_chroma_client()
-        collection = init_collection(client, payload.collection_name)
-        results = search(collection, query=payload.query, filters=None, where_document=None, k=payload.k)
 
-        contexts = (results.get("documents") or [[]])[0]
+        # 1. Utiliser la logique de fusion des collections comme dans /query
+        collection_names, warnings1 = _resolve_target_collections(payload)
+
+        # 2. Collecter les contextes multi-collections
+        items, warnings2 = _collect_contexts_from_collections(
+            client=client,
+            query=payload.query,
+            k=payload.k,
+            collection_names=collection_names,
+        )
+
+        # 3. Classer et compacter (Ranking)
+        contexts, metadatas, sources_used = _rank_and_compact(items, max_contexts=5)
+
         if not contexts:
-            return StreamingResponse(iter(["Je n'ai trouvé aucun passage pertinent dans la base documentaire."]), media_type="text/plain")
+            return StreamingResponse(iter(["Je n'ai trouvé aucun passage pertinent."]), media_type="text/plain")
 
         chat_model = os.getenv("CHAT_MODEL", "mistral:7b")
         ollama_url, prompt = _build_prompt(payload.query, contexts)
@@ -233,27 +245,25 @@ def chat_query_stream(payload: ChatRequest, _auth: dict = Depends(require_auth))
 
         def _stream():
             try:
+                # On pourrait aussi envoyer les warnings au début du stream si besoin
                 with httpx.Client(timeout=timeout_seconds) as stream_client:
                     with stream_client.stream(
-                        "POST",
-                        f"{ollama_url}/api/generate",
-                        json={"model": chat_model, "prompt": prompt, "stream": True},
+                            "POST",
+                            f"{ollama_url}/api/generate",
+                            json={"model": chat_model, "prompt": prompt, "stream": True},
                     ) as resp:
                         resp.raise_for_status()
                         for line in resp.iter_lines():
-                            if not line:
-                                continue
+                            if not line: continue
                             data = json.loads(line)
                             chunk = data.get("response", "")
-                            if chunk:
-                                yield chunk
-                            if data.get("done"):
-                                break
+                            if chunk: yield chunk
+                            if data.get("done"): break
             except Exception:
-                yield "\n[ERREUR] génération interrompue (timeout ou backend indisponible)\n"
+                yield "\n[ERREUR] génération interrompue\n"
 
         return StreamingResponse(_stream(), media_type="text/plain")
     except HTTPException:
         raise
     except Exception as exc:
-        raise HTTPException(status_code=500, detail=f"Chat retrieval failure: {exc}")
+        raise HTTPException(status_code=500, detail=str(exc))
