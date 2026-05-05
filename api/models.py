@@ -33,14 +33,20 @@ class IngestResponse(BaseModel):
 
 class ChatRequest(BaseModel):
     query: str = Field(..., min_length=2)
-    collection_name: str | None = None
     k: int = Field(default=5, ge=1, le=20)
+    use_official: bool = True
+    include_user_collection: bool = True
+    chat_id: str | None = None
+    user_collection_name: str | None = None
+    collection_name: str | None = None
 
 
 class ChatResponse(BaseModel):
     answer: str
     contexts: list[str]
     metadatas: list[dict[str, Any]]
+    sources_used: list[str] = []
+    warnings: list[str] = []
 
 
 class HealthResponse(BaseModel):

@@ -11,6 +11,100 @@ from Vector.chroma_client import get_chroma_client, init_collection, search
 
 router = APIRouter(prefix="/chat", tags=["chat"])
 
+def _resolve_target_collections(payload):
+    warnings: list[str] = []
+
+    if payload.collection_name:
+        return [payload.collection_name], warnings
+
+    collections: list[str] = []
+
+    if payload.include_user_collection:
+        if payload.user_collection_name:
+            collections.append(payload.user_collection_name)
+        elif payload.chat_id:
+            chat = payload.chat_id.strip().lower().replace(" ", "_")
+            collections.append(f"document_user_{chat}")
+        else:
+            warnings.append("User collection not requested because chat_id/user_collection_name is missing.")
+    collections = list(dict.fromkeys(collections))
+
+    if not collections:
+        raise HTTPException(status_code=400, detail="No target collection resolved.")
+
+    return collections, warnings
+
+def _collect_contexts_from_collections(client, query: str, k: int, collection_names: list[str]) -> tuple[list[dict], list[str]]:
+    """
+    Retourne (items, warnings)
+    item = {text, metadata, distance, source_collection}
+    """
+    items: list[dict] = []
+    warnings: list[str] = []
+
+    for cname in collection_names:
+        try:
+            col = init_collection(client, cname)
+            res = search(col, query=query, filters=None, where_document=None, k=k)
+
+            docs = (res.get("documents") or [[]])[0]
+            metas = (res.get("metadatas") or [[]])[0]
+            dists = (res.get("distances") or [[]])[0]
+
+            for i, txt in enumerate(docs):
+                if not txt:
+                    continue
+                md = metas[i] if i < len(metas) else {}
+                dist = dists[i] if i < len(dists) else 999999.0
+                if not isinstance(md, dict):
+                    md = {}
+                md = {**md, "source_collection": cname}
+
+                items.append(
+                    {
+                        "text": txt,
+                        "metadata": md,
+                        "distance": float(dist) if dist is not None else 999999.0,
+                        "source_collection": cname,
+                    }
+                )
+        except Exception as exc:
+            warnings.append(f"Collection '{cname}' unavailable or query failed: {exc}")
+
+    return items, warnings
+
+def _rank_and_compact(items: list[dict], max_contexts: int = 5) -> tuple[list[str], list[dict], list[str]]:
+    if not items:
+        return [], [], []
+
+    # tri par pertinence (distance croissante)
+    items_sorted = sorted(items, key=lambda x: x.get("distance", 999999.0))
+
+    contexts: list[str] = []
+    metadatas: list[dict] = []
+    sources_used: list[str] = []
+    seen_texts: set[str] = set()
+
+    for it in items_sorted:
+        txt = it["text"]
+        if txt in seen_texts:
+            continue
+        seen_texts.add(txt)
+
+        contexts.append(txt)
+        metadatas.append(it.get("metadata", {}))
+        src = it.get("source_collection")
+        if src and src not in sources_used:
+            sources_used.append(src)
+
+        if len(contexts) >= max_contexts:
+            break
+
+    return contexts, metadatas, sources_used
+
+
+
+
 
 def _generate_answer_with_ollama(query: str, contexts: list[str]) -> str:
     ollama_url = os.getenv("OLLAMA_URL", "http://127.0.0.1:11434")
@@ -60,28 +154,52 @@ def _build_prompt(query: str, contexts: list[str]) -> tuple[str, str]:
     response_model=ChatResponse,
     responses={401: {"model": ErrorResponse}, 500: {"model": ErrorResponse}, 502: {"model": ErrorResponse}},
 )
-def chat_query(payload: ChatRequest, _auth: dict = Depends(require_auth)):
+def chat_query_stream(payload: ChatRequest, _auth: dict = Depends(require_auth)):
     try:
         client = get_chroma_client()
-        collection = init_collection(client, payload.collection_name)
-        results = search(collection, query=payload.query, filters=None, where_document=None, k=payload.k)
 
-        contexts = (results.get("documents") or [[]])[0]
-        metadatas = (results.get("metadatas") or [[]])[0]
+        collection_names, warnings1 = _resolve_target_collections(payload)
+        items, warnings2 = _collect_contexts_from_collections(
+            client=client,
+            query=payload.query,
+            k=payload.k,
+            collection_names=collection_names,
+        )
+        contexts, _, _ = _rank_and_compact(items, max_contexts=5)
 
         if not contexts:
-            return ChatResponse(
-                answer="Je n'ai trouvé aucun passage pertinent dans la base documentaire.",
-                contexts=[],
-                metadatas=[],
-            )
+            warn_txt = " | ".join(warnings1 + warnings2)
+            msg = "Je n'ai trouvé aucun passage pertinent dans les sources demandées."
+            if warn_txt:
+                msg += f"\n[INFO] {warn_txt}"
+            return StreamingResponse(iter([msg]), media_type="text/plain")
 
-        try:
-            answer = _generate_answer_with_ollama(payload.query, contexts)
-        except Exception as exc:
-            raise HTTPException(status_code=502, detail=f"LLM backend unavailable: {exc}")
+        chat_model = os.getenv("CHAT_MODEL", "mistral:7b")
+        ollama_url, prompt = _build_prompt(payload.query, contexts)
+        timeout_seconds = float(os.getenv("OLLAMA_GENERATE_TIMEOUT_SECONDS", "300"))
 
-        return ChatResponse(answer=answer, contexts=contexts, metadatas=metadatas)
+        def _stream():
+            try:
+                with httpx.Client(timeout=timeout_seconds) as stream_client:
+                    with stream_client.stream(
+                        "POST",
+                        f"{ollama_url}/api/generate",
+                        json={"model": chat_model, "prompt": prompt, "stream": True},
+                    ) as resp:
+                        resp.raise_for_status()
+                        for line in resp.iter_lines():
+                            if not line:
+                                continue
+                            data = json.loads(line)
+                            chunk = data.get("response", "")
+                            if chunk:
+                                yield chunk
+                            if data.get("done"):
+                                break
+            except Exception:
+                yield "\n[ERREUR] génération interrompue (timeout ou backend indisponible)\n"
+
+        return StreamingResponse(_stream(), media_type="text/plain")
     except HTTPException:
         raise
     except Exception as exc:
