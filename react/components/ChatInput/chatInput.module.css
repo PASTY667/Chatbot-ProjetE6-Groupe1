@@ -1,5 +1,6 @@
 .chatInput {
-  padding: 0;
+  width: 100%;
+  padding: 0px 50px 0px 0px;
 
   .textInput {
     font-family: var(--primary-font-family);
@@ -12,9 +13,6 @@
     margin: 10px 0px;
     width: 94%;
     resize: none;
-    /* word-wrap: break-word;
-    overflow-wrap: break-word;
-    white-space: pre-wrap; */
   }
 
   .textInput:focus {

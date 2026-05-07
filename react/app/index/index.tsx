@@ -44,6 +44,7 @@ export default function Index() {
       className={`${style.main} ${messages.length === 0 ? style.centered : ""}`}
     >
       <div className={style.newchatPage}>
+
         {/* HEADER DE LA PAGE */}
         {messages.length === 0 && (
           <div className={style.newchatHeader}>
@@ -59,7 +60,7 @@ export default function Index() {
               {msg.content}
               {files.map((file, index) => (
                 <div key={index} className={style.fileItem}>
-                  <p>{file.name}</p>
+                  <p className={style.fileMessage}>{file.name}</p>
                 </div>
               ))}
             </div>
@@ -108,7 +109,7 @@ export default function Index() {
           {/* INPUT D'UN MESSAGE AU CHABOT */}
           <ChatInput onSend={handleSendMessage} />
         </div>
-        <div className={style.footer}>footer</div>
+        {/* <div className={style.footer}>f</div> */}
       </div>
     </main>
   );

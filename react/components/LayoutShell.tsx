@@ -17,7 +17,6 @@ export default function LayoutShell({ children }: LayoutShellProps) {
 
   return (
     <>
-      <Sidebar />
       <main className="content">{children}</main>
     </>
   );
