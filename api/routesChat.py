@@ -90,13 +90,16 @@ def _collect_contexts_from_collections(client, query: str, k: int, collection_na
 
     return items, warnings
 
+
 def _rank_and_compact(items: list[dict], max_contexts: int = 5) -> tuple[list[str], list[dict], list[str]]:
     if not items:
         return [], [], []
 
-    # tri par pertinence (distance croissante)
+    # Tri par distance globale
     items_sorted = sorted(items, key=lambda x: x.get("distance", 999999.0))
 
+    # Stratégie de diversité : On essaie de prendre au moins un chunk de chaque source
+    # si elles sont présentes dans les résultats
     contexts: list[str] = []
     metadatas: list[dict] = []
     sources_used: list[str] = []
@@ -104,12 +107,12 @@ def _rank_and_compact(items: list[dict], max_contexts: int = 5) -> tuple[list[st
 
     for it in items_sorted:
         txt = it["text"]
-        if txt in seen_texts:
-            continue
-        seen_texts.add(txt)
+        if txt in seen_texts: continue
 
+        seen_texts.add(txt)
         contexts.append(txt)
         metadatas.append(it.get("metadata", {}))
+
         src = it.get("source_collection")
         if src and src not in sources_used:
             sources_used.append(src)
@@ -128,8 +131,9 @@ def _generate_answer_with_ollama(query: str, contexts: list[str]) -> str:
     chat_model = os.getenv("CHAT_MODEL", "mistral:7b")
     timeout_seconds = float(os.getenv("OLLAMA_GENERATE_TIMEOUT_SECONDS", "300"))
     system_prompt = (
-        "Tu es un assistant RAG. Réponds uniquement avec le contexte fourni. "
-        "Si le contexte est insuffisant, dis explicitement que tu ne sais pas."
+    "Tu es un assistant RAG expert. Tu dois synthétiser une réponse en utilisant "
+    "TOUTES les sources fournies (documentation officielle et documents utilisateur). "
+    "Cite les sources si possible. Si une information manque, dis-le."
     )
 
     formatted_context = "\n\n".join([f"- {ctx}" for ctx in contexts[:5]])

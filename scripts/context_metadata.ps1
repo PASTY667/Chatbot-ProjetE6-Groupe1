@@ -168,7 +168,7 @@ if ([string]::IsNullOrWhiteSpace($UserPdf) -or -not (Test-Path $UserPdf)) {
     # Note: Votre backend stream actuel n'utilise pas encore la fusion automatique (resolve_target_collections)
     # Dans le TEST 3 du .ps1
     $payload = @{
-        query = "Explique le projet en utilisant les infos de l'école et de mon document.";
+        query = "Explique le projet en utilisant les infos de l'école et de mon document. Et explique moi en détail le fonctionnement de l'API";
         include_user_collection = $true;
         chat_id = $UserChatId; # Sera transformé en documents_user_chat_test_user_001
         use_official = $true;   # Pour forcer la fusion avec l'officiel
