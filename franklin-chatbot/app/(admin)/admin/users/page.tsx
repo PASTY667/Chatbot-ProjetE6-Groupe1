@@ -64,7 +64,7 @@ export default async function UsersManagementPage() {
                           🚫
                         </button>
                         <button 
-                          //onClick={() => handleDelete(user.id)}
+                          className='delete'
                           title="Supprimer"
                           style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.2rem' }}
                         >
