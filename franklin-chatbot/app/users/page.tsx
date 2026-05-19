@@ -22,6 +22,12 @@ export default async function UsersManagementPage() {
 
   const users = await prisma.user.findMany();
 
+  const logs = await prisma.log.findMany({
+    include: {
+      user: true,
+    },
+  });
+
   type UserType = typeof users[number];
 
   return (
@@ -50,6 +56,7 @@ export default async function UsersManagementPage() {
                   <th>#</th>
                   <th>Nom de l'utilisateur</th>
                   <th>Rôle</th>
+                  <th>Documents envoyés</th>
                   <th>Bloquer / Supprimer</th>
                 </tr>
               </thead>
@@ -59,6 +66,7 @@ export default async function UsersManagementPage() {
                     <td>{user.id_user}</td>
                     <td>{user.id_LDAP}</td>
                     <td>{user.admin ? "Administrateur" : "Utilisateur"}</td>
+                    <td>{user.nbr_doc_sent}</td>
                     <td>
                       <div style={{ display: 'flex', gap: '15px', justifyContent: 'center' }}>
                         <button 
