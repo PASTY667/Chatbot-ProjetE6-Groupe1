@@ -10,7 +10,7 @@ export default async function UsersManagementPage() {
     { id: 3, name: "Marie Curie", role: "Modérateur", ip: "10.0.0.5", lastLogin: "2026-04-07" },
   ]);
 
-  const handleBlock = (id: number) => {
+  /*const handleBlock = (id: number) => {
     alert(`Utilisateur ${id} bloqué (logique à implémenter)`);
   };
 
@@ -28,7 +28,7 @@ export default async function UsersManagementPage() {
     <>
 
       <p className="app-description">
-        Gérez les comptes utilisateurs, surveillez leurs adresses IP et contrôlez les accès au système.
+        Gérer les comptes utilisateurs et contrôler les accès au système.
       </p>
 
       <div className="log-content">
@@ -47,33 +47,7 @@ export default async function UsersManagementPage() {
                 </tr>
               </thead>
               <tbody>
-                {users.map((user: UserType) => (
-                  <tr key={user.id_user}>
-                    <td>{user.id_user}</td>
-                    <td>{user.id_LDAP}</td>
-                    <td>{user.admin ? "Administrateur" : "Utilisateur"}</td>
-                    <td>{user.ip}</td>
-                    <td>{user.lastLogin}</td>
-                    <td>
-                      <div style={{ display: 'flex', gap: '15px', justifyContent: 'center' }}>
-                        <button 
-                          //onClick={() => }
-                          title="Bloquer"
-                          style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.2rem' }}
-                        >
-                          🚫
-                        </button>
-                        <button 
-                          className='delete'
-                          title="Supprimer"
-                          style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.2rem' }}
-                        >
-                          🗑️
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
+                
               </tbody>
             </table>
           </div>

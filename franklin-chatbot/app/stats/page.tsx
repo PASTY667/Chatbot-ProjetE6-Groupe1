@@ -1,9 +1,8 @@
-"use client"; // Obligatoire car on va utiliser des interactions (boutons, inputs)
+"use client"; 
 
 import React, { useState } from 'react';
 
 export default function StatsPage() {
-  // Exemple d'état pour les filtres
   const [filters, setFilters] = useState({
     user: 'all',
     startDate: '',
@@ -14,7 +13,6 @@ export default function StatsPage() {
 
   const handleApplyFilters = () => {
     console.log("Filtres appliqués :", filters);
-    // Ici tu feras ton appel API plus tard
   };
 
   return (
@@ -26,7 +24,6 @@ export default function StatsPage() {
       <div className="log-content">
         <div className="stats-container">
           
-          {/* ASIDE - FILTRES */}
           <aside className="stats-filters">
             <h3>Filtres</h3>
 
@@ -38,24 +35,20 @@ export default function StatsPage() {
                 onChange={(e) => setFilters({...filters, user: e.target.value})}
               >
                 <option value="all">Tous les utilisateurs</option>
-                <option value="1">Utilisateur Alpha</option>
-                <option value="2">Utilisateur Beta</option>
+                <option value="1">Utilisateur 1</option>
+                <option value="2">Utilisateur 2</option>
               </select>
             </div>
 
             <div className="filter-group">
-              <label>Période</label>
+              <label>Depuis</label>
               <input 
                 type="date" 
                 onChange={(e) => setFilters({...filters, startDate: e.target.value})}
               />
-              <input 
-                type="date" 
-                onChange={(e) => setFilters({...filters, endDate: e.target.value})}
-              />
             </div>
 
-            <div className="filter-group">
+            {/* <div className="filter-group">
               <label>Type d'accès</label>
               <div className="checkbox-item">
                 <input 
@@ -75,20 +68,19 @@ export default function StatsPage() {
                 /> 
                 <label htmlFor="fail">Échecs</label>
               </div>
-            </div>
+            </div> */}
 
             <button className="btn-apply" onClick={handleApplyFilters}>
               Appliquer les filtres
             </button>
           </aside>
-
-          {/* SECTION - VISUALISATION */}
+          
           <section className="stats-visual">
             <div className="chart-header">
               <h2>Statistiques d'utilisation</h2>
             </div>
             <div className="chart-placeholder">
-              <p>Emplacement du graphique (Stats Utilisateurs)</p>
+              <p></p>
             </div>
           </section>
 
