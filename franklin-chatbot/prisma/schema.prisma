@@ -51,6 +51,7 @@ model deposer {
 model file {
   id_file         Int               @id @default(autoincrement())
   filename        String            @db.VarChar(100)
+  date            DateTime          @db.DateTime(0)
   deposer         deposer[]
   vector_document vector_document[]
 }

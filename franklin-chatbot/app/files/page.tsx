@@ -1,5 +1,5 @@
 import React from 'react';
-import {prisma} from '@/lib/prisma';
+import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
 
 export default async function FilesPage() {
@@ -24,7 +24,7 @@ export default async function FilesPage() {
 
       <div className="log-content">
         <div className="log-data">
-          
+
           {/* <form onSubmit={handleSearch}>
             <input 
               type="submit" 
@@ -49,25 +49,30 @@ export default async function FilesPage() {
                 </tr>
               </thead>
               <tbody>
-                {files.map((file) => (
-                  <tr key={file.id_file}>
-                    <td>{file.id_file}</td>
-                    <td>{file.filename}</td>
-                    <td>{file.format}</td>
-                    <td>
-                      <Link href={`/users/${file.id}`} className="log-user">
-                        {file.user}
-                      </Link>
-                    </td>
-                    <td>{file.date}</td>
-                    <td>
-                      <div style={{ display: 'flex', gap: '10px', justifyContent: 'center' }}>
-                        <button title="Modifier" style={{ background: 'none', border: 'none', cursor: 'pointer' }}>📝</button>
-                        <button title="Supprimer" style={{ background: 'none', border: 'none', cursor: 'pointer' }}>🗑️</button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
+                {files.map((file) => {
+                  
+                  const filesDate = new Date(user.log[0].date).toLocaleString()
+
+                  return (
+                    <tr key={file.id_file}>
+                      <td>{file.id_file}</td>
+                      <td>{file.filename}</td>
+                      <td>{file.format}</td>
+                      <td>
+                        <Link href={`/users/${file.id}`} className="log-user">
+                          {file.user}
+                        </Link>
+                      </td>
+                      <td>{file.date}</td>
+                      <td>
+                        <div style={{ display: 'flex', gap: '10px', justifyContent: 'center' }}>
+                          <button title="Modifier" style={{ background: 'none', border: 'none', cursor: 'pointer' }}>📝</button>
+                          <button title="Supprimer" style={{ background: 'none', border: 'none', cursor: 'pointer' }}>🗑️</button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>

@@ -60,13 +60,13 @@ export default async function UsersManagementPage() {
               </thead>
               <tbody>
 
-                {users.map((user) => {
+                {users.map((user, index) => {
 
                   const lastLogDate = user.log[0] ? new Date(user.log[0].date).toLocaleString() : "Aucun log";
 
                   return (
                     <tr key={user.id_user}>
-                      <td>{user.id_user}</td>
+                      <td>{index + 1}</td>
                       <td>{user.id_LDAP}</td>
                       <td>{user.admin ? "Administrateur" : "Utilisateur"}</td>
                       <td>{user.nbr_doc_sent}</td>
