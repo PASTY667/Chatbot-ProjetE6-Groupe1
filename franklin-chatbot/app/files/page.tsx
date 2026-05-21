@@ -1,18 +1,19 @@
-"use client";
-
-import React, { useState } from 'react';
+import React from 'react';
+import {prisma} from '@/lib/prisma';
 import Link from 'next/link';
 
-export default function FilesPage() {
-  const [files, setFiles] = useState([
+export default async function FilesPage() {
+  /* const [files, setFiles] = useState([
     { id: 1, name: "sniffsniff", format: "PDF", user: "Utilisateur Alpha", date: "2026-04-02" },
     { id: 2, name: "budget_2026", format: "XLSX", user: "Admin", date: "2026-04-05" },
-  ]);
+  ]); */
 
-  const handleSearch = (e: React.FormEvent) => {
+  const files = await prisma.file.findMany();
+
+  /* const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     console.log("Recherche lancée...");
-  };
+  }; */
 
   return (
     <>
@@ -49,9 +50,9 @@ export default function FilesPage() {
               </thead>
               <tbody>
                 {files.map((file) => (
-                  <tr key={file.id}>
-                    <td>{file.id}</td>
-                    <td>{file.name}</td>
+                  <tr key={file.id_file}>
+                    <td>{file.id_file}</td>
+                    <td>{file.filename}</td>
                     <td>{file.format}</td>
                     <td>
                       <Link href={`/users/${file.id}`} className="log-user">

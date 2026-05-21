@@ -1,4 +1,3 @@
-import React from 'react';
 
 import { prisma } from '@/lib/prisma'
 
@@ -20,9 +19,13 @@ export default async function UsersManagementPage() {
     }
   }; */
 
-  /* const users = await prisma.user.findMany();
-
-  type UserType = typeof users[number]; */
+  const users = await prisma.user.findMany({
+    include: {
+      log: {
+        take: 1,
+      }
+    },
+  });
 
   return (
     <>
@@ -33,12 +36,12 @@ export default async function UsersManagementPage() {
 
       <div className="log-content">
         <div className="log-data">
-          
+
           {/* <form onSubmit={(e) => e.preventDefault()}>
             <input 
               type="submit" 
               value="Actualiser la liste" 
-              className="btn-apply"
+              className="btn-apply" 
               style={{ marginBottom: '20px', width: 'auto' }}
             />
           </form> */}
@@ -51,10 +54,45 @@ export default async function UsersManagementPage() {
                   <th>Nom de l'utilisateur</th>
                   <th>Rôle</th>
                   <th>Documents envoyés</th>
+                  <th>Dernière connexion</th>
                   <th>Bloquer / Supprimer</th>
                 </tr>
               </thead>
               <tbody>
+
+                {users.map((user) => {
+
+                  const lastLogDate = user.log[0] ? new Date(user.log[0].date).toLocaleString() : "Aucun log";
+
+                  return (
+                    <tr key={user.id_user}>
+                      <td>{user.id_user}</td>
+                      <td>{user.id_LDAP}</td>
+                      <td>{user.admin ? "Administrateur" : "Utilisateur"}</td>
+                      <td>{user.nbr_doc_sent}</td>
+                      <td>{lastLogDate}</td>
+                      <td>
+                        <div style={{ display: 'flex', gap: '15px', justifyContent: 'center' }}>
+                          <button
+                            
+                            //onClick={() => handleBlock(user.id)}
+                            title="Bloquer"
+                            style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.2rem' }}
+                          >
+                            🚫
+                          </button>
+                          <button
+                            //onClick={() => handleDelete(user.id)}
+                            title="Supprimer"
+                            style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.2rem' }}
+                          >
+                            🗑️
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
