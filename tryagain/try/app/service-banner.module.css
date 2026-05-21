@@ -1,0 +1,10 @@
+.banner{
+    z-index: 100;
+    color: white;
+    background-color: #f1af3d;
+    font-size: 2rem;
+    padding: 30px;
+    margin: 30px;
+    border-radius: 2px;
+    justify-self: top;
+}
