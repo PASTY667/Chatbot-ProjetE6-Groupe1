@@ -41,7 +41,7 @@ export default function Index() {
 
   return (
     <main
-      className={`${style.main} ${messages.length === 0 ? style.centered : ""}`}
+      className={style.main}
     >
       <div className={style.newchatPage}>
 

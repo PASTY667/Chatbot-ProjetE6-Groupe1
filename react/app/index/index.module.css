@@ -11,15 +11,12 @@ body {
 .newchatPage {
   min-width: 900px;
   font-size: 2rem;
-}
-
-.centered {
-  justify-content: center;
+  justify-items: center;
 }
 
 .inputCentered {
-  /* position: static;
-  margin-top: 2rem; */
+  position: static;
+  margin-top: 2rem;
 }
 
 .newchatHeader{
@@ -36,9 +33,10 @@ body {
 }
 
 .grid {
-  width: 70%;
+  width: 50%;
   justify-self: end;
   margin-bottom: 8em;
+  position: relative;
 }
 
 .message {
@@ -58,7 +56,8 @@ body {
 .newchatInput {
   z-index: 10;
   bottom: 0;
-  width: 100%;
+  min-width: 900px;
+  position: fixed;
 
   color: var(--dark-text-color);
   background-color: var(--grey-background-color);

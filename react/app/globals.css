@@ -7,8 +7,10 @@ main {
   margin: 0;
   width: 99%;
   display: flex;
+  justify-content: center;
 }
 
 .layout {
   min-height: 100vh;
+  min-width: 100vh;
 }
