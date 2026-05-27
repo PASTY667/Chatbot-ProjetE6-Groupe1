@@ -1,0 +1,149 @@
+body {
+  color: var(--light-text-color);
+  background-color: var(--dark-background-color);
+  font-family: var(--primary-font-family);
+  margin: 0;
+  height: 100%;
+  display: flex;
+  place-items: center;
+}
+
+.newchatPage {
+  min-width: 900px;
+  font-size: 2rem;
+}
+
+.centered {
+  justify-content: center;
+}
+
+.inputCentered {
+  position: static;
+  margin-top: 2rem;
+}
+
+.newchatHeader{
+  text-align: center;
+}
+.logo {
+  background-color: pink;
+  border-radius: 50%;
+  height: 7em;
+  padding: 0.7em;
+  margin: 0px 15px;
+  align-self: center;
+}
+
+.grid {
+  width: 70%;
+  justify-self: end;
+  margin-bottom: 8em;
+}
+
+.message {
+  color: white;
+  font-size: 1.5rem;
+  justify-self: end;
+  background-color: var(--lightOrange-background-color);
+  padding: 10px 20px;
+  margin: 15px 0px;
+  border-radius: 10px;
+  box-shadow: 0px 0px 5px 0px var(--pink-background-color);
+  text-align: start;
+  white-space: pre-wrap;
+  line-break: anywhere;
+}
+
+.newchatInput {
+  z-index: 10;
+  position: fixed;
+  bottom: 0;
+  margin-bottom: 15px;
+  margin-left: -80px;
+  width: 50%;
+
+  color: var(--dark-text-color);
+  background-color: var(--grey-background-color);
+  padding: 0.2em 0.5em 0.5em 0.6em;
+  border-radius: 5px;
+  text-align: justify;
+
+  input[type="file"] {
+    display: none;
+  }
+}
+
+
+/* INPUT CENTRÉ */
+.inputCentered {
+  margin-bottom: 8em;
+}
+
+
+
+.uploadSection {
+  justify-self: self-start;
+}
+
+.uploadButton {
+  color: var(--dark-text-color);
+  background-color: var(--grey-background-color);
+  font-family: var(--primary-font-family);
+  font-size: 1rem;
+
+  border: 2px solid var(--dark-text-color);
+  border-radius: 55px;
+  border-color: var(--dark-text-color);
+  padding: 5px 10px;
+  margin-right: 20px;
+  box-shadow: none;
+
+  cursor: pointer;
+  font-weight: bold;
+  transition: 0.2s ease-in-out;
+
+  text-align: center;
+}
+
+.uploadIcon {
+  width: 20px;
+  height: auto;
+  margin-bottom: -4px;
+}
+
+.fileList{
+display: flex;
+}
+
+.fileItem{
+  display: flex;
+  align-self: center;
+  padding: 5px 10px 5px 10px;
+  margin: 10px;
+  border: 2px solid var(--orange-text-color);
+  border-radius: 20px;
+  font-size: 0.8rem;
+}
+.deleteButton{
+  margin: 0px 10px 0px 0px;
+  padding: 0px 13px;
+  border: none;
+  border-radius: 50px;
+  color: var(--orange-text-color);
+  background-color: var(--lightOrange-background-color);
+  font-size: 1.3rem;
+}
+
+.deleteButton:hover{
+  cursor: pointer;
+}
+
+.footer {
+  z-index: 5;
+  position: fixed;
+  bottom: 0;
+  width: 110%;
+  color:var(--dark-background-color);
+  background-color: var(--dark-background-color);
+  padding: 0.5px 0px;
+}
