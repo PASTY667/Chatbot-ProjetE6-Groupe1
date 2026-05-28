@@ -33,10 +33,12 @@ body {
 }
 
 .grid {
-  width: 50%;
+  width: 100%;
+  display: flex;
   justify-self: end;
   margin-bottom: 8em;
   position: relative;
+  flex-direction: column-reverse;
 }
 
 .message {
@@ -115,8 +117,8 @@ display: flex;
   align-self: left;
   padding: 5px 10px 5px 10px;
   margin: 10px;
-  border: 3px solid var(--orange-text-color);
-  background-color: #cfbba4;
+  border: 3px solid rgb(202, 139, 139);
+  background-color: #e4abac;
   border-radius: 20px;
   font-size: 0.8rem;
 }

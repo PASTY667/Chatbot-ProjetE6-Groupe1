@@ -10,6 +10,7 @@ import logo from "@/assets/frankLogo.png";
 type Message = {
   role: "user" | "assistant";
   content: string;
+  files:File[];
 };
 
 export default function Index() {
@@ -21,9 +22,11 @@ export default function Index() {
     const newMessage: Message = {
       role: "user",
       content: msg,
+      files: [...files],
     };
 
     setMessages((prev) => [...prev, newMessage]);
+    setFiles([]);
   };
 
   //Gérer l'envoi des fichiers
@@ -32,6 +35,7 @@ export default function Index() {
 
     const selectedFiles = Array.from(e.target.files);
     setFiles((prev) => [...prev, ...selectedFiles]);
+    e.target.value = "";
   };
 
   //Gérer la suppression des fichiers
@@ -55,16 +59,19 @@ export default function Index() {
         )}
 
         <Grid className={style.grid}>
+          <div className={style.question}>
           {messages.map((msg, index) => (
             <div className={style.message} key={index}>
               {msg.content}
-              {files.map((file, index) => (
-                <div key={index} className={style.fileItem}>
+              {msg.files?.map((file, fileIndex) => (
+                <div key={fileIndex} className={style.fileItem}>
                   <p className={style.fileMessage}>{file.name}</p>
                 </div>
               ))}
             </div>
-          ))}
+          ))}</div>
+
+          <div className={style.reponse}> test</div>
         </Grid>
 
         {/* ZONE D'INPUT */}
