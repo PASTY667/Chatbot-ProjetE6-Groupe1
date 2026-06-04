@@ -22,9 +22,10 @@ body {
   margin-top: 2rem;
 }
 
-.newchatHeader{
+.newchatHeader {
   text-align: center;
 }
+
 .logo {
   background-color: pink;
   border-radius: 50%;
@@ -52,6 +53,17 @@ body {
   text-align: start;
   white-space: pre-wrap;
   line-break: anywhere;
+}
+
+.streamingCursor {
+  margin-left: 2px;
+  animation: blink 1s steps(2, start) infinite;
+}
+
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
 }
 
 .newchatInput {
@@ -111,20 +123,57 @@ body {
   margin-bottom: -4px;
 }
 
-.fileList{
+.fileList {
 display: flex;
 }
 
-.fileItem{
+.fileItem {
   display: flex;
   align-self: center;
+  align-items: center;
+  gap: 8px;
   padding: 5px 10px 5px 10px;
   margin: 10px;
   border: 2px solid var(--orange-text-color);
   border-radius: 20px;
   font-size: 0.8rem;
 }
-.deleteButton{
+
+.fileStatus {
+  border-radius: 12px;
+  padding: 2px 8px;
+  font-size: 0.75rem;
+  font-weight: bold;
+}
+
+.pending,
+.uploading {
+  color: var(--dark-text-color);
+  background-color: var(--grey-background-color);
+}
+
+.done {
+  color: white;
+  background-color: #237a57;
+}
+
+.error {
+  color: white;
+  background-color: #a73535;
+}
+
+.fileDetail {
+  color: var(--dark-text-color);
+  font-size: 0.75rem;
+}
+
+.uploadError {
+  color: #a73535;
+  font-size: 0.9rem;
+  margin: 8px 0 0 0;
+}
+
+.deleteButton {
   margin: 0px 10px 0px 0px;
   padding: 0px 13px;
   border: none;
@@ -134,7 +183,7 @@ display: flex;
   font-size: 1.3rem;
 }
 
-.deleteButton:hover{
+.deleteButton:hover {
   cursor: pointer;
 }
 
@@ -143,7 +192,7 @@ display: flex;
   position: fixed;
   bottom: 0;
   width: 110%;
-  color:var(--dark-background-color);
+  color: var(--dark-background-color);
   background-color: var(--dark-background-color);
   padding: 0.5px 0px;
 }
