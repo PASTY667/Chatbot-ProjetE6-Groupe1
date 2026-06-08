@@ -1,3 +1,0 @@
-This is a sample text file with the only goal of testing the extraction module
-
-This file was writen by Arthur Domy-Bonnel.
