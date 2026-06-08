@@ -1,0 +1,50 @@
+"use client";
+
+import React, { useState } from "react";
+import style from "@/components/ChatInput/chatInput.module.css";
+
+type Props = {
+  onSend: (message: string) => void | Promise<void>;
+  disabled?: boolean;
+};
+
+export default function ChatInput({ onSend, disabled = false }: Props) {
+  const [message, setMessage] = useState("");
+
+  const handleSend = async () => {
+    if (!message.trim() || disabled) return;
+    await onSend(message);
+    setMessage("");
+  };
+
+  const capitalizeFirstLetter = (value: string) => {
+    if (!value) return value;
+    return value.charAt(0).toUpperCase() + value.slice(1);
+  };
+
+  return (
+    <div className={style.chatInput}>
+      <textarea
+        className={style.textInput}
+        value={message}
+        onChange={(e) => setMessage(capitalizeFirstLetter(e.target.value))}
+        placeholder="Poser une question..."
+        disabled={disabled}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") {
+            e.preventDefault();
+            void handleSend();
+          }
+        }}
+      />
+
+      <input
+        className={style.submitButton}
+        type="submit"
+        value={disabled ? "..." : ">"}
+        onClick={() => void handleSend()}
+        disabled={disabled}
+      />
+    </div>
+  );
+}
