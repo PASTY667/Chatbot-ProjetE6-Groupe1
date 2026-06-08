@@ -1,13 +1,15 @@
-html,
-body {
-  
-}
-
 main {
-  margin: 2em 0em 0em 24em;
-  width: 66%;
+  margin: 0;
+  width: 99%;
+  display: flex;
+  justify-content: center;
+  min-height: 100%;
+  background-color: var(--dark-background-color);
 }
 
 .layout {
   min-height: 100vh;
+  min-width: 100vh;
+  background-color: var(--dark-background-color);
+  z-index: -10;
 }

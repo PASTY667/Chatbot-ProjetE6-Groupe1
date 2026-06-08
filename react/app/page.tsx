@@ -1,10 +1,12 @@
 "use client";
-import Index from "@/app/index/index";
+import User from "@/app/user/page";
+import Sidebar from "@/components/sidebar/sidebar";
 
 export default function Home(){
     return(
       <>
-      <Index />
+      <Sidebar />
+      <User />
       </>
     );
 }

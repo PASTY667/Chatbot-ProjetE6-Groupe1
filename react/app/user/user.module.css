@@ -11,6 +11,7 @@ body {
 .newchatPage {
   min-width: 900px;
   font-size: 2rem;
+  justify-items: center;
 }
 
 .centered {
@@ -36,9 +37,12 @@ body {
 }
 
 .grid {
-  width: 70%;
+  width: 100%;
+  display: flex;
   justify-self: end;
   margin-bottom: 8em;
+  position: relative;
+  flex-direction: column-reverse;
 }
 
 .message {

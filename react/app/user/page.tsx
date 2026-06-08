@@ -4,7 +4,7 @@ import Image from "next/image";
 import { useRef, useState } from "react";
 import { Grid } from "@mui/material";
 
-import style from "@/app/index/index.module.css";
+import style from "@/app/user/user.module.css";
 import uploadIcon from "@/assets/upload-file.png";
 import ChatInput from "@/components/ChatInput/chatInput";
 
@@ -30,7 +30,7 @@ type IngestResponse = {
   source_path: string;
 };
 
-export default function Index() {
+export default function User() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [files, setFiles] = useState<UploadedFile[]>([]);
   const [uploadError, setUploadError] = useState("");
@@ -100,6 +100,7 @@ export default function Index() {
     }
   };
 
+  //Gérer l'envoi d'un message
   const handleSendMessage = async (msg: string) => {
     const trimmed = msg.trim();
     if (!trimmed || isSending) return;
@@ -196,6 +197,7 @@ export default function Index() {
     }
   };
 
+  //Gérer l'envoi des fichiers
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files) return;
 
@@ -214,6 +216,7 @@ export default function Index() {
     e.target.value = "";
   };
 
+  //Gérer la suppression des fichiers
   const removeFile = (indexToRemove: number) => {
     setFiles((prev) => prev.filter((_, index) => index !== indexToRemove));
   };
