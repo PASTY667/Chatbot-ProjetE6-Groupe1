@@ -2,9 +2,11 @@
 
 import { useState } from "react";
 import { signIn } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import style from "@/app/login/login.module.css";
 
 export default function Login() {
+  const router = useRouter();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
@@ -17,14 +19,15 @@ export default function Login() {
       username,
       password,
       redirect: false,
-      // callbackUrl: "/",
+      callbackUrl: "/",
     });
 
     if (res?.error) {
       setError("Identifiants invalides");
       return;
     }
-    
+
+    router.push(res?.url ?? "/");
   }
 
   return (
@@ -34,7 +37,7 @@ export default function Login() {
       <div className={style.loginSection}>
         <h3 className={style.loginTitle}>Connexion</h3>
 
-        <h5 className={style.loginText}>Nom d'utilisateur</h5>
+        <h5 className={style.loginText}>Nom d&apos;utilisateur</h5>
         <input
           className={style.inputUser}
           value={username}
