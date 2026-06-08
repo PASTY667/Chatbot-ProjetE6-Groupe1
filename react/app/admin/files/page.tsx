@@ -1,15 +1,15 @@
 "use client";
 
-import React, { useState } from 'react';
+import React from 'react';
 import Link from 'next/link';
 
 export default function FilesPage() {
   // Simulation de données (à remplacer par un fetch plus tard)
-  const [files, setFiles] = useState([
+  const files = [
     { id: 1, name: "sniffsniff", format: "PDF", user: "Utilisateur Alpha", date: "2026-04-02" },
     { id: 2, name: "budget_2026", format: "XLSX", user: "Admin", date: "2026-04-05" },
     // Ajoute d'autres fichiers ici
-  ]);
+  ];
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -20,7 +20,7 @@ export default function FilesPage() {
     <>
 
       <p className="app-description">
-        Consultez ici l'historique complet des accès et des tentatives de connexion au système.
+        Consultez ici l&apos;historique complet des accès et des tentatives de connexion au système.
       </p>
 
       <div className="log-content">
@@ -45,7 +45,7 @@ export default function FilesPage() {
                   <th>Nom du fichier</th>
                   <th>Format</th>
                   <th>Ajouté par</th>
-                  <th>Date d'ajout</th>
+                  <th>Date d&apos;ajout</th>
                   <th>Modifier / Supprimer</th>
                 </tr>
               </thead>

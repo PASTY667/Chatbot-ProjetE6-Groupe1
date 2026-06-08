@@ -1,15 +1,21 @@
-import { PrismaClient } from "@prisma/client";
+type PrismaClientLike = unknown;
+type PrismaClientConstructor = new () => PrismaClientLike;
 
 const globalForPrisma = globalThis as unknown as {
-  prisma?: PrismaClient;
+  prisma?: PrismaClientLike;
 };
 
-export function getPrismaClient(): PrismaClient | null {
+export async function getPrismaClient(): Promise<PrismaClientLike | null> {
   if (!process.env.DATABASE_URL) {
     return null;
   }
 
   if (!globalForPrisma.prisma) {
+    const clientModulePath = "../app/generated/prisma/client";
+    const { PrismaClient } = (await import(clientModulePath)) as {
+      PrismaClient: PrismaClientConstructor;
+    };
+
     globalForPrisma.prisma = new PrismaClient();
   }
 

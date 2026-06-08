@@ -20,7 +20,7 @@ export default function StatsPage() {
   return (
     <>
       <p className="app-description">
-        Consultez ici l'historique complet des accès et des tentatives de connexion au système.
+        Consultez ici l&apos;historique complet des accès et des tentatives de connexion au système.
       </p>
 
       <div className="log-content">
@@ -56,7 +56,7 @@ export default function StatsPage() {
             </div>
 
             <div className="filter-group">
-              <label>Type d'accès</label>
+              <label>Type d&apos;accès</label>
               <div className="checkbox-item">
                 <input 
                   type="checkbox" 
@@ -85,7 +85,7 @@ export default function StatsPage() {
           {/* SECTION - VISUALISATION */}
           <section className="stats-visual">
             <div className="chart-header">
-              <h2>Statistiques d'utilisation</h2>
+              <h2>Statistiques d&apos;utilisation</h2>
             </div>
             <div className="chart-placeholder">
               <p>Emplacement du graphique (Stats Utilisateurs)</p>

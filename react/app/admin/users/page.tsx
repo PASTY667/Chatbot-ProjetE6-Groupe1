@@ -46,7 +46,7 @@ export default function UsersManagementPage() {
               <thead>
                 <tr>
                   <th>#</th>
-                  <th>Nom de l'utilisateur</th>
+                  <th>Nom de l&apos;utilisateur</th>
                   <th>Rôle</th>
                   <th>Adresse IP</th>
                   <th>Dernière connexion</th>

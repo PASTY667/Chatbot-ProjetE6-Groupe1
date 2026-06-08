@@ -1,18 +1,18 @@
 "use client";
 
-import React, { useState } from 'react';
+import React from 'react';
 import Link from 'next/link';
 
 export default function LogsPage() {
   // On simule les données des logs
   // Plus tard, ces données viendront d'une API ou d'une base de données
-  const [logEntries, setLogEntries] = useState([
+  const logEntries = [
     { id: 1, user: "Utilisateur Alpha", status: "Connecté", ip: "192.168.1.1", date: "2026-04-02" },
     { id: 2, user: "Admin", status: "Échec", ip: "172.16.254.1", date: "2026-04-02" },
     { id: 3, user: "Utilisateur Beta", status: "Connecté", ip: "192.168.1.45", date: "2026-04-03" },
     { id: 4, user: "Inconnu", status: "Échec", ip: "45.12.89.10", date: "2026-04-03" },
     { id: 5, user: "Utilisateur Gamma", status: "Déconnecté", ip: "192.168.1.12", date: "2026-04-04" },
-  ]);
+  ];
 
   const handleRefresh = (e: React.FormEvent) => {
     e.preventDefault();
@@ -23,7 +23,7 @@ export default function LogsPage() {
   return (
     <>
       <p className="app-description">
-        Consultez ici l'historique complet des accès et des tentatives de connexion au système.
+        Consultez ici l&apos;historique complet des accès et des tentatives de connexion au système.
       </p>
 
       <div className="log-content">

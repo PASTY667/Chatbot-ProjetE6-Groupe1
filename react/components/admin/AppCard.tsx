@@ -1,5 +1,4 @@
 import Link from 'next/link';
-import styles from './globals.css'; // Tu peux créer ce fichier CSS spécifique
 
 interface AppCardProps {
   title: string;
