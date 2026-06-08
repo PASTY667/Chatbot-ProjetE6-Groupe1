@@ -8,6 +8,7 @@ export default async function Home() {
   if (!session || !session.user) {
     return <Login />;
   }
+
   return (
     <div style={{height: '100%'}}>
       <div style={{justifyContent:"top"}}><SessionBanner /></div>

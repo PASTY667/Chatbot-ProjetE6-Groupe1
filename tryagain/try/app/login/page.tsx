@@ -16,13 +16,15 @@ export default function Login() {
     const res = await signIn("credentials", {
       username,
       password,
-      redirect: true,
-      callbackUrl: "/",
+      redirect: false,
+      // callbackUrl: "/",
     });
 
     if (res?.error) {
       setError("Identifiants invalides");
+      return;
     }
+    
   }
 
   return (
