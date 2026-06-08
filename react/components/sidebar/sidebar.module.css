@@ -31,7 +31,9 @@ body {
 
     .titleSidebar:visited {
       text-decoration: none;
-      color: var(--light-text-color);
+      /* color: var(--light-text-color); */
+      color: white;
+
     }
 
     .buttonSidebar {

@@ -1,8 +1,10 @@
+"use client";
+
 import Image from "next/image";
 import { useState } from "react";
 import { Grid } from "@mui/material";
 
-import style from "@/app/index/index.module.css";
+import style from "@/app/user/user.module.css";
 import uploadIcon from "@/assets/upload-file.png";
 import ChatInput from "@/components/ChatInput/chatInput";
 import logo from "@/assets/frankLogo.png";
@@ -13,7 +15,7 @@ type Message = {
   files:File[];
 };
 
-export default function Index() {
+export default function User() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [files, setFiles] = useState<File[]>([]);
 
@@ -71,7 +73,7 @@ export default function Index() {
             </div>
           ))}</div>
 
-          <div className={style.reponse}> test</div>
+          {/* <div className={style.reponse}> test</div> */}
         </Grid>
 
         {/* ZONE D'INPUT */}

@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { signIn } from "next-auth/react";
+import { signIn, getSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import style from "@/app/login/login.module.css";
 
 export default function Login() {
@@ -9,20 +10,40 @@ export default function Login() {
   const [password, setPassword] = useState("");
 
   const [error, setError] = useState("");
+  const router = useRouter();
 
   async function handleLogin() {
+    console.log("LOGIN CLICKED");
     setError("");
 
     const res = await signIn("credentials", {
       username,
       password,
-      redirect: true,
-      callbackUrl: "/",
+      redirect: false,
     });
+
+    console.log("SIGNIN RESULT:", res);
 
     if (res?.error) {
       setError("Identifiants invalides");
+      return;
     }
+
+    const session = await getSession();
+
+    const role = session?.user?.role;
+
+    if (role === "admin") {
+      router.push("/admin");
+      return;
+    }
+
+    if (role === "user") {
+      router.push("/user");
+      return;
+    }
+
+    router.push("/");
   }
 
   return (
