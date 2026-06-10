@@ -17,21 +17,16 @@ export default function ChatInput({ onSend, disabled = false }: Props) {
     setMessage("");
   };
 
-  const capitalizeFirstLetter = (value: string) => {
-    if (!value) return value;
-    return value.charAt(0).toUpperCase() + value.slice(1);
-  };
-
   return (
     <div className={style.chatInput}>
       <textarea
         className={style.textInput}
         value={message}
-        onChange={(e) => setMessage(capitalizeFirstLetter(e.target.value))}
+        onChange={(e) => setMessage(e.target.value)}
         placeholder="Poser une question..."
         disabled={disabled}
         onKeyDown={(e) => {
-          if (e.key === "Enter") {
+          if (e.key === "Enter" && !e.shiftKey) {
             e.preventDefault();
             void handleSend();
           }

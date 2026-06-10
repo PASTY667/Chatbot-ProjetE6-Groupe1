@@ -2,18 +2,11 @@
 
 import Image from "next/image";
 import { useRef, useState } from "react";
-import { Grid } from "@mui/material";
 
 import style from "@/app/user/user.module.css";
 import uploadIcon from "@/assets/upload-file.png";
 import ChatInput from "@/components/ChatInput/chatInput";
-
-type Message = {
-  id: string;
-  role: "user" | "assistant";
-  content: string;
-  streaming?: boolean;
-};
+import type { ChatMessage, ChatSession } from "@/app/page";
 
 type UploadedFile = {
   id: string;
@@ -30,26 +23,38 @@ type IngestResponse = {
   source_path: string;
 };
 
-export default function User() {
-  const [messages, setMessages] = useState<Message[]>([]);
+type UserProps = {
+  activeSession: ChatSession | null;
+  onMessagesChange: (sessionId: string, messages: ChatMessage[]) => void;
+  isAuthenticated: boolean;
+};
+
+export default function User({ activeSession, onMessagesChange, isAuthenticated }: UserProps) {
   const [files, setFiles] = useState<UploadedFile[]>([]);
   const [uploadError, setUploadError] = useState("");
   const [isSending, setIsSending] = useState(false);
   const assistantMessageIdRef = useRef<string | null>(null);
 
+  const messages = activeSession?.messages ?? [];
+
+  const updateMessages = (nextMessages: ChatMessage[]) => {
+    if (!activeSession) return;
+    onMessagesChange(activeSession.id, nextMessages);
+  };
+
   const uploadFile = async (file: File, id: string) => {
     const token = localStorage.getItem("backend_access_token");
-    const chatId = localStorage.getItem("backend_subject") ?? "user";
+    const chatId = localStorage.getItem("backend_subject") ?? activeSession?.id ?? "user";
 
     if (!token) {
       setFiles((prev) =>
         prev.map((item) =>
           item.id === id
-            ? { ...item, status: "error", detail: "Connectez-vous avant l'envoi." }
+            ? { ...item, status: "error", detail: "Connexion LDAP requise avant l'envoi." }
             : item,
         ),
       );
-      setUploadError("Connectez-vous avant d'envoyer un document.");
+      setUploadError("Connectez-vous au LDAP pour envoyer un document.");
       return;
     }
 
@@ -100,33 +105,35 @@ export default function User() {
     }
   };
 
-  //Gérer l'envoi d'un message
   const handleSendMessage = async (msg: string) => {
     const trimmed = msg.trim();
-    if (!trimmed || isSending) return;
+    if (!trimmed || isSending || !activeSession) return;
 
-    const userMessage: Message = {
+    const userMessage: ChatMessage = {
       id: `${Date.now()}-user`,
       role: "user",
       content: trimmed,
     };
+
     const assistantId = `${Date.now()}-assistant`;
     assistantMessageIdRef.current = assistantId;
 
-    setMessages((prev) => [
-      ...prev,
+    const nextMessages: ChatMessage[] = [
+      ...messages,
       userMessage,
       { id: assistantId, role: "assistant", content: "", streaming: true },
-    ]);
+    ];
+
+    updateMessages(nextMessages);
     setIsSending(true);
 
     try {
       const token = localStorage.getItem("backend_access_token");
       if (!token) {
-        throw new Error("Connectez-vous avant de poser une question.");
+        throw new Error("Connexion LDAP requise pour interroger le chatbot.");
       }
 
-      const chatId = localStorage.getItem("backend_subject") ?? "user";
+      const chatId = localStorage.getItem("backend_subject") ?? activeSession.id;
       const response = await fetch("/api/backend-chat/stream", {
         method: "POST",
         headers: {
@@ -149,55 +156,46 @@ export default function User() {
 
       const reader = response.body.getReader();
       const decoder = new TextDecoder();
+      let assistantContent = "";
 
       while (true) {
         const { value, done } = await reader.read();
         if (done) break;
         if (!value) continue;
         const chunk = decoder.decode(value, { stream: true });
+        if (!chunk) continue;
 
-        if (chunk) {
-          setMessages((prev) =>
-            prev.map((item) =>
-              item.id === assistantId
-                ? { ...item, content: item.content + chunk, streaming: true }
-                : item,
-            ),
-          );
-        }
+        assistantContent += chunk;
+        updateMessages(
+          nextMessages.map((item) =>
+            item.id === assistantId ? { ...item, content: assistantContent, streaming: true } : item,
+          ),
+        );
       }
 
       const tail = decoder.decode();
       if (tail) {
-        setMessages((prev) =>
-          prev.map((item) =>
-            item.id === assistantId
-              ? { ...item, content: item.content + tail, streaming: true }
-              : item,
-          ),
-        );
+        assistantContent += tail;
       }
+
+      updateMessages(
+        nextMessages.map((item) =>
+          item.id === assistantId ? { ...item, content: assistantContent, streaming: false } : item,
+        ),
+      );
     } catch (error) {
       const message = error instanceof Error ? error.message : "Erreur chat";
-      setMessages((prev) =>
-        prev.map((item) =>
-          item.id === assistantMessageIdRef.current
-            ? { ...item, content: message, streaming: false }
-            : item,
+      updateMessages(
+        nextMessages.map((item) =>
+          item.id === assistantId ? { ...item, content: message, streaming: false } : item,
         ),
       );
     } finally {
       assistantMessageIdRef.current = null;
       setIsSending(false);
-      setMessages((prev) =>
-        prev.map((item) =>
-          item.role === "assistant" && item.streaming ? { ...item, streaming: false } : item,
-        ),
-      );
     }
   };
 
-  //Gérer l'envoi des fichiers
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files) return;
 
@@ -216,34 +214,40 @@ export default function User() {
     e.target.value = "";
   };
 
-  //Gérer la suppression des fichiers
   const removeFile = (indexToRemove: number) => {
     setFiles((prev) => prev.filter((_, index) => index !== indexToRemove));
   };
 
   return (
-    <main className={`${style.main} ${messages.length === 0 ? style.centered : ""}`}>
+    <main className={style.main}>
       <div className={style.newchatPage}>
-        {messages.length === 0 && (
-          <div className={style.newchatHeader}>
-            <h1 className={style.newchatTitle}>Franklin</h1>
-          </div>
-        )}
+        <div className={style.newchatHeader}>
+          <p className={style.kicker}>Chatbot souverain pour intranet</p>
+          <h1 className={style.newchatTitle}>{activeSession?.title ?? "Conversation"}</h1>
+          <p className={style.statusLine}>
+            {isAuthenticated ? "Connexion LDAP active." : "Connectez vous pour echanger avec le chatbot."}
+          </p>
+        </div>
 
-        <Grid className={style.grid}>
+        <div className={style.grid}>
+          {messages.length === 0 && (
+            <div className={style.emptyState}>
+              Creez une conversation ou connectez-vous pour interroger le chatbot.
+            </div>
+          )}
+
           {messages.map((msg) => (
-            <div className={style.message} key={msg.id}>
+            <div
+              className={`${style.message} ${msg.role === "user" ? style.userMessage : style.assistantMessage}`}
+              key={msg.id}
+            >
               {msg.content}
               {msg.streaming && <span className={style.streamingCursor}>|</span>}
             </div>
           ))}
-        </Grid>
+        </div>
 
-        <div
-          className={`${style.newchatInput} ${
-            messages.length === 0 ? style.inputCentered : style.inputBottom
-          }`}
-        >
+        <div className={style.newchatInput}>
           <div className={style.uploadSection}>
             <label className={style.uploadButton} htmlFor="upload-file">
               <Image className={style.uploadIcon} src={uploadIcon} alt="i" /> PDF
@@ -256,12 +260,13 @@ export default function User() {
               accept=".pdf,.txt,.md"
               multiple
               onChange={handleFileChange}
+              disabled={!isAuthenticated}
             />
 
             <div className={style.fileList}>
               {files.map((file, index) => (
                 <div key={file.id} className={style.fileItem}>
-                  <button className={style.deleteButton} onClick={() => removeFile(index)}>
+                  <button className={style.deleteButton} onClick={() => removeFile(index)} type="button">
                     X
                   </button>
                   <p>{file.file.name}</p>
@@ -275,9 +280,8 @@ export default function User() {
             {uploadError && <p className={style.uploadError}>{uploadError}</p>}
           </div>
 
-          <ChatInput onSend={handleSendMessage} disabled={isSending} />
+          <ChatInput onSend={handleSendMessage} disabled={isSending || !isAuthenticated} />
         </div>
-        <div className={style.footer}>footer</div>
       </div>
     </main>
   );

@@ -1,20 +1,20 @@
 .chatInput {
   padding: 0;
+  display: grid;
+  gap: 0.75rem;
 
   .textInput {
     font-family: var(--primary-font-family);
     color: var(--light-text-color);
     border: none;
     box-shadow: none;
-    background-color: var(--grey-background-color);
-    font-size: 1.3rem;
-    padding: 0.2em 2em 2em 1em;
-    margin: 10px 0px;
-    width: 94%;
-    resize: none;
-    /* word-wrap: break-word;
-    overflow-wrap: break-word;
-    white-space: pre-wrap; */
+    background-color: var(--dark-background-color);
+    font-size: 1.05rem;
+    line-height: 1.5;
+    padding: 0.9rem 1rem;
+    width: 100%;
+    min-height: 6rem;
+    resize: vertical;
   }
 
   .textInput:focus {
@@ -26,12 +26,10 @@
     color: var(--light-text-color);
     background-color: var(--lightOrange-background-color);
     border: none;
-    border-radius: 5px;
-    padding: 6px 28px;
+    padding: 0.55rem 1.1rem;
     margin: 0;
-    font-size: 1.8rem;
+    font-size: 1.3rem;
     cursor: pointer;
-    display: flex;
     justify-self: end;
   }
 

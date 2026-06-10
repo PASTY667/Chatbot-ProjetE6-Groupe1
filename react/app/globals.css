@@ -1,15 +1,27 @@
-main {
+html,
+body {
   margin: 0;
-  width: 99%;
-  display: flex;
-  justify-content: center;
   min-height: 100%;
+  width: 100%;
+}
+
+body {
+  color: var(--light-text-color);
   background-color: var(--dark-background-color);
+  font-family: var(--primary-font-family);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+main {
+  min-height: 100vh;
+  min-width: 0;
 }
 
 .layout {
   min-height: 100vh;
-  min-width: 100vh;
+  width: 100%;
   background-color: var(--dark-background-color);
-  z-index: -10;
 }
