@@ -3,6 +3,7 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import { authenticateLDAP } from "@/lib/ldap";
 
 export const authOptions: NextAuthOptions = {
+  secret: process.env.NEXTAUTH_SECRET,
   providers: [
     CredentialsProvider({
       name: "LDAP",

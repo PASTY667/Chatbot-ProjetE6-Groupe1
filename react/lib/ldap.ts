@@ -4,20 +4,27 @@ const LDAP_URL = process.env.LDAP_URL!;
 const BASE_DN = process.env.LDAP_BASE_DN!;
 
 export async function authenticateLDAP(username: string, password: string) {
+  const safeUsername = username.trim();
+  const safePassword = password.trim();
+
+  if (!safeUsername || !safePassword) {
+    return null;
+  }
+
   const client = new Client({ url: LDAP_URL });
 
   try {
     // 1. Bind avec UPN
-    const upn = `${username}@franklin.llm`;
+    const upn = `${safeUsername}@franklin.llm`;
 
-    console.log("Trying LDAP bind for:", username);
+    console.log("Trying LDAP bind for:", safeUsername);
 
-    await client.bind(upn, password);
+    await client.bind(upn, safePassword);
 
     // 2. Recherche utilisateur
     const { searchEntries } = await client.search(BASE_DN, {
       scope: "sub",
-      filter: `(sAMAccountName=${username})`,
+      filter: `(sAMAccountName=${safeUsername})`,
       attributes: [
         "cn",
         "mail",
