@@ -165,6 +165,21 @@
   font-weight: bold;
 }
 
+.logoutButton {
+  border: none;
+  color: var(--light-text-color);
+  background-color: var(--dark-text-color);
+  padding: 0.6rem 0.8rem;
+  font-family: var(--primary-font-family);
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.logoutButton:hover {
+  background-color: var(--pink-background-color);
+  transition: 0.2s ease-in-out;
+}
+
 .settingButton {
   text-decoration: none;
   background-color: white;
@@ -200,6 +215,7 @@
 .collapsed .sessionSection,
 .collapsed .settingText,
 .collapsed .loginButton,
+.collapsed .logoutButton,
 .collapsed .titleSidebar {
   opacity: 0;
   width: 0;

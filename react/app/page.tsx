@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useSession } from "next-auth/react";
 
 import Sidebar from "@/components/sidebar/sidebar";
@@ -31,18 +31,10 @@ function createSession(index: number): ChatSession {
 
 export default function Home() {
   const { status, data } = useSession();
-  const [sessions, setSessions] = useState<ChatSession[]>([]);
-  const [activeSessionId, setActiveSessionId] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (sessions.length > 0) {
-      return;
-    }
-
-    const firstSession = createSession(1);
-    setSessions([firstSession]);
-    setActiveSessionId(firstSession.id);
-  }, [sessions.length]);
+  const [sessions, setSessions] = useState<ChatSession[]>(() => [createSession(1)]);
+  const [activeSessionId, setActiveSessionId] = useState<string | null>(
+    () => sessions[0]?.id ?? null,
+  );
 
   const activeSession = useMemo(
     () => sessions.find((session) => session.id === activeSessionId) ?? sessions[0] ?? null,

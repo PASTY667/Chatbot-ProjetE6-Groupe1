@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { signOut } from "next-auth/react";
 
 import logo from "@/assets/settingLogo.png";
 import logoHover from "@/assets/settingLogoHover.png";
@@ -30,6 +31,17 @@ export default function Sidebar({
   canCreateSession,
 }: SidebarProps) {
   const [collapsed, setCollapsed] = useState(false);
+
+  const handleSignOut = () => {
+    localStorage.removeItem("backend_access_token");
+    localStorage.removeItem("backend_token_type");
+    localStorage.removeItem("backend_token_expires_in");
+    localStorage.removeItem("backend_subject");
+    localStorage.removeItem("backend_role");
+    localStorage.removeItem("backend_groups");
+
+    void signOut({ callbackUrl: "/login" });
+  };
 
   return (
     <aside className={`${style.sidebar} ${collapsed ? style.collapsed : ""}`}>
@@ -95,7 +107,11 @@ export default function Sidebar({
           </p>
         </div>
         <div className={style.settingActions}>
-          {authStatus !== "authenticated" && (
+          {authStatus === "authenticated" ? (
+            <button className={style.logoutButton} type="button" onClick={handleSignOut}>
+              Se deconnecter
+            </button>
+          ) : (
             <Link className={style.loginButton} href="/login">
               Se connecter
             </Link>
