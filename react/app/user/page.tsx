@@ -44,7 +44,7 @@ export default function User({ activeSession, onMessagesChange, isAuthenticated 
 
   const uploadFile = async (file: File, id: string) => {
     const token = localStorage.getItem("backend_access_token");
-    const chatId = localStorage.getItem("backend_subject") ?? activeSession?.id ?? "user";
+    const chatId = activeSession?.id ?? "user";
 
     if (!token) {
       setFiles((prev) =>
@@ -133,7 +133,7 @@ export default function User({ activeSession, onMessagesChange, isAuthenticated 
         throw new Error("Connexion LDAP requise pour interroger le chatbot.");
       }
 
-      const chatId = localStorage.getItem("backend_subject") ?? activeSession.id;
+      const chatId = activeSession.id;
       const response = await fetch("/api/backend-chat/stream", {
         method: "POST",
         headers: {

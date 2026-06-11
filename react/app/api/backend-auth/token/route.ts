@@ -4,7 +4,9 @@ import { getToken } from "next-auth/jwt";
 export async function POST(request: NextRequest) {
   const session = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET });
 
-  if (!session?.name) {
+  const username = typeof session?.username === "string" ? session.username : session?.name;
+
+  if (!username) {
     return NextResponse.json({ detail: "Not authenticated" }, { status: 401 });
   }
 
@@ -18,16 +20,16 @@ export async function POST(request: NextRequest) {
   const response = await fetch(`${backendUrl}/auth/token`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ api_key: adminKey, subject: session.name }),
+    body: JSON.stringify({ api_key: adminKey, subject: username }),
   });
 
   const data = await response.json().catch(() => ({}));
   return NextResponse.json(
     {
       ...data,
-      username: session.name,
-      role: session.role ?? "user",
-      groups: session.groups ?? [],
+      username,
+      role: session?.role ?? "user",
+      groups: session?.groups ?? [],
     },
     { status: response.status },
   );
