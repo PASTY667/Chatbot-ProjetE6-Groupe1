@@ -1,7 +1,8 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 import Sidebar from "@/components/sidebar/sidebar";
 import User from "@/app/user/page";
@@ -31,10 +32,17 @@ function createSession(index: number): ChatSession {
 
 export default function Home() {
   const { status, data } = useSession();
+  const router = useRouter();
   const [sessions, setSessions] = useState<ChatSession[]>(() => [createSession(1)]);
   const [activeSessionId, setActiveSessionId] = useState<string | null>(
     () => sessions[0]?.id ?? null,
   );
+
+  useEffect(() => {
+    if (status === "unauthenticated") {
+      router.replace("/login");
+    }
+  }, [router, status]);
 
   const activeSession = useMemo(
     () => sessions.find((session) => session.id === activeSessionId) ?? sessions[0] ?? null,
@@ -60,6 +68,10 @@ export default function Home() {
       prev.map((session) => (session.id === sessionId ? { ...session, messages } : session)),
     );
   };
+
+  if (status === "loading" || status === "unauthenticated") {
+    return null;
+  }
 
   return (
     <div className={style.shell}>

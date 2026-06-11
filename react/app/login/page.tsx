@@ -21,6 +21,7 @@ export default function Login() {
         username,
         password,
         redirect: false,
+        callbackUrl: "/",
       });
 
       if (result?.error) {
@@ -28,23 +29,39 @@ export default function Login() {
         return;
       }
 
-      const tokenRes = await fetch("/api/backend-auth/token", {
-        method: "POST",
-      });
-      const data = await tokenRes.json().catch(() => ({}));
+      try {
+        const tokenRes = await fetch("/api/backend-auth/token", {
+          method: "POST",
+        });
+        const data = await tokenRes.json().catch(() => ({}));
 
-      if (!tokenRes.ok || !data.access_token) {
-        setError(data.detail ?? "Connexion impossible");
-        return;
+        if (tokenRes.ok && data.access_token) {
+          localStorage.setItem("backend_access_token", data.access_token);
+          localStorage.setItem("backend_token_type", data.token_type ?? "bearer");
+          localStorage.setItem("backend_token_expires_in", String(data.expires_in ?? ""));
+          localStorage.setItem("backend_subject", data.username ?? username);
+          localStorage.setItem("backend_role", data.role ?? "user");
+          localStorage.setItem("backend_groups", JSON.stringify(data.groups ?? []));
+        } else {
+          localStorage.removeItem("backend_access_token");
+          localStorage.removeItem("backend_token_type");
+          localStorage.removeItem("backend_token_expires_in");
+          localStorage.removeItem("backend_subject");
+          localStorage.removeItem("backend_role");
+          localStorage.removeItem("backend_groups");
+          console.warn("Backend token unavailable after LDAP login", data);
+        }
+      } catch (tokenError) {
+        localStorage.removeItem("backend_access_token");
+        localStorage.removeItem("backend_token_type");
+        localStorage.removeItem("backend_token_expires_in");
+        localStorage.removeItem("backend_subject");
+        localStorage.removeItem("backend_role");
+        localStorage.removeItem("backend_groups");
+        console.warn("Backend token request failed after LDAP login", tokenError);
       }
 
-      localStorage.setItem("backend_access_token", data.access_token);
-      localStorage.setItem("backend_token_type", data.token_type ?? "bearer");
-      localStorage.setItem("backend_token_expires_in", String(data.expires_in ?? ""));
-      localStorage.setItem("backend_subject", data.username ?? username);
-      localStorage.setItem("backend_role", data.role ?? "user");
-      localStorage.setItem("backend_groups", JSON.stringify(data.groups ?? []));
-      router.push("/");
+      router.replace(result?.url ?? "/");
     } catch {
       setError("Connexion impossible");
     } finally {
