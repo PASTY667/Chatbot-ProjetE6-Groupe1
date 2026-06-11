@@ -16,9 +16,11 @@ type SidebarProps = {
   activeSessionId: string | null;
   onCreateSession: () => void;
   onSelectSession: (sessionId: string) => void;
+  onRenameSession: (sessionId: string, title: string) => void;
   authStatus: "authenticated" | "loading" | "unauthenticated";
   displayName: string | null;
   canCreateSession: boolean;
+  storageError: string;
 };
 
 export default function Sidebar({
@@ -26,11 +28,15 @@ export default function Sidebar({
   activeSessionId,
   onCreateSession,
   onSelectSession,
+  onRenameSession,
   authStatus,
   displayName,
   canCreateSession,
+  storageError,
 }: SidebarProps) {
   const [collapsed, setCollapsed] = useState(false);
+  const [editingSessionId, setEditingSessionId] = useState<string | null>(null);
+  const [draftTitle, setDraftTitle] = useState("");
 
   const handleSignOut = () => {
     localStorage.removeItem("backend_access_token");
@@ -41,6 +47,19 @@ export default function Sidebar({
     localStorage.removeItem("backend_groups");
 
     void signOut({ callbackUrl: "/login" });
+  };
+
+  const startRename = (session: ChatSession) => {
+    setEditingSessionId(session.id);
+    setDraftTitle(session.title);
+  };
+
+  const submitRename = () => {
+    if (!editingSessionId) return;
+
+    onRenameSession(editingSessionId, draftTitle);
+    setEditingSessionId(null);
+    setDraftTitle("");
   };
 
   return (
@@ -75,20 +94,51 @@ export default function Sidebar({
               ? `Connecte en tant que ${displayName ?? "utilisateur"}`
               : "Navigation visible sans LDAP. La creation de chats, le chat IA et l'upload demandent une connexion LDAP."}
           </div>
+          {storageError && <div className={style.storageError}>{storageError}</div>}
 
           <ul className={style.listSidebar}>
             {sessions.map((session) => (
               <li key={session.id}>
-                <button
-                  className={`${style.chatLink} ${session.id === activeSessionId ? style.activeChat : ""}`}
-                  onClick={() => onSelectSession(session.id)}
-                  type="button"
-                >
-                  <span className={style.chatTitle}>{session.title}</span>
-                  <span className={style.chatMeta}>
-                    {session.messages.length} message{session.messages.length > 1 ? "s" : ""}
-                  </span>
-                </button>
+                {editingSessionId === session.id ? (
+                  <form
+                    className={style.renameForm}
+                    onSubmit={(event) => {
+                      event.preventDefault();
+                      submitRename();
+                    }}
+                  >
+                    <input
+                      className={style.renameInput}
+                      value={draftTitle}
+                      onChange={(event) => setDraftTitle(event.target.value)}
+                    />
+                    <button className={style.renameSubmit} type="submit">
+                      OK
+                    </button>
+                  </form>
+                ) : (
+                  <div
+                    className={`${style.chatItem} ${session.id === activeSessionId ? style.activeChat : ""}`}
+                  >
+                    <button
+                      className={style.chatLink}
+                      onClick={() => onSelectSession(session.id)}
+                      type="button"
+                    >
+                      <span className={style.chatTitle}>{session.title}</span>
+                      <span className={style.chatMeta}>
+                        {session.messages.length} message{session.messages.length > 1 ? "s" : ""}
+                      </span>
+                    </button>
+                    <button
+                      className={style.renameButton}
+                      onClick={() => startRename(session)}
+                      type="button"
+                    >
+                      Renommer
+                    </button>
+                  </div>
+                )}
               </li>
             ))}
           </ul>

@@ -88,6 +88,15 @@
   line-height: 1.4;
 }
 
+.storageError {
+  color: var(--light-text-color);
+  background-color: var(--pink-background-color);
+  padding: 0.65rem;
+  font-family: var(--primary-font-family);
+  font-size: 0.9rem;
+  line-height: 1.35;
+}
+
 .listSidebar {
   list-style: none;
   padding: 0;
@@ -96,20 +105,29 @@
   gap: 0.65rem;
 }
 
-.chatLink {
+.chatItem {
   width: 100%;
   border: none;
-  text-align: left;
   color: var(--light-text-color);
   background-color: rgba(87, 83, 91, 0.18);
   padding: 0.8rem 0.9rem;
-  cursor: pointer;
   display: grid;
   gap: 0.25rem;
 }
 
 .activeChat {
   background-color: rgba(87, 83, 91, 0.32);
+}
+
+.chatLink {
+  border: none;
+  color: inherit;
+  background: transparent;
+  text-align: left;
+  padding: 0;
+  cursor: pointer;
+  display: grid;
+  gap: 0.25rem;
 }
 
 .chatTitle {
@@ -120,6 +138,32 @@
 .chatMeta {
   font-size: 0.82rem;
   opacity: 0.92;
+  font-family: var(--primary-font-family);
+}
+
+.renameButton,
+.renameSubmit {
+  width: fit-content;
+  border: none;
+  color: var(--light-text-color);
+  background-color: var(--dark-text-color);
+  padding: 0.35rem 0.5rem;
+  font-family: var(--primary-font-family);
+  font-size: 0.78rem;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.renameForm {
+  display: flex;
+  gap: 0.4rem;
+}
+
+.renameInput {
+  min-width: 0;
+  flex: 1;
+  border: none;
+  padding: 0.45rem;
   font-family: var(--primary-font-family);
 }
 

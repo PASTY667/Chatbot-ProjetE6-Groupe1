@@ -25,7 +25,7 @@ type IngestResponse = {
 
 type UserProps = {
   activeSession: ChatSession | null;
-  onMessagesChange: (sessionId: string, messages: ChatMessage[]) => void;
+  onMessagesChange: (sessionId: string, messages: ChatMessage[], persist?: boolean) => void;
   isAuthenticated: boolean;
 };
 
@@ -37,9 +37,9 @@ export default function User({ activeSession, onMessagesChange, isAuthenticated 
 
   const messages = activeSession?.messages ?? [];
 
-  const updateMessages = (nextMessages: ChatMessage[]) => {
+  const updateMessages = (nextMessages: ChatMessage[], persist = false) => {
     if (!activeSession) return;
-    onMessagesChange(activeSession.id, nextMessages);
+    onMessagesChange(activeSession.id, nextMessages, persist);
   };
 
   const uploadFile = async (file: File, id: string) => {
@@ -134,6 +134,13 @@ export default function User({ activeSession, onMessagesChange, isAuthenticated 
       }
 
       const chatId = activeSession.id;
+      const hasSessionFile = files.some((file) => file.status === "done");
+      const fallbackPrompt = [
+        "Reponds a la question de l'utilisateur meme si aucun document utilisateur n'est disponible.",
+        "Si le contexte documentaire est vide ou insuffisant, reponds avec tes connaissances generales et indique les limites de ta reponse.",
+        `Question: ${trimmed}`,
+      ].join("\n\n");
+
       const response = await fetch("/api/backend-chat/stream", {
         method: "POST",
         headers: {
@@ -141,10 +148,12 @@ export default function User({ activeSession, onMessagesChange, isAuthenticated 
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
-          query: trimmed,
+          query: hasSessionFile ? trimmed : fallbackPrompt,
+          original_query: trimmed,
+          history: messages.map(({ role, content }) => ({ role, content })),
           k: 2,
           use_official: true,
-          include_user_collection: true,
+          include_user_collection: hasSessionFile,
           chat_id: chatId,
         }),
       });
@@ -178,18 +187,16 @@ export default function User({ activeSession, onMessagesChange, isAuthenticated 
         assistantContent += tail;
       }
 
-      updateMessages(
-        nextMessages.map((item) =>
+      const finalMessages = nextMessages.map((item) =>
           item.id === assistantId ? { ...item, content: assistantContent, streaming: false } : item,
-        ),
-      );
+        );
+      updateMessages(finalMessages, true);
     } catch (error) {
       const message = error instanceof Error ? error.message : "Erreur chat";
-      updateMessages(
-        nextMessages.map((item) =>
+      const errorMessages = nextMessages.map((item) =>
           item.id === assistantId ? { ...item, content: message, streaming: false } : item,
-        ),
-      );
+        );
+      updateMessages(errorMessages, true);
     } finally {
       assistantMessageIdRef.current = null;
       setIsSending(false);
