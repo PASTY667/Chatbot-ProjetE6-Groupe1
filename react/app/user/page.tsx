@@ -135,11 +135,6 @@ export default function User({ activeSession, onMessagesChange, isAuthenticated 
 
       const chatId = activeSession.id;
       const hasSessionFile = files.some((file) => file.status === "done");
-      const fallbackPrompt = [
-        "Reponds a la question de l'utilisateur meme si aucun document utilisateur n'est disponible.",
-        "Si le contexte documentaire est vide ou insuffisant, reponds avec tes connaissances generales et indique les limites de ta reponse.",
-        `Question: ${trimmed}`,
-      ].join("\n\n");
 
       const response = await fetch("/api/backend-chat/stream", {
         method: "POST",
@@ -148,9 +143,11 @@ export default function User({ activeSession, onMessagesChange, isAuthenticated 
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
-          query: hasSessionFile ? trimmed : fallbackPrompt,
+          query: trimmed,
           original_query: trimmed,
           history: messages.map(({ role, content }) => ({ role, content })),
+          answer_mode: "hybrid",
+          allow_general_knowledge: true,
           k: 2,
           use_official: true,
           include_user_collection: hasSessionFile,
