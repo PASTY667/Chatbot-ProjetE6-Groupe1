@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useRef, useState } from "react";
+import { Grid } from "@mui/material";
 
 import style from "@/app/user/user.module.css";
 import uploadIcon from "@/assets/upload-file.png";
@@ -25,11 +26,19 @@ type IngestResponse = {
 
 type UserProps = {
   activeSession: ChatSession | null;
-  onMessagesChange: (sessionId: string, messages: ChatMessage[], persist?: boolean) => void;
+  onMessagesChange: (
+    sessionId: string,
+    messages: ChatMessage[],
+    persist?: boolean,
+  ) => void;
   isAuthenticated: boolean;
 };
 
-export default function User({ activeSession, onMessagesChange, isAuthenticated }: UserProps) {
+export default function User({
+  activeSession,
+  onMessagesChange,
+  isAuthenticated,
+}: UserProps) {
   const [files, setFiles] = useState<UploadedFile[]>([]);
   const [uploadError, setUploadError] = useState("");
   const [isSending, setIsSending] = useState(false);
@@ -50,7 +59,11 @@ export default function User({ activeSession, onMessagesChange, isAuthenticated 
       setFiles((prev) =>
         prev.map((item) =>
           item.id === id
-            ? { ...item, status: "error", detail: "Connexion LDAP requise avant l'envoi." }
+            ? {
+                ...item,
+                status: "error",
+                detail: "Connexion LDAP requise avant l'envoi.",
+              }
             : item,
         ),
       );
@@ -60,7 +73,9 @@ export default function User({ activeSession, onMessagesChange, isAuthenticated 
 
     setFiles((prev) =>
       prev.map((item) =>
-        item.id === id ? { ...item, status: "uploading", detail: undefined } : item,
+        item.id === id
+          ? { ...item, status: "uploading", detail: undefined }
+          : item,
       ),
     );
 
@@ -75,6 +90,7 @@ export default function User({ activeSession, onMessagesChange, isAuthenticated 
         headers: { Authorization: `Bearer ${token}` },
         body: formData,
       });
+
       const data = (await response.json().catch(() => ({}))) as Partial<IngestResponse> & {
         detail?: string;
       };
@@ -105,15 +121,23 @@ export default function User({ activeSession, onMessagesChange, isAuthenticated 
     }
   };
 
+  // Ajoute un message utilisateur avec ses fichiers attachés dans la grille
   const handleSendMessage = async (msg: string) => {
     const trimmed = msg.trim();
     if (!trimmed || isSending || !activeSession) return;
+
+    const attachedFiles = files.map((item) => item.file);
 
     const userMessage: ChatMessage = {
       id: `${Date.now()}-user`,
       role: "user",
       content: trimmed,
+      files: attachedFiles,
     };
+
+    // Vide la zone d'input après avoir figé les fichiers dans le message
+    setFiles([]);
+    setUploadError("");
 
     const assistantId = `${Date.now()}-assistant`;
     assistantMessageIdRef.current = assistantId;
@@ -135,9 +159,10 @@ export default function User({ activeSession, onMessagesChange, isAuthenticated 
 
       const chatId = activeSession.id;
       const hasSessionFile = files.some((file) => file.status === "done");
+
       const fallbackPrompt = [
-        "Reponds a la question de l'utilisateur meme si aucun document utilisateur n'est disponible.",
-        "Si le contexte documentaire est vide ou insuffisant, reponds avec tes connaissances generales et indique les limites de ta reponse.",
+        "Réponds à la question de l'utilisateur même si aucun document utilisateur n'est disponible.",
+        "Si le contexte documentaire est vide ou insuffisant, réponds avec tes connaissances générales et indique les limites de ta réponse.",
         `Question: ${trimmed}`,
       ].join("\n\n");
 
@@ -171,31 +196,40 @@ export default function User({ activeSession, onMessagesChange, isAuthenticated 
         const { value, done } = await reader.read();
         if (done) break;
         if (!value) continue;
+
         const chunk = decoder.decode(value, { stream: true });
         if (!chunk) continue;
 
         assistantContent += chunk;
+
         updateMessages(
           nextMessages.map((item) =>
-            item.id === assistantId ? { ...item, content: assistantContent, streaming: true } : item,
+            item.id === assistantId
+              ? { ...item, content: assistantContent, streaming: true }
+              : item,
           ),
         );
       }
 
       const tail = decoder.decode();
-      if (tail) {
-        assistantContent += tail;
-      }
+      if (tail) assistantContent += tail;
 
       const finalMessages = nextMessages.map((item) =>
-          item.id === assistantId ? { ...item, content: assistantContent, streaming: false } : item,
-        );
+        item.id === assistantId
+          ? { ...item, content: assistantContent, streaming: false }
+          : item,
+      );
+
       updateMessages(finalMessages, true);
     } catch (error) {
       const message = error instanceof Error ? error.message : "Erreur chat";
+
       const errorMessages = nextMessages.map((item) =>
-          item.id === assistantId ? { ...item, content: message, streaming: false } : item,
-        );
+        item.id === assistantId
+          ? { ...item, content: message, streaming: false }
+          : item,
+      );
+
       updateMessages(errorMessages, true);
     } finally {
       assistantMessageIdRef.current = null;
@@ -203,10 +237,12 @@ export default function User({ activeSession, onMessagesChange, isAuthenticated 
     }
   };
 
+  // Upload immédiat des fichiers sélectionnés, mais affichage final dans le message
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files) return;
 
     const selectedFiles = Array.from(e.target.files);
+
     const nextFiles: UploadedFile[] = selectedFiles.map((file, index) => ({
       id: `${Date.now()}-${index}-${file.name}`,
       file,
@@ -215,12 +251,15 @@ export default function User({ activeSession, onMessagesChange, isAuthenticated 
 
     setUploadError("");
     setFiles((prev) => [...prev, ...nextFiles]);
+
     nextFiles.forEach((item) => {
       void uploadFile(item.file, item.id);
     });
+
     e.target.value = "";
   };
 
+  // Supprime un fichier uniquement de la zone d'input
   const removeFile = (indexToRemove: number) => {
     setFiles((prev) => prev.filter((_, index) => index !== indexToRemove));
   };
@@ -228,33 +267,61 @@ export default function User({ activeSession, onMessagesChange, isAuthenticated 
   return (
     <main className={style.main}>
       <div className={style.newchatPage}>
+        {/* En-tête de la conversation */}
         <div className={style.newchatHeader}>
-          <p className={style.kicker}>Chatbot souverain pour intranet</p>
-          <h1 className={style.newchatTitle}>{activeSession?.title ?? "Conversation"}</h1>
+          <p className={style.kicker}>Chatbot souverain</p>
+          <h1 className={style.newchatTitle}>
+            {activeSession?.title ?? "Conversation"}
+          </h1>
           <p className={style.statusLine}>
-            {isAuthenticated ? "Connexion LDAP active." : "Connectez vous pour echanger avec le chatbot."}
+            {isAuthenticated ? "" : "Connectez vous pour échanger avec le chatbot."}
           </p>
         </div>
 
-        <div className={style.grid}>
+        {/* Grille principale des messages */}
+        <Grid className={style.grid}>
           {messages.length === 0 && (
             <div className={style.emptyState}>
-              Creez une conversation ou connectez-vous pour interroger le chatbot.
+              Créez une conversation pour interroger le chatbot.
             </div>
           )}
 
           {messages.map((msg) => (
             <div
-              className={`${style.message} ${msg.role === "user" ? style.userMessage : style.assistantMessage}`}
               key={msg.id}
+              className={`${style.message} ${
+                msg.role === "user" ? style.userMessage : style.assistantMessage
+              }`}
             >
-              {msg.content}
-              {msg.streaming && <span className={style.streamingCursor}>|</span>}
+              {/* Texte du message */}
+              <div className={style.messageContent}>{msg.content}</div>
+
+              {/* Fichiers attachés au message utilisateur */}
+              {msg.role === "user" && msg.files?.length ? (
+                <div className={style.attachedFiles}>
+                  {msg.files.map((file, fileIndex) => (
+                    <div key={fileIndex} className={style.attachedFile}>
+                      {file.name}
+                    </div>
+                  ))}
+                </div>
+              ) : null}
+
+              {/* Affichage du streaming assistant */}
+              {msg.streaming && (
+                <span className={style.streamingCursor}>|</span>
+              )}
             </div>
           ))}
-        </div>
+        </Grid>
 
-        <div className={style.newchatInput}>
+        {/* Zone d'input */}
+        <div
+          className={`${style.newchatInput} ${
+            messages.length === 0 ? style.inputCentered : style.inputBottom
+          }`}
+        >
+          {/* Upload de document */}
           <div className={style.uploadSection}>
             <label className={style.uploadButton} htmlFor="upload-file">
               <Image className={style.uploadIcon} src={uploadIcon} alt="i" /> PDF
@@ -270,24 +337,35 @@ export default function User({ activeSession, onMessagesChange, isAuthenticated 
               disabled={!isAuthenticated}
             />
 
+            {/* Liste temporaire avant envoi du message */}
             <div className={style.fileList}>
               {files.map((file, index) => (
                 <div key={file.id} className={style.fileItem}>
-                  <button className={style.deleteButton} onClick={() => removeFile(index)} type="button">
+                  <button
+                    className={style.deleteButton}
+                    onClick={() => removeFile(index)}
+                    type="button"
+                  >
                     X
                   </button>
                   <p>{file.file.name}</p>
                   <span className={`${style.fileStatus} ${style[file.status]}`}>
                     {file.status === "uploading" ? "ingestion..." : file.status}
                   </span>
-                  {file.detail && <span className={style.fileDetail}>{file.detail}</span>}
+                  {file.detail && (
+                    <span className={style.fileDetail}>{file.detail}</span>
+                  )}
                 </div>
               ))}
             </div>
+
             {uploadError && <p className={style.uploadError}>{uploadError}</p>}
           </div>
 
-          <ChatInput onSend={handleSendMessage} disabled={isSending || !isAuthenticated} />
+          <ChatInput
+            onSend={handleSendMessage}
+            disabled={isSending || !isAuthenticated}
+          />
         </div>
       </div>
     </main>

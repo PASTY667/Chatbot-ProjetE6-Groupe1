@@ -86,14 +86,25 @@
 }
 
 .newchatInput {
-  width: 100%;
+  z-index: 10;
+  bottom: 0;
+  max-width: 1200px;
+  position: fixed;
+
   color: var(--dark-text-color);
   background-color: var(--grey-background-color);
-  padding: 0.75rem;
+  padding: 1em 0.5em 0.5em 0.6em;
+  border-radius: 5px;
+  text-align: justify;
 
   input[type="file"] {
     display: none;
   }
+}
+
+/* INPUT CENTRÉ */
+.inputCentered {
+  margin-bottom: 8em;
 }
 
 .uploadSection {
@@ -105,11 +116,14 @@
   background-color: var(--grey-background-color);
   font-family: var(--primary-font-family);
   font-size: 1rem;
+
   border: 2px solid var(--dark-text-color);
+  border-radius: 55px;
   border-color: var(--dark-text-color);
   padding: 5px 10px;
   margin-right: 20px;
   box-shadow: none;
+
   cursor: pointer;
   font-weight: bold;
   transition: 0.2s ease-in-out;

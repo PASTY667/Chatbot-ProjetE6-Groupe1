@@ -11,14 +11,19 @@ type Props = {
 export default function ChatInput({ onSend, disabled = false }: Props) {
   const [message, setMessage] = useState("");
 
+  //Fonction d'envoi
   const handleSend = async () => {
+    //Empêche d’envoyer une chaîne vide ou juste des espaces
     if (!message.trim() || disabled) return;
+    
     await onSend(message);
+    // Vide l'input après l'envoi
     setMessage("");
   };
 
   return (
     <div className={style.chatInput}>
+      {/* Configuration du champ d'input */}
       <textarea
         className={style.textInput}
         value={message}
@@ -33,6 +38,7 @@ export default function ChatInput({ onSend, disabled = false }: Props) {
         }}
       />
 
+{/* BOUTON SOUMETTRE LE MESSAGE */}
       <input
         className={style.submitButton}
         type="submit"

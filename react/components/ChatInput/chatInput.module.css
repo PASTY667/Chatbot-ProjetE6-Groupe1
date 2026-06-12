@@ -1,5 +1,6 @@
 .chatInput {
-  padding: 0;
+  width: 100%;
+  padding: 0px 50px 0px 0px;
   display: grid;
   gap: 0.75rem;
 
@@ -8,11 +9,12 @@
     color: var(--light-text-color);
     border: none;
     box-shadow: none;
-    background-color: var(--dark-background-color);
+    background-color: var(--grey-background-color);
     font-size: 1.05rem;
     line-height: 1.5;
-    padding: 0.9rem 1rem;
-    width: 100%;
+    padding: 0.2em 2em 2em 1em;
+    margin: 10px 0px;
+    width: 94%;
     min-height: 6rem;
     resize: vertical;
   }
@@ -26,10 +28,12 @@
     color: var(--light-text-color);
     background-color: var(--lightOrange-background-color);
     border: none;
-    padding: 0.55rem 1.1rem;
+    border-radius: 5px;
+    padding: 6px 28px;
     margin: 0;
     font-size: 1.3rem;
     cursor: pointer;
+    display: flex;
     justify-self: end;
   }
 
