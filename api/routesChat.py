@@ -126,19 +126,48 @@ def _rank_and_compact(items: list[dict], max_contexts: int = 5) -> tuple[list[st
 
 
 
-def _generate_answer_with_ollama(query: str, contexts: list[str]) -> str:
+def _format_history(history: list[dict[str, str]], limit: int = 8) -> str:
+    if not history:
+        return "Aucun historique fourni."
+
+    lines = []
+    for item in history[-limit:]:
+        role = item.get("role", "user")
+        content = item.get("content", "").strip()
+        if not content:
+            continue
+        lines.append(f"{role}: {content}")
+
+    return "\n".join(lines) if lines else "Aucun historique fourni."
+
+
+def _system_prompt(answer_mode: str, allow_general_knowledge: bool) -> str:
+    if answer_mode == "strict" or not allow_general_knowledge:
+        return (
+            "Tu es un assistant RAG. Réponds uniquement avec le contexte fourni. "
+            "Si le contexte est insuffisant, dis explicitement que tu ne sais pas."
+        )
+
+    return (
+        "Tu es un assistant RAG pour un chatbot intranet. Utilise en priorité le contexte fourni "
+        "(documentation officielle et documents utilisateur). Si le contexte ne suffit pas pour "
+        "répondre correctement, complète avec tes connaissances générales. Dans ce cas, indique "
+        "clairement que cette partie n'est pas explicitement présente dans les documents fournis. "
+        "Ne refuse pas de répondre uniquement parce qu'un détail utile n'apparaît pas dans le contexte."
+    )
+
+
+def _generate_answer_with_ollama(query: str, contexts: list[str], history: list[dict[str, str]] | None = None, answer_mode: str = "hybrid", allow_general_knowledge: bool = True) -> str:
     ollama_url = os.getenv("OLLAMA_URL", "http://127.0.0.1:11434")
     chat_model = os.getenv("CHAT_MODEL", "mistral:7b")
     timeout_seconds = float(os.getenv("OLLAMA_GENERATE_TIMEOUT_SECONDS", "300"))
-    system_prompt = (
-    "Tu es un assistant RAG expert. Tu dois synthétiser une réponse en utilisant "
-    "TOUTES les sources fournies (documentation officielle et documents utilisateur). "
-    "Cite les sources si possible. Si une information manque, dis-le."
-    )
+    system_prompt = _system_prompt(answer_mode, allow_general_knowledge)
 
     formatted_context = "\n\n".join([f"- {ctx}" for ctx in contexts[:5]])
+    formatted_history = _format_history(history or [])
     prompt = (
         f"{system_prompt}\n\n"
+        f"Historique récent:\n{formatted_history}\n\n"
         f"Contexte:\n{formatted_context}\n\n"
         f"Question: {query}\n"
         "Réponse:"
@@ -154,15 +183,14 @@ def _generate_answer_with_ollama(query: str, contexts: list[str]) -> str:
     return data.get("response", "")
 
 
-def _build_prompt(query: str, contexts: list[str]) -> tuple[str, str]:
+def _build_prompt(query: str, contexts: list[str], history: list[dict[str, str]] | None = None, answer_mode: str = "hybrid", allow_general_knowledge: bool = True) -> tuple[str, str]:
     ollama_url = os.getenv("OLLAMA_URL", "http://127.0.0.1:11434")
-    system_prompt = (
-        "Tu es un assistant RAG. Réponds uniquement avec le contexte fourni. "
-        "Si le contexte est insuffisant, dis explicitement que tu ne sais pas."
-    )
+    system_prompt = _system_prompt(answer_mode, allow_general_knowledge)
     formatted_context = "\n\n".join([f"- {ctx}" for ctx in contexts[:5]])
+    formatted_history = _format_history(history or [])
     prompt = (
         f"{system_prompt}\n\n"
+        f"Historique récent:\n{formatted_history}\n\n"
         f"Contexte:\n{formatted_context}\n\n"
         f"Question: {query}\n"
         "Réponse:"
@@ -190,7 +218,7 @@ def chat_query(payload: ChatRequest, _auth: dict = Depends(require_auth)):
 
         warnings = warnings1 + warnings2
 
-        if not contexts:
+        if not contexts and (payload.answer_mode == "strict" or not payload.allow_general_knowledge):
             return ChatResponse(
                 answer="Je n'ai trouvé aucun passage pertinent dans les sources demandées.",
                 contexts=[],
@@ -200,7 +228,13 @@ def chat_query(payload: ChatRequest, _auth: dict = Depends(require_auth)):
             )
 
         try:
-            answer = _generate_answer_with_ollama(payload.query, contexts)
+            answer = _generate_answer_with_ollama(
+                payload.original_query or payload.query,
+                contexts,
+                history=payload.history,
+                answer_mode=payload.answer_mode,
+                allow_general_knowledge=payload.allow_general_knowledge,
+            )
         except Exception as exc:
             raise HTTPException(status_code=502, detail=f"LLM backend unavailable: {exc}")
 
@@ -240,11 +274,17 @@ def chat_query_stream(payload: ChatRequest, _auth: dict = Depends(require_auth))
         # 3. Classer et compacter (Ranking)
         contexts, metadatas, sources_used = _rank_and_compact(items, max_contexts=5)
 
-        if not contexts:
+        if not contexts and (payload.answer_mode == "strict" or not payload.allow_general_knowledge):
             return StreamingResponse(iter(["Je n'ai trouvé aucun passage pertinent."]), media_type="text/plain")
 
         chat_model = os.getenv("CHAT_MODEL", "mistral:7b")
-        ollama_url, prompt = _build_prompt(payload.query, contexts)
+        ollama_url, prompt = _build_prompt(
+            payload.original_query or payload.query,
+            contexts,
+            history=payload.history,
+            answer_mode=payload.answer_mode,
+            allow_general_knowledge=payload.allow_general_knowledge,
+        )
         timeout_seconds = float(os.getenv("OLLAMA_GENERATE_TIMEOUT_SECONDS", "300"))
 
         def _stream():

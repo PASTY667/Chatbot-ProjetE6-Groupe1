@@ -39,6 +39,10 @@ class ChatRequest(BaseModel):
     chat_id: str | None = None
     user_collection_name: str | None = None
     collection_name: str | None = None
+    history: list[dict[str, str]] = []
+    answer_mode: str = "hybrid"
+    allow_general_knowledge: bool = True
+    original_query: str | None = None
 
 
 class ChatResponse(BaseModel):
